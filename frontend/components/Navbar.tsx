@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export const Navbar = () => {
   return (
     <nav className="w-full  backdrop-blur-md fixed top-0 z-50">
@@ -22,11 +24,13 @@ export const Navbar = () => {
         </ul>
 
         {/* Auth Buttons */}
+        <Link href="/pages/Auth/SignIn">
         <div className="flex items-center gap-4">
           <button className="border-2 border-black rounded-full px-4 py-2 text-gray-600 hover:text-white hover:bg-black  transition">
             Sign In 
           </button>
         </div>
+        </Link>
 
       </div>
     </nav>

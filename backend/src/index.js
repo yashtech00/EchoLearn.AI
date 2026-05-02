@@ -3,7 +3,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { ConnectionDb } from "./config/db.js";
 import auth_router from "./routes/auth_routes.js";
-
+import session from "express-session";
+import survey_router from "./routes/survey_routes.js";
 dotenv.config();
 
 const app = express();
@@ -15,13 +16,21 @@ app.use(cors({
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true
 }));
+app.use(
+    session({
+      secret: "your-secret-key",
+      resave: false,
+      saveUninitialized: true,
+    })
+  );
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.options(/.*/, cors());
 // Routes
 
-app.use("/api/auth", auth_router);
+app.use("/api/v1/auth", auth_router);
+app.use("/api/v1/survey", survey_router);
 
 // Health check
 app.get("/health", (_, res) => res.json({ status: "ok", timestamp: new Date().toISOString() }));

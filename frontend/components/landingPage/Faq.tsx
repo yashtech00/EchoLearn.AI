@@ -42,7 +42,7 @@ export const FAQSection = () => {
   };
 
   return (
-    <section className="bg-black text-white py-24 px-6">
+    <section className="py-24 px-6">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <span className="inline-block mb-4 px-3 py-1 text-xs font-semibold tracking-widest uppercase rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">

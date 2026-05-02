@@ -7,6 +7,16 @@ import {
     generateAccessToken,
     generateRefreshToken,
 } from "../utils/jwt.js";
+import { oauth2Client, scopes } from "../services/googleAuth.js";
+import crypto from "crypto";
+import { google } from "googleapis";
+
+const getFrontendBaseUrl = () => {
+  const configuredUrl = process.env.FRONTEND_URL?.trim();
+  return (configuredUrl || "http://localhost:3000").replace(/\/+$/, "");
+};
+
+const frontendUrl = (path) => `${getFrontendBaseUrl()}${path}`;
 
 /* ================= REGISTER ================= */
 export const register = async (req, res) => {
@@ -57,7 +67,7 @@ export const register = async (req, res) => {
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            sameSite: "lax",
             path: "/api/auth/refresh",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
@@ -121,7 +131,7 @@ export const login = async (req, res) => {
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            sameSite: "lax",
             path: "/api/auth/refresh",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
@@ -187,7 +197,7 @@ export const refresh = async (req, res) => {
         res.cookie("refreshToken", newRefreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            sameSite: "lax",
             path: "/api/auth/refresh",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
@@ -247,4 +257,113 @@ export const profile = async (req, res) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export const googleAuth = (req, res) => {
+    try {
+      const state = crypto.randomBytes(32).toString("hex");
+  
+      req.session.state = state;
+  
+      const authUrl = oauth2Client.generateAuthUrl({
+        access_type: "offline",
+        scope: scopes,
+        include_granted_scopes: true,
+        state,
+        prompt: "consent", // 🔥 ensures refresh_token always
+      });
+  
+      return res.json({ url: authUrl });
+    } catch (e) {
+      console.error(e);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  };
+
+  export const googleAuthCallback = async (req, res) => {
+    try {
+      const { code, state, error } = req.query;
+  
+      // 🔴 handle user cancel
+      if (error) {
+        return res.redirect(
+          frontendUrl("/login?error=google_auth_failed")
+        );
+      }
+  
+      // 🔴 state validation
+      if (!state || state !== req.session.state) {
+        return res.status(400).send("Invalid state");
+      }
+  
+      // 🔴 clear state (important)
+      delete req.session.state;
+  
+      const { tokens } = await oauth2Client.getToken(code);
+      oauth2Client.setCredentials(tokens);
+  
+      const oauth2 = google.oauth2({
+        auth: oauth2Client,
+        version: "v2",
+      });
+  
+      const { data } = await oauth2.userinfo.get();
+  
+      if (!data.email) {
+        return res.status(400).send("Google account has no email");
+      }
+  
+      let user = await prisma.user.findUnique({
+        where: { email: data.email },
+      });
+  
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            email: data.email,
+            name: data.name,
+            image: data.picture,
+          },
+        });
+      }
+  
+      // 🔥 TOKEN FLOW (same as login)
+      const accessToken = generateAccessToken(user);
+      const refreshToken = generateRefreshToken();
+      const tokenHash = await bcrypt.hash(refreshToken, 10);
+  
+      await prisma.refreshToken.deleteMany({
+        where: { userId: user.id },
+      });
+  
+      await prisma.refreshToken.create({
+        data: {
+          tokenHash,
+          userId: user.id,
+          expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        },
+      });
+  
+      // 🔥 cookie
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/api/auth/refresh",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+  
+      // 🔥 redirect
+      return res.redirect(
+        frontendUrl(
+          `/oauth-success?accessToken=${encodeURIComponent(accessToken)}`
+        )
+      );
+  
+    } catch (error) {
+      console.error("Google Auth Error:", error);
+      return res.redirect(
+        frontendUrl("/login?error=server_error")
+      );
+    }
+  };
 

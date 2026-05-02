@@ -5,45 +5,115 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-
 }
 
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  password  String
+  id       String @id @default(uuid())
+  name     String
+  email    String @unique
+  password String?
+  image    String?
 
-  profiles       Profile[]
-  refreshTokens  RefreshToken[]
+  role Role @default(USER)
+
+  survey Survey[]
+  refreshTokens RefreshToken[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model RefreshToken {
-  id          String   @id @default(uuid())
-  tokenHash   String
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  expiresAt   DateTime
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@index([userId])
-}
-
-model Profile {
-  id        String   @id @default(uuid())
-  level     Int      @default(1)
-  xp        Int      @default(0)
+  id        String @id @default(uuid())
+  tokenHash String
 
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  userAgent String?
+  ip        String?
+
+  isRevoked Boolean @default(false)
+
+  expiresAt DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+}
+
+model Survey {
+  id          String       @id @default(uuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status      SurveyStatus @default(IN_PROGRESS)
+  currentStep Int          @default(1)
+  progress    Float        @default(0)
+
+  version Int @default(1)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  answers SurveyAnswer[]
+
+  @@index([userId])
+}
+
+model SurveyQuestion {
+  id       String       @id @default(uuid())
+  question String
+  type     QuestionType
+  order    Int
+
+  options SurveyOption[]
+  answer SurveyAnswer[]
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+
+  @@index([order])
+}
+
+model SurveyOption {
+  id         String @id @default(uuid())
+  questionId String
+  label      String
+
+  value    Json?
+  question SurveyQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model SurveyAnswer {
+  id         String @id @default(uuid())
+  surveyId   String
+  questionId String
+
+  answer    Json
+  createdAt DateTime @default(now())
+
+  survey   Survey         @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  question SurveyQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([surveyId, questionId])
+}
+
+enum QuestionType {
+  SINGLE_SELECT
+  MULTI_SELECT
+  TEXT
+}
+
+enum SurveyStatus {
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+}
+
+enum Role {
+  USER
+  ADMIN
 }

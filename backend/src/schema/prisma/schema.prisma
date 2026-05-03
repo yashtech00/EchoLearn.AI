@@ -7,16 +7,81 @@ datasource db {
   provider = "postgresql"
 }
 
+enum PrimaryRole {
+  STUDENT
+  WORKING_PROFESSIONAL
+  OTHER
+}
+
+enum EducationLevel {
+  HIGH_SCHOOL
+  UNDERGRAD
+  GRADUATE
+  OTHER
+}
+
+enum InstitutionContext {
+  SCHOOL
+  COLLEGE
+  WORKPLACE
+  SELF_STUDY
+}
+
+enum PrimaryGoal {
+  EXAM
+  JOB_COMMUNICATION
+  ACADEMIC
+  RELOCATION
+  CASUAL
+}
+
+enum SubmissionGenre {
+  GENERAL
+  WORK_EMAIL
+  SHORT_ESSAY
+  DIARY
+  ACADEMIC_PARAGRAPH
+}
+
+enum AnalysisStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum MistakeSeverity {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum PillarCode {
+  VERB_SYSTEMS
+  AGREEMENT_GRAMMAR
+  DETERMINERS_QUANTITY
+  PREPOSITIONS_PHRASAL
+  LEXICAL_COLLOCATION
+  CLARITY_AMBIGUITY
+  COHESION_FLOW
+  INFO_STRUCTURE
+  REGISTER_TONE
+  PUNCTUATION_MECHANICS
+  SPELLING_ORTHOGRAPHY
+  GENRE_PRAGMATICS
+}
+
 model User {
-  id       String @id @default(uuid())
+  id       String  @id @default(uuid())
   name     String
-  email    String @unique
+  email    String  @unique
   password String?
   image    String?
 
-  role Role @default(USER)
+  submissions Submission[]
+  userProfile UserProfile[]
+  userStats   UserStats[]
+  xpEvents    XpEvent[]
 
-  survey Survey[]
   refreshTokens RefreshToken[]
 
   createdAt DateTime @default(now())
@@ -27,8 +92,8 @@ model RefreshToken {
   id        String @id @default(uuid())
   tokenHash String
 
-  userId    String
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   userAgent String?
   ip        String?
@@ -42,78 +107,150 @@ model RefreshToken {
   @@index([userId])
 }
 
-model Survey {
-  id          String       @id @default(uuid())
-  userId      String
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status      SurveyStatus @default(IN_PROGRESS)
-  currentStep Int          @default(1)
-  progress    Float        @default(0)
+model UserProfile {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  version Int @default(1)
+  primaryRole             PrimaryRole
+  educationLevel          EducationLevel?
+  intitutionContext       String?
+  occupationTitle         String?
+  englishReadingSelfScore Int // 1-5
+  englishWritingSelfScore Int // 1-5
+  primaryGoal             PrimaryGoal?
+  weeklyTimeMinutes       Int?
+  interestTags            String[] // FINANCE, SPORTS, etc.
+  preferredGenres         SubmissionGenre[]
+  localePreference        String            @default("en-US")
+  grammarScore            Int? // AI assessed (0–100)
+  vocabularyScore         Int?
+  fluencyScore            Int?
+  pronunciationScore      Int?
+  learningPurpose         String? // job, study abroad, interviews, casual, etc.
+  targetScoreGoal         Int? // optional (like IELTS band target)
+  dailyGoalMinutes        Int? // realistic habit building
+  preferredLearningStyle  String? // visual, conversation, quiz, etc.
+  weakAreas               String[] // ["grammar", "speaking", "confidence"]
+  initialAssessmentDone   Boolean           @default(false)
+
+  onboardingCompletedAt DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+model WritingPrompt {
+  id          String          @id @default(cuid())
+  title       String
+  genre       SubmissionGenre
+  body        String
+  topicTags   String[]
+  targetLevel Int? // optional CEFR-ish 1-6
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+
+  submissions Submission[]
+}
+
+model Submission {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  promptId String?
+
+  prompt WritingPrompt? @relation(fields: [promptId], references: [id])
+
+  title     String?
+  genre     SubmissionGenre
+  body      String          @db.Text
+  wordCount Int
 
   createdAt DateTime @default(now())
+
+  analysisRuns AnalysisRun[]
+  mistakes     Mistake[]
+
+  @@index([userId, createdAt])
+}
+
+model AnalysisRun {
+  id           String     @id @default(cuid())
+  submissionId String
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  status AnalysisStatus @default(PENDING)
+
+  analyzerModel   String?
+  analyzerVersion String?
+  rulesetVersion  String?
+
+  summaryJson    Json?
+  rawModelOutput Json? // optional; consider PII/size policies
+
+  errorMessage String?
+  startedAt    DateTime  @default(now())
+  completedAt  DateTime?
+
+  mistakes Mistake[]
+
+  @@index([submissionId])
+}
+
+model Mistake {
+  id           String     @id @default(cuid())
+  submissionId String
+  submission   Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  analysisRunId String
+  analysisRun   AnalysisRun @relation(fields: [analysisRunId], references: [id], onDelete: Cascade)
+
+  pillar   PillarCode
+  subtype  String // e.g. TENSE_CONSISTENCY
+  severity MistakeSeverity?
+
+  startOffset Int
+  endOffset   Int
+  surfaceText String?
+
+  message    String
+  suggestion String?
+
+  canonicalRuleId String?
+  confidence      Float?
+
+  createdAt DateTime @default(now())
+
+  @@index([pillar, subtype])
+  @@index([submissionId])
+  @@index([analysisRunId])
+}
+
+model UserStats {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  totalXp Int @default(0)
+  level   Int @default(1)
+
+  currentStreak  Int       @default(0)
+  longestStreak  Int       @default(0)
+  lastActiveDate DateTime? // date-only semantics in application (UTC day)
+
   updatedAt DateTime @updatedAt
-
-  answers SurveyAnswer[]
-
-  @@index([userId])
 }
 
-model SurveyQuestion {
-  id       String       @id @default(uuid())
-  question String
-  type     QuestionType
-  order    Int
+model XpEvent {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  options SurveyOption[]
-  answer SurveyAnswer[]
-
-  isActive Boolean @default(true)
+  eventType String
+  xpDelta   Int
+  payload   Json?
 
   createdAt DateTime @default(now())
 
-  @@index([order])
-}
-
-model SurveyOption {
-  id         String @id @default(uuid())
-  questionId String
-  label      String
-
-  value    Json?
-  question SurveyQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-}
-
-model SurveyAnswer {
-  id         String @id @default(uuid())
-  surveyId   String
-  questionId String
-
-  answer    Json
-  createdAt DateTime @default(now())
-
-  survey   Survey         @relation(fields: [surveyId], references: [id], onDelete: Cascade)
-  question SurveyQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-
-  @@unique([surveyId, questionId])
-}
-
-enum QuestionType {
-  SINGLE_SELECT
-  MULTI_SELECT
-  TEXT
-}
-
-enum SurveyStatus {
-  IN_PROGRESS
-  COMPLETED
-  ABANDONED
-}
-
-enum Role {
-  USER
-  ADMIN
+  @@index([userId, createdAt])
 }

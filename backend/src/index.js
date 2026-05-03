@@ -4,7 +4,8 @@ import cors from "cors";
 import { ConnectionDb } from "./config/db.js";
 import auth_router from "./routes/auth_routes.js";
 import session from "express-session";
-import survey_router from "./routes/survey_routes.js";
+import user_profile_router from "./routes/user_profile_routes.js";
+import { Protect } from "./middleware/authMiddleware.js";
 dotenv.config();
 
 const app = express();
@@ -30,8 +31,7 @@ app.options(/.*/, cors());
 // Routes
 
 app.use("/api/v1/auth", auth_router);
-app.use("/api/v1/survey", survey_router);
-
+app.use("/api/v1/user-profile", user_profile_router);
 // Health check
 app.get("/health", (_, res) => res.json({ status: "ok", timestamp: new Date().toISOString() }));
 

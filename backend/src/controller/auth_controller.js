@@ -75,7 +75,7 @@ export const register = async (req, res) => {
         return res.status(201).json({
             message: "User registered successfully",
             accessToken,
-            user: { id: newUser.id, name: newUser.name, email: newUser.email },
+            user: { id: newUser.id, name: newUser.name, email: newUser.email, isNewUser: newUser.isNewUser },
         });
 
     } catch (error) {
@@ -138,7 +138,7 @@ export const login = async (req, res) => {
 
         return res.status(200).json({
             accessToken,
-            user: { id: user.id, name: user.name, email: user.email },
+            user: { id: user.id, name: user.name, email: user.email, isNewUser: user.isNewUser },
         });
 
     } catch (e) {
@@ -258,6 +258,41 @@ export const profile = async (req, res) => {
     }
 }
 
+export const getMe = async (req, res) => {
+    try {
+        const { userId } = req.user;
+        
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                isNewUser: true,
+                createdAt: true,
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Check if user has a profile
+        const userProfile = await prisma.userProfile.findUnique({
+            where: { userId },
+        });
+
+        return res.json({
+            user,
+            hasProfile: !!userProfile,
+            isNewUser: user.isNewUser,
+        });
+    } catch (error) {
+        console.error("Get me error:", error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 export const googleAuth = (req, res) => {
     try {
       const state = crypto.randomBytes(32).toString("hex");
@@ -286,7 +321,7 @@ export const googleAuth = (req, res) => {
       // 🔴 handle user cancel
       if (error) {
         return res.redirect(
-          frontendUrl("/login?error=google_auth_failed")
+          frontendUrl("/auth/login?error=google_auth_failed")
         );
       }
   
@@ -355,14 +390,14 @@ export const googleAuth = (req, res) => {
       // 🔥 redirect
       return res.redirect(
         frontendUrl(
-          `/oauth-success?accessToken=${encodeURIComponent(accessToken)}`
+          `/oauth-success?accessToken=${encodeURIComponent(accessToken)}&isNewUser=${user.isNewUser}`
         )
       );
   
     } catch (error) {
       console.error("Google Auth Error:", error);
       return res.redirect(
-        frontendUrl("/login?error=server_error")
+        frontendUrl("/auth/login?error=server_error")
       );
     }
   };

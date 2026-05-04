@@ -10,9 +10,13 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent } from "@/components/ui/card";
 
-import { login, googleAuth } from "@/app/api/auth/auth_api";
+import { login, register, googleAuth } from "@/app/api/auth/auth_api";
+import { useRouter } from "next/navigation";
 
 export default function SignInForm() {
+  const router = useRouter();
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -33,15 +37,31 @@ export default function SignInForm() {
     setSuccess("");
 
     try {
-      const response = await login(email, password);
-
-      if (response.success) {
-        setSuccess("Login successful!");
+      let response;
+      
+      if (isSignUp) {
+        // Handle signup
+        response = await register(name, email, password);
       } else {
-        setError(response.message || "Invalid credentials");
+        // Handle login
+        response = await login(email, password);
+      }
+
+      if (response.accessToken) {
+        // Store token
+        localStorage.setItem("token", response.accessToken);
+        
+        // Redirect based on isNewUser
+        if (response.user?.isNewUser) {
+          router.replace("/UserProfile");
+        } else {
+          router.replace("/Dashboard");
+        }
+      } else {
+        setError(response.message || (isSignUp ? "Registration failed" : "Invalid credentials"));
       }
     } catch (err) {
-      setError("Something went wrong. Please try again.");
+      setError(isSignUp ? "Registration failed. Please try again." : "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -69,7 +89,35 @@ export default function SignInForm() {
   return (
     <Card className="w-full max-w-md rounded-2xl shadow-md border bg-background">
       <CardContent className="p-6">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold">
+            {isSignUp ? "Create Account" : "Sign In"}
+          </h2>
+          <p className="text-muted-foreground text-sm mt-2">
+            {isSignUp ? "Sign up to get started" : "Welcome back! Please sign in"}
+          </p>
+        </div>
+        
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          {/* Name field - only show for signup */}
+          {isSignUp && (
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="name">Name</Label>
+              <div className="flex items-center gap-2 border rounded-lg px-3 h-12 focus-within:ring-2 focus-within:ring-ring">
+                <Mail className="h-5 w-5 text-muted-foreground" />
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Enter your name"
+                  className="border-0 shadow-none focus-visible:ring-0"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+          )}
+
           {/* Email */}
           <div className="flex flex-col gap-2">
             <Label htmlFor="email">Email</Label>
@@ -159,7 +207,7 @@ export default function SignInForm() {
             {loading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              "Sign In"
+              isSignUp ? "Sign Up" : "Sign In"
             )}
           </Button>
 
@@ -188,11 +236,18 @@ export default function SignInForm() {
             </Button>
           </div>
 
-          {/* Signup */}
+          {/* Mode Toggle */}
           <p className="text-center text-sm text-muted-foreground mt-2">
-            Don’t have an account?{" "}
-            <span className="text-primary cursor-pointer hover:underline">
-              Sign Up
+            {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
+            <span 
+              className="text-primary cursor-pointer hover:underline"
+              onClick={() => {
+                setIsSignUp(!isSignUp);
+                setError("");
+                setSuccess("");
+              }}
+            >
+              {isSignUp ? "Sign In" : "Sign Up"}
             </span>
           </p>
         </form>

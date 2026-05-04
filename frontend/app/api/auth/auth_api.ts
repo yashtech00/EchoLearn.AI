@@ -70,3 +70,13 @@ export const googleAuthCallback = async (code: string, state: string) => {
         throw error;
     }
 };
+
+export const getMe = async () => {
+    try{
+        const response = await axiosInstance.get('/auth/me');
+        return response.data;
+    } catch (error) {
+        console.error("Get Me Error:", error);
+        throw error;
+    }
+};

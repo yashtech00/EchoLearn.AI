@@ -33,15 +33,21 @@ export const createUserProfile = async (req, res) => {
 
     const data = parsed.data;
 
-    // create
-    const userProfile = await prisma.userProfile.create({
-      data: {
-        ...data,
-        userId,
-        onboardingCompletedAt: new Date(),
-        initialAssessmentDone: false, // force backend control
-      },
-    });
+    // create profile and update user isNewUser flag
+    const [userProfile] = await prisma.$transaction([
+      prisma.userProfile.create({
+        data: {
+          ...data,
+          userId,
+          onboardingCompletedAt: new Date(),
+          initialAssessmentDone: false, // force backend control
+        },
+      }),
+      prisma.user.update({
+        where: { id: userId },
+        data: { isNewUser: false },
+      }),
+    ]);
 
     return res.status(201).json({
       message: "User profile created successfully",

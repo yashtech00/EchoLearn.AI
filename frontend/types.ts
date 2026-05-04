@@ -1,13 +1,20 @@
 export interface UserProfile {
-    id: string;
+    id?: string;
     primaryRole: string;
-    educationLevel: EducationLevel;
-    institutionContext: InstitutionContext;
+    educationLevel: string;
+    institutionContext: string;
     occupationTitle: string;
-    englishReading: string;
-    englishWriting: number;
-    englishListening: number;
-    englishSpeaking: number;
+    englishReadingSelfScore: number;
+    englishWritingSelfScore: number;
+    primaryGoal: string;
+    weeklyTimeMinutes: number;
+    interestTags: string[];
+    preferredGenres: string[];
+    learningPurpose: string;
+    targetScoreGoal: number | null;
+    dailyGoalMinutes: number;
+    preferredLearningStyle: string;
+    weakAreas: string[];
 }
 export enum EducationLevel {
     HIGH_SCHOOL = "HIGH_SCHOOL",

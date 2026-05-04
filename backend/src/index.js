@@ -6,6 +6,7 @@ import auth_router from "./routes/auth_routes.js";
 import session from "express-session";
 import user_profile_router from "./routes/user_profile_routes.js";
 import { Protect } from "./middleware/authMiddleware.js";
+import cookieParser from "cookie-parser";
 dotenv.config();
 
 const app = express();
@@ -25,13 +26,14 @@ app.use(
     })
   );
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.options(/.*/, cors());
 // Routes
 
 app.use("/api/v1/auth", auth_router);
-app.use("/api/v1/user-profile", user_profile_router);
+app.use("/api/v1/profile", user_profile_router);
 // Health check
 app.get("/health", (_, res) => res.json({ status: "ok", timestamp: new Date().toISOString() }));
 

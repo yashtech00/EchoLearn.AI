@@ -55,7 +55,7 @@ axiosInstance.interceptors.response.use(
 
             if (status === 401) {
                 // Don't redirect when the failed request was the login attempt itself
-                const isLoginRequest = error.config?.url?.includes('auth/login');
+                const isLoginRequest = error.config?.url?.includes('/auth/login');
                 if (!isLoginRequest && typeof window !== 'undefined') {
                     localStorage.removeItem('token');
                     window.location.href = '/auth/login';

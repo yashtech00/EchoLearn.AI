@@ -1,26 +1,33 @@
-import { getUserProfile } from "@/app/api/user_profile/user_profile";
 import { useEffect, useState } from "react";
-import { UserProfile } from "@/types";
+import { getMe } from "@/app/api/auth/auth_api";
 
 export const useAuth = () => {
-    const [user, setUser] = useState<UserProfile | null>(null);
+    const [user, setUser] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [isNewUser, setIsNewUser] = useState(false);
 
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const res = await getUserProfile( user?.id as string );
-
-                if ('error' in res) {
-                    if (res.error === "USER_NOT_FOUND") {
-                        setIsNewUser(true);
-                    }
-                } else {
-                    setUser(res);
+                const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+                
+                if (!token) {
+                    setLoading(false);
+                    return;
                 }
-            } catch (err) {
-                console.log(err);
+
+                const response = await getMe();
+                
+                if (response.user) {
+                    setUser(response.user);
+                    setIsNewUser(response.isNewUser);
+                }
+            } catch (error) {
+                console.error("Auth check failed:", error);
+                // Clear invalid token
+                if (typeof window !== 'undefined') {
+                    localStorage.removeItem('token');
+                }
             } finally {
                 setLoading(false);
             }

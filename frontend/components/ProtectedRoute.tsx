@@ -10,7 +10,7 @@ export default function ProtectedRoute({ children }: any) {
 
     useEffect(() => {
         if (!loading && !user) {
-            router.replace("/login");
+            router.replace("/auth/login");
         }
     }, [loading, user]);
 

@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getUserProfile } from "@/app/api/user_profile/user_profile";
 
 export default function OAuthSuccessPage() {
   const router = useRouter();
@@ -11,32 +10,23 @@ export default function OAuthSuccessPage() {
   useEffect(() => {
     const handleAuth = async () => {
       const accessToken = searchParams.get("accessToken");
+      const isNewUser = searchParams.get("isNewUser");
 
       if (!accessToken) {
-        router.replace("/login"); // fix path
+        router.replace("/auth/login");
         return;
       }
 
       // 1. token store
       localStorage.setItem("token", accessToken);
 
-      try {
-        // 2. user fetch
-        const res = await getUserProfile(localStorage.getItem("user_id") as string || "");
-
-        if ("error" in res) {
-          if (res.error === "USER_NOT_FOUND") {
-            // 🆕 new user
-            router.replace("/user-profile");
-          } else {
-            router.replace("/login");
-          }
-        } else {
-          // ✅ existing user
-          router.replace("/dashboard");
-        }
-      } catch (err) {
-        router.replace("/login");
+      // 2. redirect based on isNewUser
+      if (isNewUser === "true") {
+        // 🆕 new user - redirect to profile setup
+        router.replace("/UserProfile");
+      } else {
+        // ✅ existing user - redirect to dashboard
+        router.replace("/Dashboard");
       }
     };
 

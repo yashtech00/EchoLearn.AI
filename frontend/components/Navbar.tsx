@@ -24,7 +24,7 @@ export const Navbar = () => {
         </ul>
 
         {/* Auth Buttons */}
-        <Link href="/pages/Auth/SignIn">
+        <Link href="/auth/login">
         <div className="flex items-center gap-4">
           <button className="border-2 border-black rounded-full px-4 py-2 text-gray-600 hover:text-white hover:bg-black  transition">
             Sign In 

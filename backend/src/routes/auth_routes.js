@@ -1,5 +1,5 @@
 import express from "express"
-import { register, login, logout, refresh, profile, googleAuth, googleAuthCallback } from "../controller/auth_controller.js";
+import { register, login, logout, refresh, profile, googleAuth, googleAuthCallback, getMe } from "../controller/auth_controller.js";
 import { Protect } from "../middleware/authMiddleware.js";
 
 
@@ -14,7 +14,7 @@ auth_router.get("/google", googleAuth);
 auth_router.get("/google/callback", googleAuthCallback);
 
 auth_router.get("/profile/:id", Protect, profile);
-
+auth_router.get("/me", Protect, getMe);
 
 export default auth_router;
 

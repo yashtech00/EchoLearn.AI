@@ -5,7 +5,6 @@ import { ConnectionDb } from "./config/db.js";
 import auth_router from "./routes/auth_routes.js";
 import session from "express-session";
 import user_profile_router from "./routes/user_profile_routes.js";
-import { Protect } from "./middleware/authMiddleware.js";
 import cookieParser from "cookie-parser";
 dotenv.config();
 

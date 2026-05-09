@@ -111,21 +111,21 @@ export default function InterestsForm({ formData, setFormData, onSubmit, onBack 
                           : 'border-gray-300 bg-white hover:border-green-300 hover:shadow-lg'
                       }`}
                     >
-                      <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mr-5 transition-all duration-300 ${
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center mr-4 flex-shrink-0 transition-all duration-300 ${
                         formData.preferredLearningStyle === style.id
                           ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg scale-105'
                           : 'bg-gray-100 text-gray-500 group-hover:bg-green-100 group-hover:text-green-600'
                       }`}>
-                        <IconComponent className="w-8 h-8" />
+                        <IconComponent className="w-7 h-7" />
                       </div>
-                      <div className="flex-1">
+                      <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between mb-2">
-                          <p className="text-lg font-bold text-gray-900">{style.name}</p>
+                          <p className="text-base font-bold text-gray-900 truncate">{style.name}</p>
                           {formData.preferredLearningStyle === style.id && (
-                            <CheckCircle2 className="w-5 h-5 text-green-600 fill-green-600 animate-in zoom-in duration-300" />
+                            <CheckCircle2 className="w-5 h-5 text-green-600 fill-green-600 animate-in zoom-in duration-300 flex-shrink-0" />
                           )}
                         </div>
-                        <p className="text-sm text-gray-600 leading-relaxed">{style.description}</p>
+                        <p className="text-xs text-gray-600 leading-snug line-clamp-2">{style.description}</p>
                       </div>
                     </div>
                   );

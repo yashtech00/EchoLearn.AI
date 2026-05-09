@@ -24,7 +24,7 @@ export default function UserProfileNavbar({
       <div className="flex justify-between items-center w-full px-8 py-5 max-w-7xl mx-auto">
         <div className="flex items-center gap-12">
           <span className="text-3xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
-            LinguistAI
+            EchoLearn.AI
           </span>
           <nav className="hidden md:flex gap-8 items-center">
             {steps.map((step, index) => (
@@ -59,9 +59,9 @@ export default function UserProfileNavbar({
               ></div>
             </div>
           </div>
-          <button className="text-gray-400 hover:text-indigo-600 transition-colors duration-300 active:scale-95 p-2 rounded-lg hover:bg-indigo-50">
+          {/* <button className="text-gray-400 hover:text-indigo-600 transition-colors duration-300 active:scale-95 p-2 rounded-lg hover:bg-indigo-50">
             <HelpCircle className="w-6 h-6" />
-          </button>
+          </button> */}
           {showSkip && (
             <button 
               onClick={onSkip}

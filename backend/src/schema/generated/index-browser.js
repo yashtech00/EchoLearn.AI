@@ -148,9 +148,6 @@ exports.Prisma.UserProfileScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   primaryRole: 'primaryRole',
-  educationLevel: 'educationLevel',
-  intitutionContext: 'intitutionContext',
-  occupationTitle: 'occupationTitle',
   englishReadingSelfScore: 'englishReadingSelfScore',
   englishWritingSelfScore: 'englishWritingSelfScore',
   primaryGoal: 'primaryGoal',
@@ -162,7 +159,6 @@ exports.Prisma.UserProfileScalarFieldEnum = {
   vocabularyScore: 'vocabularyScore',
   fluencyScore: 'fluencyScore',
   pronunciationScore: 'pronunciationScore',
-  learningPurpose: 'learningPurpose',
   targetScoreGoal: 'targetScoreGoal',
   dailyGoalMinutes: 'dailyGoalMinutes',
   preferredLearningStyle: 'preferredLearningStyle',
@@ -274,22 +270,17 @@ exports.Prisma.JsonNullValueFilter = {
 exports.PrimaryRole = exports.$Enums.PrimaryRole = {
   STUDENT: 'STUDENT',
   WORKING_PROFESSIONAL: 'WORKING_PROFESSIONAL',
-  OTHER: 'OTHER'
-};
-
-exports.EducationLevel = exports.$Enums.EducationLevel = {
-  HIGH_SCHOOL: 'HIGH_SCHOOL',
-  UNDERGRAD: 'UNDERGRAD',
-  GRADUATE: 'GRADUATE',
-  OTHER: 'OTHER'
+  HOBBYIST: 'HOBBYIST',
+  JOB_SEEKER: 'JOB_SEEKER'
 };
 
 exports.PrimaryGoal = exports.$Enums.PrimaryGoal = {
-  EXAM: 'EXAM',
-  JOB_COMMUNICATION: 'JOB_COMMUNICATION',
-  ACADEMIC: 'ACADEMIC',
-  RELOCATION: 'RELOCATION',
-  CASUAL: 'CASUAL'
+  FLUENCY: 'FLUENCY',
+  PROFICIENCY: 'PROFICIENCY',
+  EXAM_PREP: 'EXAM_PREP',
+  BUSINESS_ENGLISH: 'BUSINESS_ENGLISH',
+  TRAVEL_AND_CULTURE_ENGLISH: 'TRAVEL_AND_CULTURE_ENGLISH',
+  GRAMMAR_MASTERY: 'GRAMMAR_MASTERY'
 };
 
 exports.SubmissionGenre = exports.$Enums.SubmissionGenre = {

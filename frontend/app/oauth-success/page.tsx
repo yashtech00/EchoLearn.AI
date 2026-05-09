@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { tokenManager } from "@/lib/tokenManager";
 
 export default function OAuthSuccessPage() {
   const router = useRouter();
@@ -17,15 +18,15 @@ export default function OAuthSuccessPage() {
         return;
       }
 
-      // 1. token store
-      localStorage.setItem("token", accessToken);
+      // Store access token in token manager
+      tokenManager.setAccessToken(accessToken);
 
-      // 2. redirect based on isNewUser
+      // Redirect based on isNewUser
       if (isNewUser === "true") {
-        // 🆕 new user - redirect to profile setup
+        // New user - redirect to profile setup
         router.replace("/UserProfile");
       } else {
-        // ✅ existing user - redirect to dashboard
+        // Existing user - redirect to dashboard
         router.replace("/Dashboard");
       }
     };

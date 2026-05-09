@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getMe } from "@/app/api/auth/auth_api";
+import { tokenManager } from "@/lib/tokenManager";
 
 export const useAuth = () => {
     const [user, setUser] = useState<any>(null);
@@ -9,7 +10,7 @@ export const useAuth = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+                const token = tokenManager.getAccessToken();
                 
                 if (!token) {
                     setLoading(false);
@@ -25,9 +26,7 @@ export const useAuth = () => {
             } catch (error) {
                 console.error("Auth check failed:", error);
                 // Clear invalid token
-                if (typeof window !== 'undefined') {
-                    localStorage.removeItem('token');
-                }
+                tokenManager.clearAccessToken();
             } finally {
                 setLoading(false);
             }

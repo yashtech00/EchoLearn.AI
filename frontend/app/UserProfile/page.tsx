@@ -16,16 +16,12 @@ export default function UserProfilePage() {
 
   const [formData, setFormData] = useState({
     primaryRole: "",
-    educationLevel: "",
-    institutionContext: "",
-    occupationTitle: "",
     englishReadingSelfScore: 3,
     englishWritingSelfScore: 3,
     primaryGoal: "",
     weeklyTimeMinutes: 60,
     interestTags: [] as string[],
     preferredGenres: [] as string[],
-    learningPurpose: "",
     targetScoreGoal: "",
     dailyGoalMinutes: 20,
     preferredLearningStyle: "",

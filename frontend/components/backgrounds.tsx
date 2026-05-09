@@ -5,16 +5,6 @@ import { MynaHero } from "./ui/myna-hero";
 export default function Background() {
   return (
     <>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-      />
-      <style>{`
-        .font-modern {
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        }
-      `}</style>
-
       <Component
         numBars={20}
         gradientFrom="#009ccbff"
@@ -23,7 +13,7 @@ export default function Background() {
         backgroundColor="#ffffff"
       >
         {/* Center Info */}
-        <div className="text-center font-modern">
+        <div className="text-center">
           {/* <h1 className="text-gray-900 text-5xl md:text-7xl font-bold mb-4 tracking-tight">
             English IQ
           </h1>

@@ -94,13 +94,13 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
                   background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(readingLevel - 1) * 25}%, #e5e7eb ${(readingLevel - 1) * 25}%, #e5e7eb 100%)`
                 }}
               />
-              <div className="flex justify-between mt-7 text-xs font-bold text-gray-500 tracking-widest">
+              {/* <div className="flex justify-between mt-7 text-xs font-bold text-gray-500 tracking-widest">
                 <span className="text-center">BEGINNER</span>
                 <span className="text-center">ELEMENTARY</span>
                 <span className="text-center">INTERMEDIATE</span>
                 <span className="text-center">ADVANCED</span>
                 <span className="text-center">FLUENT</span>
-              </div>
+              </div> */}
             </div>
 
             {/* Writing Level */}
@@ -131,13 +131,13 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
                   background: `linear-gradient(to right, #10b981 0%, #10b981 ${(writingLevel - 1) * 25}%, #e5e7eb ${(writingLevel - 1) * 25}%, #e5e7eb 100%)`
                 }}
               />
-              <div className="flex justify-between mt-7 text-xs font-bold text-gray-500 tracking-widest">
+              {/* <div className="flex justify-between mt-7 text-xs font-bold text-gray-500 tracking-widest">
                 <span className="text-center">BEGINNER</span>
                 <span className="text-center">ELEMENTARY</span>
                 <span className="text-center">INTERMEDIATE</span>
                 <span className="text-center">ADVANCED</span>
                 <span className="text-center">FLUENT</span>
-              </div>
+              </div> */}
             </div>
           </section>
 
@@ -163,16 +163,16 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
                       onChange={() => handleFocusAreaToggle(area.id)}
                       className="peer sr-only"
                     />
-                    <div className="p-7 rounded-2xl border-2 border-transparent bg-white shadow-lg transition-all duration-300 peer-checked:border-purple-500 peer-checked:bg-gradient-to-br from-purple-50 via-white to-purple-50 peer-checked:shadow-xl peer-checked:ring-2 peer-checked:ring-purple-200 group-hover:scale-[1.04] group-hover:shadow-xl animate-in fade-in slide-in-from-bottom-2">
-                      <div className="flex flex-col items-center text-center gap-4">
-                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                    <div className="p-6 rounded-2xl border-2 border-transparent bg-white shadow-lg transition-all duration-300 peer-checked:border-purple-500 peer-checked:bg-gradient-to-br from-purple-50 via-white to-purple-50 peer-checked:shadow-xl peer-checked:ring-2 peer-checked:ring-purple-200 group-hover:scale-[1.02] group-hover:shadow-xl animate-in fade-in slide-in-from-bottom-2">
+                      <div className="flex flex-col items-center text-center gap-3">
+                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-300 ${
                           formData.weakAreas?.includes(area.id) 
                             ? 'bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg scale-105' 
                             : 'bg-gray-100 text-gray-500 group-hover:bg-purple-100 group-hover:text-purple-600 group-hover:scale-105'
                         }`}>
-                          <IconComponent className="w-8 h-8" />
+                          <IconComponent className="w-7 h-7" />
                         </div>
-                        <span className="text-lg font-bold text-gray-900">{area.name}</span>
+                        <span className="text-base font-bold text-gray-900 truncate">{area.name}</span>
                         {formData.weakAreas?.includes(area.id) && (
                           <div className="flex items-center gap-2 text-purple-600 animate-in zoom-in duration-300">
                             <CheckCircle2 className="w-5 h-5 fill-purple-600" />

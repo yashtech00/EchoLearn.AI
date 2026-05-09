@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/userAuth";
 import { Button } from "@/components/ui/button";
+import {Navbar} from "@/components/Navbar";
 
 export default function Home() {
   const { user, loading, isNewUser } = useAuth();
@@ -63,7 +64,7 @@ export default function Home() {
               </div>
             </div>
           </section>
-
+<Navbar />
           <FeaturesSection />
           <WorkingSection />
           <FAQSection />

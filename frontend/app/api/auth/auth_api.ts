@@ -1,9 +1,13 @@
 import axiosInstance from "../axiosInstances";
-
+import { tokenManager } from "@/lib/tokenManager";
 
 export const login = async (email: string, password: string) => {
     try{
         const response = await axiosInstance.post('/auth/login', { email, password });
+        // Store access token in token manager
+        if (response.data.accessToken) {
+            tokenManager.setAccessToken(response.data.accessToken);
+        }
         return response.data;
     } catch (error) {
         console.error("Login Error:", error);
@@ -14,6 +18,10 @@ export const login = async (email: string, password: string) => {
 export const register = async (name: string, email: string, password: string) => {
     try{
         const response = await axiosInstance.post('/auth/register', { name, email, password });
+        // Store access token in token manager
+        if (response.data.accessToken) {
+            tokenManager.setAccessToken(response.data.accessToken);
+        }
         return response.data;
     } catch (error) {
         console.error("Register Error:", error);
@@ -24,6 +32,8 @@ export const register = async (name: string, email: string, password: string) =>
 export const logout = async () => {
     try{
         const response = await axiosInstance.post('/auth/logout');
+        // Clear access token from token manager
+        tokenManager.clearAccessToken();
         return response.data;
     } catch (error) {
         console.error("Logout Error:", error);
@@ -34,6 +44,10 @@ export const logout = async () => {
 export const refresh = async () => {
     try{
         const response = await axiosInstance.post('/auth/refresh');
+        // Update access token in token manager
+        if (response.data.accessToken) {
+            tokenManager.setAccessToken(response.data.accessToken);
+        }
         return response.data;
     } catch (error) {
         console.error("Refresh Error:", error);

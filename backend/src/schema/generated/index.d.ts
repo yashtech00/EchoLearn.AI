@@ -66,38 +66,20 @@ export namespace $Enums {
   export const PrimaryRole: {
   STUDENT: 'STUDENT',
   WORKING_PROFESSIONAL: 'WORKING_PROFESSIONAL',
-  OTHER: 'OTHER'
+  HOBBYIST: 'HOBBYIST',
+  JOB_SEEKER: 'JOB_SEEKER'
 };
 
 export type PrimaryRole = (typeof PrimaryRole)[keyof typeof PrimaryRole]
 
 
-export const EducationLevel: {
-  HIGH_SCHOOL: 'HIGH_SCHOOL',
-  UNDERGRAD: 'UNDERGRAD',
-  GRADUATE: 'GRADUATE',
-  OTHER: 'OTHER'
-};
-
-export type EducationLevel = (typeof EducationLevel)[keyof typeof EducationLevel]
-
-
-export const InstitutionContext: {
-  SCHOOL: 'SCHOOL',
-  COLLEGE: 'COLLEGE',
-  WORKPLACE: 'WORKPLACE',
-  SELF_STUDY: 'SELF_STUDY'
-};
-
-export type InstitutionContext = (typeof InstitutionContext)[keyof typeof InstitutionContext]
-
-
 export const PrimaryGoal: {
-  EXAM: 'EXAM',
-  JOB_COMMUNICATION: 'JOB_COMMUNICATION',
-  ACADEMIC: 'ACADEMIC',
-  RELOCATION: 'RELOCATION',
-  CASUAL: 'CASUAL'
+  FLUENCY: 'FLUENCY',
+  PROFICIENCY: 'PROFICIENCY',
+  EXAM_PREP: 'EXAM_PREP',
+  BUSINESS_ENGLISH: 'BUSINESS_ENGLISH',
+  TRAVEL_AND_CULTURE_ENGLISH: 'TRAVEL_AND_CULTURE_ENGLISH',
+  GRAMMAR_MASTERY: 'GRAMMAR_MASTERY'
 };
 
 export type PrimaryGoal = (typeof PrimaryGoal)[keyof typeof PrimaryGoal]
@@ -154,14 +136,6 @@ export type PillarCode = (typeof PillarCode)[keyof typeof PillarCode]
 export type PrimaryRole = $Enums.PrimaryRole
 
 export const PrimaryRole: typeof $Enums.PrimaryRole
-
-export type EducationLevel = $Enums.EducationLevel
-
-export const EducationLevel: typeof $Enums.EducationLevel
-
-export type InstitutionContext = $Enums.InstitutionContext
-
-export const InstitutionContext: typeof $Enums.InstitutionContext
 
 export type PrimaryGoal = $Enums.PrimaryGoal
 
@@ -4252,9 +4226,6 @@ export namespace Prisma {
     id: string | null
     userId: string | null
     primaryRole: $Enums.PrimaryRole | null
-    educationLevel: $Enums.EducationLevel | null
-    intitutionContext: string | null
-    occupationTitle: string | null
     englishReadingSelfScore: number | null
     englishWritingSelfScore: number | null
     primaryGoal: $Enums.PrimaryGoal | null
@@ -4264,7 +4235,6 @@ export namespace Prisma {
     vocabularyScore: number | null
     fluencyScore: number | null
     pronunciationScore: number | null
-    learningPurpose: string | null
     targetScoreGoal: number | null
     dailyGoalMinutes: number | null
     preferredLearningStyle: string | null
@@ -4278,9 +4248,6 @@ export namespace Prisma {
     id: string | null
     userId: string | null
     primaryRole: $Enums.PrimaryRole | null
-    educationLevel: $Enums.EducationLevel | null
-    intitutionContext: string | null
-    occupationTitle: string | null
     englishReadingSelfScore: number | null
     englishWritingSelfScore: number | null
     primaryGoal: $Enums.PrimaryGoal | null
@@ -4290,7 +4257,6 @@ export namespace Prisma {
     vocabularyScore: number | null
     fluencyScore: number | null
     pronunciationScore: number | null
-    learningPurpose: string | null
     targetScoreGoal: number | null
     dailyGoalMinutes: number | null
     preferredLearningStyle: string | null
@@ -4304,9 +4270,6 @@ export namespace Prisma {
     id: number
     userId: number
     primaryRole: number
-    educationLevel: number
-    intitutionContext: number
-    occupationTitle: number
     englishReadingSelfScore: number
     englishWritingSelfScore: number
     primaryGoal: number
@@ -4318,7 +4281,6 @@ export namespace Prisma {
     vocabularyScore: number
     fluencyScore: number
     pronunciationScore: number
-    learningPurpose: number
     targetScoreGoal: number
     dailyGoalMinutes: number
     preferredLearningStyle: number
@@ -4359,9 +4321,6 @@ export namespace Prisma {
     id?: true
     userId?: true
     primaryRole?: true
-    educationLevel?: true
-    intitutionContext?: true
-    occupationTitle?: true
     englishReadingSelfScore?: true
     englishWritingSelfScore?: true
     primaryGoal?: true
@@ -4371,7 +4330,6 @@ export namespace Prisma {
     vocabularyScore?: true
     fluencyScore?: true
     pronunciationScore?: true
-    learningPurpose?: true
     targetScoreGoal?: true
     dailyGoalMinutes?: true
     preferredLearningStyle?: true
@@ -4385,9 +4343,6 @@ export namespace Prisma {
     id?: true
     userId?: true
     primaryRole?: true
-    educationLevel?: true
-    intitutionContext?: true
-    occupationTitle?: true
     englishReadingSelfScore?: true
     englishWritingSelfScore?: true
     primaryGoal?: true
@@ -4397,7 +4352,6 @@ export namespace Prisma {
     vocabularyScore?: true
     fluencyScore?: true
     pronunciationScore?: true
-    learningPurpose?: true
     targetScoreGoal?: true
     dailyGoalMinutes?: true
     preferredLearningStyle?: true
@@ -4411,9 +4365,6 @@ export namespace Prisma {
     id?: true
     userId?: true
     primaryRole?: true
-    educationLevel?: true
-    intitutionContext?: true
-    occupationTitle?: true
     englishReadingSelfScore?: true
     englishWritingSelfScore?: true
     primaryGoal?: true
@@ -4425,7 +4376,6 @@ export namespace Prisma {
     vocabularyScore?: true
     fluencyScore?: true
     pronunciationScore?: true
-    learningPurpose?: true
     targetScoreGoal?: true
     dailyGoalMinutes?: true
     preferredLearningStyle?: true
@@ -4527,9 +4477,6 @@ export namespace Prisma {
     id: string
     userId: string
     primaryRole: $Enums.PrimaryRole
-    educationLevel: $Enums.EducationLevel | null
-    intitutionContext: string | null
-    occupationTitle: string | null
     englishReadingSelfScore: number
     englishWritingSelfScore: number
     primaryGoal: $Enums.PrimaryGoal | null
@@ -4541,7 +4488,6 @@ export namespace Prisma {
     vocabularyScore: number | null
     fluencyScore: number | null
     pronunciationScore: number | null
-    learningPurpose: string | null
     targetScoreGoal: number | null
     dailyGoalMinutes: number | null
     preferredLearningStyle: string | null
@@ -4575,9 +4521,6 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     primaryRole?: boolean
-    educationLevel?: boolean
-    intitutionContext?: boolean
-    occupationTitle?: boolean
     englishReadingSelfScore?: boolean
     englishWritingSelfScore?: boolean
     primaryGoal?: boolean
@@ -4589,7 +4532,6 @@ export namespace Prisma {
     vocabularyScore?: boolean
     fluencyScore?: boolean
     pronunciationScore?: boolean
-    learningPurpose?: boolean
     targetScoreGoal?: boolean
     dailyGoalMinutes?: boolean
     preferredLearningStyle?: boolean
@@ -4605,9 +4547,6 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     primaryRole?: boolean
-    educationLevel?: boolean
-    intitutionContext?: boolean
-    occupationTitle?: boolean
     englishReadingSelfScore?: boolean
     englishWritingSelfScore?: boolean
     primaryGoal?: boolean
@@ -4619,7 +4558,6 @@ export namespace Prisma {
     vocabularyScore?: boolean
     fluencyScore?: boolean
     pronunciationScore?: boolean
-    learningPurpose?: boolean
     targetScoreGoal?: boolean
     dailyGoalMinutes?: boolean
     preferredLearningStyle?: boolean
@@ -4635,9 +4573,6 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     primaryRole?: boolean
-    educationLevel?: boolean
-    intitutionContext?: boolean
-    occupationTitle?: boolean
     englishReadingSelfScore?: boolean
     englishWritingSelfScore?: boolean
     primaryGoal?: boolean
@@ -4649,7 +4584,6 @@ export namespace Prisma {
     vocabularyScore?: boolean
     fluencyScore?: boolean
     pronunciationScore?: boolean
-    learningPurpose?: boolean
     targetScoreGoal?: boolean
     dailyGoalMinutes?: boolean
     preferredLearningStyle?: boolean
@@ -4665,9 +4599,6 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     primaryRole?: boolean
-    educationLevel?: boolean
-    intitutionContext?: boolean
-    occupationTitle?: boolean
     englishReadingSelfScore?: boolean
     englishWritingSelfScore?: boolean
     primaryGoal?: boolean
@@ -4679,7 +4610,6 @@ export namespace Prisma {
     vocabularyScore?: boolean
     fluencyScore?: boolean
     pronunciationScore?: boolean
-    learningPurpose?: boolean
     targetScoreGoal?: boolean
     dailyGoalMinutes?: boolean
     preferredLearningStyle?: boolean
@@ -4690,7 +4620,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type UserProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "primaryRole" | "educationLevel" | "intitutionContext" | "occupationTitle" | "englishReadingSelfScore" | "englishWritingSelfScore" | "primaryGoal" | "weeklyTimeMinutes" | "interestTags" | "preferredGenres" | "localePreference" | "grammarScore" | "vocabularyScore" | "fluencyScore" | "pronunciationScore" | "learningPurpose" | "targetScoreGoal" | "dailyGoalMinutes" | "preferredLearningStyle" | "weakAreas" | "initialAssessmentDone" | "onboardingCompletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["userProfile"]>
+  export type UserProfileOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "primaryRole" | "englishReadingSelfScore" | "englishWritingSelfScore" | "primaryGoal" | "weeklyTimeMinutes" | "interestTags" | "preferredGenres" | "localePreference" | "grammarScore" | "vocabularyScore" | "fluencyScore" | "pronunciationScore" | "targetScoreGoal" | "dailyGoalMinutes" | "preferredLearningStyle" | "weakAreas" | "initialAssessmentDone" | "onboardingCompletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["userProfile"]>
   export type UserProfileInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -4710,9 +4640,6 @@ export namespace Prisma {
       id: string
       userId: string
       primaryRole: $Enums.PrimaryRole
-      educationLevel: $Enums.EducationLevel | null
-      intitutionContext: string | null
-      occupationTitle: string | null
       englishReadingSelfScore: number
       englishWritingSelfScore: number
       primaryGoal: $Enums.PrimaryGoal | null
@@ -4724,7 +4651,6 @@ export namespace Prisma {
       vocabularyScore: number | null
       fluencyScore: number | null
       pronunciationScore: number | null
-      learningPurpose: string | null
       targetScoreGoal: number | null
       dailyGoalMinutes: number | null
       preferredLearningStyle: string | null
@@ -5160,9 +5086,6 @@ export namespace Prisma {
     readonly id: FieldRef<"UserProfile", 'String'>
     readonly userId: FieldRef<"UserProfile", 'String'>
     readonly primaryRole: FieldRef<"UserProfile", 'PrimaryRole'>
-    readonly educationLevel: FieldRef<"UserProfile", 'EducationLevel'>
-    readonly intitutionContext: FieldRef<"UserProfile", 'String'>
-    readonly occupationTitle: FieldRef<"UserProfile", 'String'>
     readonly englishReadingSelfScore: FieldRef<"UserProfile", 'Int'>
     readonly englishWritingSelfScore: FieldRef<"UserProfile", 'Int'>
     readonly primaryGoal: FieldRef<"UserProfile", 'PrimaryGoal'>
@@ -5174,7 +5097,6 @@ export namespace Prisma {
     readonly vocabularyScore: FieldRef<"UserProfile", 'Int'>
     readonly fluencyScore: FieldRef<"UserProfile", 'Int'>
     readonly pronunciationScore: FieldRef<"UserProfile", 'Int'>
-    readonly learningPurpose: FieldRef<"UserProfile", 'String'>
     readonly targetScoreGoal: FieldRef<"UserProfile", 'Int'>
     readonly dailyGoalMinutes: FieldRef<"UserProfile", 'Int'>
     readonly preferredLearningStyle: FieldRef<"UserProfile", 'String'>
@@ -12626,9 +12548,6 @@ export namespace Prisma {
     id: 'id',
     userId: 'userId',
     primaryRole: 'primaryRole',
-    educationLevel: 'educationLevel',
-    intitutionContext: 'intitutionContext',
-    occupationTitle: 'occupationTitle',
     englishReadingSelfScore: 'englishReadingSelfScore',
     englishWritingSelfScore: 'englishWritingSelfScore',
     primaryGoal: 'primaryGoal',
@@ -12640,7 +12559,6 @@ export namespace Prisma {
     vocabularyScore: 'vocabularyScore',
     fluencyScore: 'fluencyScore',
     pronunciationScore: 'pronunciationScore',
-    learningPurpose: 'learningPurpose',
     targetScoreGoal: 'targetScoreGoal',
     dailyGoalMinutes: 'dailyGoalMinutes',
     preferredLearningStyle: 'preferredLearningStyle',
@@ -12837,20 +12755,6 @@ export namespace Prisma {
    * Reference to a field of type 'PrimaryRole[]'
    */
   export type ListEnumPrimaryRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PrimaryRole[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'EducationLevel'
-   */
-  export type EnumEducationLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EducationLevel'>
-    
-
-
-  /**
-   * Reference to a field of type 'EducationLevel[]'
-   */
-  export type ListEnumEducationLevelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EducationLevel[]'>
     
 
 
@@ -13133,9 +13037,6 @@ export namespace Prisma {
     id?: StringFilter<"UserProfile"> | string
     userId?: StringFilter<"UserProfile"> | string
     primaryRole?: EnumPrimaryRoleFilter<"UserProfile"> | $Enums.PrimaryRole
-    educationLevel?: EnumEducationLevelNullableFilter<"UserProfile"> | $Enums.EducationLevel | null
-    intitutionContext?: StringNullableFilter<"UserProfile"> | string | null
-    occupationTitle?: StringNullableFilter<"UserProfile"> | string | null
     englishReadingSelfScore?: IntFilter<"UserProfile"> | number
     englishWritingSelfScore?: IntFilter<"UserProfile"> | number
     primaryGoal?: EnumPrimaryGoalNullableFilter<"UserProfile"> | $Enums.PrimaryGoal | null
@@ -13147,7 +13048,6 @@ export namespace Prisma {
     vocabularyScore?: IntNullableFilter<"UserProfile"> | number | null
     fluencyScore?: IntNullableFilter<"UserProfile"> | number | null
     pronunciationScore?: IntNullableFilter<"UserProfile"> | number | null
-    learningPurpose?: StringNullableFilter<"UserProfile"> | string | null
     targetScoreGoal?: IntNullableFilter<"UserProfile"> | number | null
     dailyGoalMinutes?: IntNullableFilter<"UserProfile"> | number | null
     preferredLearningStyle?: StringNullableFilter<"UserProfile"> | string | null
@@ -13163,9 +13063,6 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     primaryRole?: SortOrder
-    educationLevel?: SortOrderInput | SortOrder
-    intitutionContext?: SortOrderInput | SortOrder
-    occupationTitle?: SortOrderInput | SortOrder
     englishReadingSelfScore?: SortOrder
     englishWritingSelfScore?: SortOrder
     primaryGoal?: SortOrderInput | SortOrder
@@ -13177,7 +13074,6 @@ export namespace Prisma {
     vocabularyScore?: SortOrderInput | SortOrder
     fluencyScore?: SortOrderInput | SortOrder
     pronunciationScore?: SortOrderInput | SortOrder
-    learningPurpose?: SortOrderInput | SortOrder
     targetScoreGoal?: SortOrderInput | SortOrder
     dailyGoalMinutes?: SortOrderInput | SortOrder
     preferredLearningStyle?: SortOrderInput | SortOrder
@@ -13196,9 +13092,6 @@ export namespace Prisma {
     OR?: UserProfileWhereInput[]
     NOT?: UserProfileWhereInput | UserProfileWhereInput[]
     primaryRole?: EnumPrimaryRoleFilter<"UserProfile"> | $Enums.PrimaryRole
-    educationLevel?: EnumEducationLevelNullableFilter<"UserProfile"> | $Enums.EducationLevel | null
-    intitutionContext?: StringNullableFilter<"UserProfile"> | string | null
-    occupationTitle?: StringNullableFilter<"UserProfile"> | string | null
     englishReadingSelfScore?: IntFilter<"UserProfile"> | number
     englishWritingSelfScore?: IntFilter<"UserProfile"> | number
     primaryGoal?: EnumPrimaryGoalNullableFilter<"UserProfile"> | $Enums.PrimaryGoal | null
@@ -13210,7 +13103,6 @@ export namespace Prisma {
     vocabularyScore?: IntNullableFilter<"UserProfile"> | number | null
     fluencyScore?: IntNullableFilter<"UserProfile"> | number | null
     pronunciationScore?: IntNullableFilter<"UserProfile"> | number | null
-    learningPurpose?: StringNullableFilter<"UserProfile"> | string | null
     targetScoreGoal?: IntNullableFilter<"UserProfile"> | number | null
     dailyGoalMinutes?: IntNullableFilter<"UserProfile"> | number | null
     preferredLearningStyle?: StringNullableFilter<"UserProfile"> | string | null
@@ -13226,9 +13118,6 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     primaryRole?: SortOrder
-    educationLevel?: SortOrderInput | SortOrder
-    intitutionContext?: SortOrderInput | SortOrder
-    occupationTitle?: SortOrderInput | SortOrder
     englishReadingSelfScore?: SortOrder
     englishWritingSelfScore?: SortOrder
     primaryGoal?: SortOrderInput | SortOrder
@@ -13240,7 +13129,6 @@ export namespace Prisma {
     vocabularyScore?: SortOrderInput | SortOrder
     fluencyScore?: SortOrderInput | SortOrder
     pronunciationScore?: SortOrderInput | SortOrder
-    learningPurpose?: SortOrderInput | SortOrder
     targetScoreGoal?: SortOrderInput | SortOrder
     dailyGoalMinutes?: SortOrderInput | SortOrder
     preferredLearningStyle?: SortOrderInput | SortOrder
@@ -13263,9 +13151,6 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"UserProfile"> | string
     userId?: StringWithAggregatesFilter<"UserProfile"> | string
     primaryRole?: EnumPrimaryRoleWithAggregatesFilter<"UserProfile"> | $Enums.PrimaryRole
-    educationLevel?: EnumEducationLevelNullableWithAggregatesFilter<"UserProfile"> | $Enums.EducationLevel | null
-    intitutionContext?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
-    occupationTitle?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
     englishReadingSelfScore?: IntWithAggregatesFilter<"UserProfile"> | number
     englishWritingSelfScore?: IntWithAggregatesFilter<"UserProfile"> | number
     primaryGoal?: EnumPrimaryGoalNullableWithAggregatesFilter<"UserProfile"> | $Enums.PrimaryGoal | null
@@ -13277,7 +13162,6 @@ export namespace Prisma {
     vocabularyScore?: IntNullableWithAggregatesFilter<"UserProfile"> | number | null
     fluencyScore?: IntNullableWithAggregatesFilter<"UserProfile"> | number | null
     pronunciationScore?: IntNullableWithAggregatesFilter<"UserProfile"> | number | null
-    learningPurpose?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
     targetScoreGoal?: IntNullableWithAggregatesFilter<"UserProfile"> | number | null
     dailyGoalMinutes?: IntNullableWithAggregatesFilter<"UserProfile"> | number | null
     preferredLearningStyle?: StringNullableWithAggregatesFilter<"UserProfile"> | string | null
@@ -13951,9 +13835,6 @@ export namespace Prisma {
   export type UserProfileCreateInput = {
     id?: string
     primaryRole: $Enums.PrimaryRole
-    educationLevel?: $Enums.EducationLevel | null
-    intitutionContext?: string | null
-    occupationTitle?: string | null
     englishReadingSelfScore: number
     englishWritingSelfScore: number
     primaryGoal?: $Enums.PrimaryGoal | null
@@ -13965,7 +13846,6 @@ export namespace Prisma {
     vocabularyScore?: number | null
     fluencyScore?: number | null
     pronunciationScore?: number | null
-    learningPurpose?: string | null
     targetScoreGoal?: number | null
     dailyGoalMinutes?: number | null
     preferredLearningStyle?: string | null
@@ -13981,9 +13861,6 @@ export namespace Prisma {
     id?: string
     userId: string
     primaryRole: $Enums.PrimaryRole
-    educationLevel?: $Enums.EducationLevel | null
-    intitutionContext?: string | null
-    occupationTitle?: string | null
     englishReadingSelfScore: number
     englishWritingSelfScore: number
     primaryGoal?: $Enums.PrimaryGoal | null
@@ -13995,7 +13872,6 @@ export namespace Prisma {
     vocabularyScore?: number | null
     fluencyScore?: number | null
     pronunciationScore?: number | null
-    learningPurpose?: string | null
     targetScoreGoal?: number | null
     dailyGoalMinutes?: number | null
     preferredLearningStyle?: string | null
@@ -14009,9 +13885,6 @@ export namespace Prisma {
   export type UserProfileUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     primaryRole?: EnumPrimaryRoleFieldUpdateOperationsInput | $Enums.PrimaryRole
-    educationLevel?: NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
-    intitutionContext?: NullableStringFieldUpdateOperationsInput | string | null
-    occupationTitle?: NullableStringFieldUpdateOperationsInput | string | null
     englishReadingSelfScore?: IntFieldUpdateOperationsInput | number
     englishWritingSelfScore?: IntFieldUpdateOperationsInput | number
     primaryGoal?: NullableEnumPrimaryGoalFieldUpdateOperationsInput | $Enums.PrimaryGoal | null
@@ -14023,7 +13896,6 @@ export namespace Prisma {
     vocabularyScore?: NullableIntFieldUpdateOperationsInput | number | null
     fluencyScore?: NullableIntFieldUpdateOperationsInput | number | null
     pronunciationScore?: NullableIntFieldUpdateOperationsInput | number | null
-    learningPurpose?: NullableStringFieldUpdateOperationsInput | string | null
     targetScoreGoal?: NullableIntFieldUpdateOperationsInput | number | null
     dailyGoalMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     preferredLearningStyle?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14039,9 +13911,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     primaryRole?: EnumPrimaryRoleFieldUpdateOperationsInput | $Enums.PrimaryRole
-    educationLevel?: NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
-    intitutionContext?: NullableStringFieldUpdateOperationsInput | string | null
-    occupationTitle?: NullableStringFieldUpdateOperationsInput | string | null
     englishReadingSelfScore?: IntFieldUpdateOperationsInput | number
     englishWritingSelfScore?: IntFieldUpdateOperationsInput | number
     primaryGoal?: NullableEnumPrimaryGoalFieldUpdateOperationsInput | $Enums.PrimaryGoal | null
@@ -14053,7 +13922,6 @@ export namespace Prisma {
     vocabularyScore?: NullableIntFieldUpdateOperationsInput | number | null
     fluencyScore?: NullableIntFieldUpdateOperationsInput | number | null
     pronunciationScore?: NullableIntFieldUpdateOperationsInput | number | null
-    learningPurpose?: NullableStringFieldUpdateOperationsInput | string | null
     targetScoreGoal?: NullableIntFieldUpdateOperationsInput | number | null
     dailyGoalMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     preferredLearningStyle?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14068,9 +13936,6 @@ export namespace Prisma {
     id?: string
     userId: string
     primaryRole: $Enums.PrimaryRole
-    educationLevel?: $Enums.EducationLevel | null
-    intitutionContext?: string | null
-    occupationTitle?: string | null
     englishReadingSelfScore: number
     englishWritingSelfScore: number
     primaryGoal?: $Enums.PrimaryGoal | null
@@ -14082,7 +13947,6 @@ export namespace Prisma {
     vocabularyScore?: number | null
     fluencyScore?: number | null
     pronunciationScore?: number | null
-    learningPurpose?: string | null
     targetScoreGoal?: number | null
     dailyGoalMinutes?: number | null
     preferredLearningStyle?: string | null
@@ -14096,9 +13960,6 @@ export namespace Prisma {
   export type UserProfileUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     primaryRole?: EnumPrimaryRoleFieldUpdateOperationsInput | $Enums.PrimaryRole
-    educationLevel?: NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
-    intitutionContext?: NullableStringFieldUpdateOperationsInput | string | null
-    occupationTitle?: NullableStringFieldUpdateOperationsInput | string | null
     englishReadingSelfScore?: IntFieldUpdateOperationsInput | number
     englishWritingSelfScore?: IntFieldUpdateOperationsInput | number
     primaryGoal?: NullableEnumPrimaryGoalFieldUpdateOperationsInput | $Enums.PrimaryGoal | null
@@ -14110,7 +13971,6 @@ export namespace Prisma {
     vocabularyScore?: NullableIntFieldUpdateOperationsInput | number | null
     fluencyScore?: NullableIntFieldUpdateOperationsInput | number | null
     pronunciationScore?: NullableIntFieldUpdateOperationsInput | number | null
-    learningPurpose?: NullableStringFieldUpdateOperationsInput | string | null
     targetScoreGoal?: NullableIntFieldUpdateOperationsInput | number | null
     dailyGoalMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     preferredLearningStyle?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14125,9 +13985,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     primaryRole?: EnumPrimaryRoleFieldUpdateOperationsInput | $Enums.PrimaryRole
-    educationLevel?: NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
-    intitutionContext?: NullableStringFieldUpdateOperationsInput | string | null
-    occupationTitle?: NullableStringFieldUpdateOperationsInput | string | null
     englishReadingSelfScore?: IntFieldUpdateOperationsInput | number
     englishWritingSelfScore?: IntFieldUpdateOperationsInput | number
     primaryGoal?: NullableEnumPrimaryGoalFieldUpdateOperationsInput | $Enums.PrimaryGoal | null
@@ -14139,7 +13996,6 @@ export namespace Prisma {
     vocabularyScore?: NullableIntFieldUpdateOperationsInput | number | null
     fluencyScore?: NullableIntFieldUpdateOperationsInput | number | null
     pronunciationScore?: NullableIntFieldUpdateOperationsInput | number | null
-    learningPurpose?: NullableStringFieldUpdateOperationsInput | string | null
     targetScoreGoal?: NullableIntFieldUpdateOperationsInput | number | null
     dailyGoalMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     preferredLearningStyle?: NullableStringFieldUpdateOperationsInput | string | null
@@ -14910,13 +14766,6 @@ export namespace Prisma {
     not?: NestedEnumPrimaryRoleFilter<$PrismaModel> | $Enums.PrimaryRole
   }
 
-  export type EnumEducationLevelNullableFilter<$PrismaModel = never> = {
-    equals?: $Enums.EducationLevel | EnumEducationLevelFieldRefInput<$PrismaModel> | null
-    in?: $Enums.EducationLevel[] | ListEnumEducationLevelFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.EducationLevel[] | ListEnumEducationLevelFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumEducationLevelNullableFilter<$PrismaModel> | $Enums.EducationLevel | null
-  }
-
   export type IntFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -14977,9 +14826,6 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     primaryRole?: SortOrder
-    educationLevel?: SortOrder
-    intitutionContext?: SortOrder
-    occupationTitle?: SortOrder
     englishReadingSelfScore?: SortOrder
     englishWritingSelfScore?: SortOrder
     primaryGoal?: SortOrder
@@ -14991,7 +14837,6 @@ export namespace Prisma {
     vocabularyScore?: SortOrder
     fluencyScore?: SortOrder
     pronunciationScore?: SortOrder
-    learningPurpose?: SortOrder
     targetScoreGoal?: SortOrder
     dailyGoalMinutes?: SortOrder
     preferredLearningStyle?: SortOrder
@@ -15018,9 +14863,6 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     primaryRole?: SortOrder
-    educationLevel?: SortOrder
-    intitutionContext?: SortOrder
-    occupationTitle?: SortOrder
     englishReadingSelfScore?: SortOrder
     englishWritingSelfScore?: SortOrder
     primaryGoal?: SortOrder
@@ -15030,7 +14872,6 @@ export namespace Prisma {
     vocabularyScore?: SortOrder
     fluencyScore?: SortOrder
     pronunciationScore?: SortOrder
-    learningPurpose?: SortOrder
     targetScoreGoal?: SortOrder
     dailyGoalMinutes?: SortOrder
     preferredLearningStyle?: SortOrder
@@ -15044,9 +14885,6 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     primaryRole?: SortOrder
-    educationLevel?: SortOrder
-    intitutionContext?: SortOrder
-    occupationTitle?: SortOrder
     englishReadingSelfScore?: SortOrder
     englishWritingSelfScore?: SortOrder
     primaryGoal?: SortOrder
@@ -15056,7 +14894,6 @@ export namespace Prisma {
     vocabularyScore?: SortOrder
     fluencyScore?: SortOrder
     pronunciationScore?: SortOrder
-    learningPurpose?: SortOrder
     targetScoreGoal?: SortOrder
     dailyGoalMinutes?: SortOrder
     preferredLearningStyle?: SortOrder
@@ -15086,16 +14923,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPrimaryRoleFilter<$PrismaModel>
     _max?: NestedEnumPrimaryRoleFilter<$PrismaModel>
-  }
-
-  export type EnumEducationLevelNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.EducationLevel | EnumEducationLevelFieldRefInput<$PrismaModel> | null
-    in?: $Enums.EducationLevel[] | ListEnumEducationLevelFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.EducationLevel[] | ListEnumEducationLevelFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumEducationLevelNullableWithAggregatesFilter<$PrismaModel> | $Enums.EducationLevel | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedEnumEducationLevelNullableFilter<$PrismaModel>
-    _max?: NestedEnumEducationLevelNullableFilter<$PrismaModel>
   }
 
   export type IntWithAggregatesFilter<$PrismaModel = never> = {
@@ -15856,10 +15683,6 @@ export namespace Prisma {
     set?: $Enums.PrimaryRole
   }
 
-  export type NullableEnumEducationLevelFieldUpdateOperationsInput = {
-    set?: $Enums.EducationLevel | null
-  }
-
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
@@ -16337,13 +16160,6 @@ export namespace Prisma {
     not?: NestedEnumPrimaryRoleFilter<$PrismaModel> | $Enums.PrimaryRole
   }
 
-  export type NestedEnumEducationLevelNullableFilter<$PrismaModel = never> = {
-    equals?: $Enums.EducationLevel | EnumEducationLevelFieldRefInput<$PrismaModel> | null
-    in?: $Enums.EducationLevel[] | ListEnumEducationLevelFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.EducationLevel[] | ListEnumEducationLevelFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumEducationLevelNullableFilter<$PrismaModel> | $Enums.EducationLevel | null
-  }
-
   export type NestedEnumPrimaryGoalNullableFilter<$PrismaModel = never> = {
     equals?: $Enums.PrimaryGoal | EnumPrimaryGoalFieldRefInput<$PrismaModel> | null
     in?: $Enums.PrimaryGoal[] | ListEnumPrimaryGoalFieldRefInput<$PrismaModel> | null
@@ -16370,16 +16186,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumPrimaryRoleFilter<$PrismaModel>
     _max?: NestedEnumPrimaryRoleFilter<$PrismaModel>
-  }
-
-  export type NestedEnumEducationLevelNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.EducationLevel | EnumEducationLevelFieldRefInput<$PrismaModel> | null
-    in?: $Enums.EducationLevel[] | ListEnumEducationLevelFieldRefInput<$PrismaModel> | null
-    notIn?: $Enums.EducationLevel[] | ListEnumEducationLevelFieldRefInput<$PrismaModel> | null
-    not?: NestedEnumEducationLevelNullableWithAggregatesFilter<$PrismaModel> | $Enums.EducationLevel | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedEnumEducationLevelNullableFilter<$PrismaModel>
-    _max?: NestedEnumEducationLevelNullableFilter<$PrismaModel>
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -16604,9 +16410,6 @@ export namespace Prisma {
   export type UserProfileCreateWithoutUserInput = {
     id?: string
     primaryRole: $Enums.PrimaryRole
-    educationLevel?: $Enums.EducationLevel | null
-    intitutionContext?: string | null
-    occupationTitle?: string | null
     englishReadingSelfScore: number
     englishWritingSelfScore: number
     primaryGoal?: $Enums.PrimaryGoal | null
@@ -16618,7 +16421,6 @@ export namespace Prisma {
     vocabularyScore?: number | null
     fluencyScore?: number | null
     pronunciationScore?: number | null
-    learningPurpose?: string | null
     targetScoreGoal?: number | null
     dailyGoalMinutes?: number | null
     preferredLearningStyle?: string | null
@@ -16632,9 +16434,6 @@ export namespace Prisma {
   export type UserProfileUncheckedCreateWithoutUserInput = {
     id?: string
     primaryRole: $Enums.PrimaryRole
-    educationLevel?: $Enums.EducationLevel | null
-    intitutionContext?: string | null
-    occupationTitle?: string | null
     englishReadingSelfScore: number
     englishWritingSelfScore: number
     primaryGoal?: $Enums.PrimaryGoal | null
@@ -16646,7 +16445,6 @@ export namespace Prisma {
     vocabularyScore?: number | null
     fluencyScore?: number | null
     pronunciationScore?: number | null
-    learningPurpose?: string | null
     targetScoreGoal?: number | null
     dailyGoalMinutes?: number | null
     preferredLearningStyle?: string | null
@@ -16808,9 +16606,6 @@ export namespace Prisma {
     id?: StringFilter<"UserProfile"> | string
     userId?: StringFilter<"UserProfile"> | string
     primaryRole?: EnumPrimaryRoleFilter<"UserProfile"> | $Enums.PrimaryRole
-    educationLevel?: EnumEducationLevelNullableFilter<"UserProfile"> | $Enums.EducationLevel | null
-    intitutionContext?: StringNullableFilter<"UserProfile"> | string | null
-    occupationTitle?: StringNullableFilter<"UserProfile"> | string | null
     englishReadingSelfScore?: IntFilter<"UserProfile"> | number
     englishWritingSelfScore?: IntFilter<"UserProfile"> | number
     primaryGoal?: EnumPrimaryGoalNullableFilter<"UserProfile"> | $Enums.PrimaryGoal | null
@@ -16822,7 +16617,6 @@ export namespace Prisma {
     vocabularyScore?: IntNullableFilter<"UserProfile"> | number | null
     fluencyScore?: IntNullableFilter<"UserProfile"> | number | null
     pronunciationScore?: IntNullableFilter<"UserProfile"> | number | null
-    learningPurpose?: StringNullableFilter<"UserProfile"> | string | null
     targetScoreGoal?: IntNullableFilter<"UserProfile"> | number | null
     dailyGoalMinutes?: IntNullableFilter<"UserProfile"> | number | null
     preferredLearningStyle?: StringNullableFilter<"UserProfile"> | string | null
@@ -17832,9 +17626,6 @@ export namespace Prisma {
   export type UserProfileCreateManyUserInput = {
     id?: string
     primaryRole: $Enums.PrimaryRole
-    educationLevel?: $Enums.EducationLevel | null
-    intitutionContext?: string | null
-    occupationTitle?: string | null
     englishReadingSelfScore: number
     englishWritingSelfScore: number
     primaryGoal?: $Enums.PrimaryGoal | null
@@ -17846,7 +17637,6 @@ export namespace Prisma {
     vocabularyScore?: number | null
     fluencyScore?: number | null
     pronunciationScore?: number | null
-    learningPurpose?: string | null
     targetScoreGoal?: number | null
     dailyGoalMinutes?: number | null
     preferredLearningStyle?: string | null
@@ -17923,9 +17713,6 @@ export namespace Prisma {
   export type UserProfileUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     primaryRole?: EnumPrimaryRoleFieldUpdateOperationsInput | $Enums.PrimaryRole
-    educationLevel?: NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
-    intitutionContext?: NullableStringFieldUpdateOperationsInput | string | null
-    occupationTitle?: NullableStringFieldUpdateOperationsInput | string | null
     englishReadingSelfScore?: IntFieldUpdateOperationsInput | number
     englishWritingSelfScore?: IntFieldUpdateOperationsInput | number
     primaryGoal?: NullableEnumPrimaryGoalFieldUpdateOperationsInput | $Enums.PrimaryGoal | null
@@ -17937,7 +17724,6 @@ export namespace Prisma {
     vocabularyScore?: NullableIntFieldUpdateOperationsInput | number | null
     fluencyScore?: NullableIntFieldUpdateOperationsInput | number | null
     pronunciationScore?: NullableIntFieldUpdateOperationsInput | number | null
-    learningPurpose?: NullableStringFieldUpdateOperationsInput | string | null
     targetScoreGoal?: NullableIntFieldUpdateOperationsInput | number | null
     dailyGoalMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     preferredLearningStyle?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17951,9 +17737,6 @@ export namespace Prisma {
   export type UserProfileUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     primaryRole?: EnumPrimaryRoleFieldUpdateOperationsInput | $Enums.PrimaryRole
-    educationLevel?: NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
-    intitutionContext?: NullableStringFieldUpdateOperationsInput | string | null
-    occupationTitle?: NullableStringFieldUpdateOperationsInput | string | null
     englishReadingSelfScore?: IntFieldUpdateOperationsInput | number
     englishWritingSelfScore?: IntFieldUpdateOperationsInput | number
     primaryGoal?: NullableEnumPrimaryGoalFieldUpdateOperationsInput | $Enums.PrimaryGoal | null
@@ -17965,7 +17748,6 @@ export namespace Prisma {
     vocabularyScore?: NullableIntFieldUpdateOperationsInput | number | null
     fluencyScore?: NullableIntFieldUpdateOperationsInput | number | null
     pronunciationScore?: NullableIntFieldUpdateOperationsInput | number | null
-    learningPurpose?: NullableStringFieldUpdateOperationsInput | string | null
     targetScoreGoal?: NullableIntFieldUpdateOperationsInput | number | null
     dailyGoalMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     preferredLearningStyle?: NullableStringFieldUpdateOperationsInput | string | null
@@ -17979,9 +17761,6 @@ export namespace Prisma {
   export type UserProfileUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     primaryRole?: EnumPrimaryRoleFieldUpdateOperationsInput | $Enums.PrimaryRole
-    educationLevel?: NullableEnumEducationLevelFieldUpdateOperationsInput | $Enums.EducationLevel | null
-    intitutionContext?: NullableStringFieldUpdateOperationsInput | string | null
-    occupationTitle?: NullableStringFieldUpdateOperationsInput | string | null
     englishReadingSelfScore?: IntFieldUpdateOperationsInput | number
     englishWritingSelfScore?: IntFieldUpdateOperationsInput | number
     primaryGoal?: NullableEnumPrimaryGoalFieldUpdateOperationsInput | $Enums.PrimaryGoal | null
@@ -17993,7 +17772,6 @@ export namespace Prisma {
     vocabularyScore?: NullableIntFieldUpdateOperationsInput | number | null
     fluencyScore?: NullableIntFieldUpdateOperationsInput | number | null
     pronunciationScore?: NullableIntFieldUpdateOperationsInput | number | null
-    learningPurpose?: NullableStringFieldUpdateOperationsInput | string | null
     targetScoreGoal?: NullableIntFieldUpdateOperationsInput | number | null
     dailyGoalMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     preferredLearningStyle?: NullableStringFieldUpdateOperationsInput | string | null

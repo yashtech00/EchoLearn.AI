@@ -11,29 +11,17 @@ datasource db {
 enum PrimaryRole {
   STUDENT
   WORKING_PROFESSIONAL
-  OTHER
-}
-
-enum EducationLevel {
-  HIGH_SCHOOL
-  UNDERGRAD
-  GRADUATE
-  OTHER
-}
-
-enum InstitutionContext {
-  SCHOOL
-  COLLEGE
-  WORKPLACE
-  SELF_STUDY
+  HOBBYIST
+  JOB_SEEKER
 }
 
 enum PrimaryGoal {
-  EXAM
-  JOB_COMMUNICATION
-  ACADEMIC
-  RELOCATION
-  CASUAL
+  FLUENCY
+  PROFICIENCY
+  EXAM_PREP
+  BUSINESS_ENGLISH
+  TRAVEL_AND_CULTURE_ENGLISH
+  GRAMMAR_MASTERY
 }
 
 enum SubmissionGenre {
@@ -116,9 +104,6 @@ model UserProfile {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   primaryRole             PrimaryRole
-  educationLevel          EducationLevel?
-  intitutionContext       String?
-  occupationTitle         String?
   englishReadingSelfScore Int // 1-5
   englishWritingSelfScore Int // 1-5
   primaryGoal             PrimaryGoal?
@@ -130,12 +115,12 @@ model UserProfile {
   vocabularyScore         Int?
   fluencyScore            Int?
   pronunciationScore      Int?
-  learningPurpose         String? // job, study abroad, interviews, casual, etc.
-  targetScoreGoal         Int? // optional (like IELTS band target)
-  dailyGoalMinutes        Int? // realistic habit building
-  preferredLearningStyle  String? // visual, conversation, quiz, etc.
-  weakAreas               String[] // ["grammar", "speaking", "confidence"]
-  initialAssessmentDone   Boolean           @default(false)
+
+  targetScoreGoal        Int? // optional (like IELTS band target)
+  dailyGoalMinutes       Int? // realistic habit building
+  preferredLearningStyle String? // visual, conversation, quiz, etc.
+  weakAreas              String[] // ["grammar", "speaking", "confidence"]
+  initialAssessmentDone  Boolean  @default(false)
 
   onboardingCompletedAt DateTime?
   createdAt             DateTime  @default(now())

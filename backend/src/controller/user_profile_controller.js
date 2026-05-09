@@ -3,7 +3,9 @@ import { user_profile_validator } from "../validator/user_profile_validator.js";
 
 export const createUserProfile = async (req, res) => {
   try {
-    const { userId } = req.user;
+    console.log("req.user", req.user);
+    console.log("req.user.userId", req.user.userId);
+    const {userId} = req.user;
 
     // check user exists
     const user = await prisma.user.findUnique({

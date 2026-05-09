@@ -1,16 +1,14 @@
 export interface UserProfile {
     id?: string;
     primaryRole: string;
-    educationLevel: string;
-    institutionContext: string;
-    occupationTitle: string;
+   
     englishReadingSelfScore: number;
     englishWritingSelfScore: number;
     primaryGoal: string;
     weeklyTimeMinutes: number;
     interestTags: string[];
     preferredGenres: string[];
-    learningPurpose: string;
+  
     targetScoreGoal: number | null;
     dailyGoalMinutes: number;
     preferredLearningStyle: string;

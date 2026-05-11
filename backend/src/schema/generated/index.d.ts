@@ -1688,16 +1688,12 @@ export namespace Prisma {
 
   export type UserCountOutputType = {
     submissions: number
-    userProfile: number
-    userStats: number
     xpEvents: number
     refreshTokens: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     submissions?: boolean | UserCountOutputTypeCountSubmissionsArgs
-    userProfile?: boolean | UserCountOutputTypeCountUserProfileArgs
-    userStats?: boolean | UserCountOutputTypeCountUserStatsArgs
     xpEvents?: boolean | UserCountOutputTypeCountXpEventsArgs
     refreshTokens?: boolean | UserCountOutputTypeCountRefreshTokensArgs
   }
@@ -1718,20 +1714,6 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountSubmissionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SubmissionWhereInput
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountUserProfileArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: UserProfileWhereInput
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountUserStatsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: UserStatsWhereInput
   }
 
   /**
@@ -1869,7 +1851,8 @@ export namespace Prisma {
     id: string | null
     name: string | null
     email: string | null
-    password: string | null
+    passwordHash: string | null
+    displayName: string | null
     image: string | null
     isNewUser: boolean | null
     createdAt: Date | null
@@ -1880,7 +1863,8 @@ export namespace Prisma {
     id: string | null
     name: string | null
     email: string | null
-    password: string | null
+    passwordHash: string | null
+    displayName: string | null
     image: string | null
     isNewUser: boolean | null
     createdAt: Date | null
@@ -1891,7 +1875,8 @@ export namespace Prisma {
     id: number
     name: number
     email: number
-    password: number
+    passwordHash: number
+    displayName: number
     image: number
     isNewUser: number
     createdAt: number
@@ -1904,7 +1889,8 @@ export namespace Prisma {
     id?: true
     name?: true
     email?: true
-    password?: true
+    passwordHash?: true
+    displayName?: true
     image?: true
     isNewUser?: true
     createdAt?: true
@@ -1915,7 +1901,8 @@ export namespace Prisma {
     id?: true
     name?: true
     email?: true
-    password?: true
+    passwordHash?: true
+    displayName?: true
     image?: true
     isNewUser?: true
     createdAt?: true
@@ -1926,7 +1913,8 @@ export namespace Prisma {
     id?: true
     name?: true
     email?: true
-    password?: true
+    passwordHash?: true
+    displayName?: true
     image?: true
     isNewUser?: true
     createdAt?: true
@@ -2010,7 +1998,8 @@ export namespace Prisma {
     id: string
     name: string
     email: string
-    password: string | null
+    passwordHash: string | null
+    displayName: string | null
     image: string | null
     isNewUser: boolean
     createdAt: Date
@@ -2038,14 +2027,15 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     email?: boolean
-    password?: boolean
+    passwordHash?: boolean
+    displayName?: boolean
     image?: boolean
     isNewUser?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    profile?: boolean | User$profileArgs<ExtArgs>
     submissions?: boolean | User$submissionsArgs<ExtArgs>
-    userProfile?: boolean | User$userProfileArgs<ExtArgs>
-    userStats?: boolean | User$userStatsArgs<ExtArgs>
+    stats?: boolean | User$statsArgs<ExtArgs>
     xpEvents?: boolean | User$xpEventsArgs<ExtArgs>
     refreshTokens?: boolean | User$refreshTokensArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -2055,7 +2045,8 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     email?: boolean
-    password?: boolean
+    passwordHash?: boolean
+    displayName?: boolean
     image?: boolean
     isNewUser?: boolean
     createdAt?: boolean
@@ -2066,7 +2057,8 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     email?: boolean
-    password?: boolean
+    passwordHash?: boolean
+    displayName?: boolean
     image?: boolean
     isNewUser?: boolean
     createdAt?: boolean
@@ -2077,18 +2069,19 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     email?: boolean
-    password?: boolean
+    passwordHash?: boolean
+    displayName?: boolean
     image?: boolean
     isNewUser?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "image" | "isNewUser" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "passwordHash" | "displayName" | "image" | "isNewUser" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    profile?: boolean | User$profileArgs<ExtArgs>
     submissions?: boolean | User$submissionsArgs<ExtArgs>
-    userProfile?: boolean | User$userProfileArgs<ExtArgs>
-    userStats?: boolean | User$userStatsArgs<ExtArgs>
+    stats?: boolean | User$statsArgs<ExtArgs>
     xpEvents?: boolean | User$xpEventsArgs<ExtArgs>
     refreshTokens?: boolean | User$refreshTokensArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -2099,9 +2092,9 @@ export namespace Prisma {
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
     objects: {
+      profile: Prisma.$UserProfilePayload<ExtArgs> | null
       submissions: Prisma.$SubmissionPayload<ExtArgs>[]
-      userProfile: Prisma.$UserProfilePayload<ExtArgs>[]
-      userStats: Prisma.$UserStatsPayload<ExtArgs>[]
+      stats: Prisma.$UserStatsPayload<ExtArgs> | null
       xpEvents: Prisma.$XpEventPayload<ExtArgs>[]
       refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[]
     }
@@ -2109,7 +2102,8 @@ export namespace Prisma {
       id: string
       name: string
       email: string
-      password: string | null
+      passwordHash: string | null
+      displayName: string | null
       image: string | null
       isNewUser: boolean
       createdAt: Date
@@ -2508,9 +2502,9 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    profile<T extends User$profileArgs<ExtArgs> = {}>(args?: Subset<T, User$profileArgs<ExtArgs>>): Prisma__UserProfileClient<$Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     submissions<T extends User$submissionsArgs<ExtArgs> = {}>(args?: Subset<T, User$submissionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    userProfile<T extends User$userProfileArgs<ExtArgs> = {}>(args?: Subset<T, User$userProfileArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserProfilePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    userStats<T extends User$userStatsArgs<ExtArgs> = {}>(args?: Subset<T, User$userStatsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserStatsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    stats<T extends User$statsArgs<ExtArgs> = {}>(args?: Subset<T, User$statsArgs<ExtArgs>>): Prisma__UserStatsClient<$Result.GetResult<Prisma.$UserStatsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     xpEvents<T extends User$xpEventsArgs<ExtArgs> = {}>(args?: Subset<T, User$xpEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$XpEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     refreshTokens<T extends User$refreshTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -2545,7 +2539,8 @@ export namespace Prisma {
     readonly id: FieldRef<"User", 'String'>
     readonly name: FieldRef<"User", 'String'>
     readonly email: FieldRef<"User", 'String'>
-    readonly password: FieldRef<"User", 'String'>
+    readonly passwordHash: FieldRef<"User", 'String'>
+    readonly displayName: FieldRef<"User", 'String'>
     readonly image: FieldRef<"User", 'String'>
     readonly isNewUser: FieldRef<"User", 'Boolean'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
@@ -2938,6 +2933,25 @@ export namespace Prisma {
   }
 
   /**
+   * User.profile
+   */
+  export type User$profileArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserProfile
+     */
+    select?: UserProfileSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserProfile
+     */
+    omit?: UserProfileOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserProfileInclude<ExtArgs> | null
+    where?: UserProfileWhereInput
+  }
+
+  /**
    * User.submissions
    */
   export type User$submissionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2962,33 +2976,9 @@ export namespace Prisma {
   }
 
   /**
-   * User.userProfile
+   * User.stats
    */
-  export type User$userProfileArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the UserProfile
-     */
-    select?: UserProfileSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the UserProfile
-     */
-    omit?: UserProfileOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserProfileInclude<ExtArgs> | null
-    where?: UserProfileWhereInput
-    orderBy?: UserProfileOrderByWithRelationInput | UserProfileOrderByWithRelationInput[]
-    cursor?: UserProfileWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: UserProfileScalarFieldEnum | UserProfileScalarFieldEnum[]
-  }
-
-  /**
-   * User.userStats
-   */
-  export type User$userStatsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type User$statsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the UserStats
      */
@@ -3002,11 +2992,6 @@ export namespace Prisma {
      */
     include?: UserStatsInclude<ExtArgs> | null
     where?: UserStatsWhereInput
-    orderBy?: UserStatsOrderByWithRelationInput | UserStatsOrderByWithRelationInput[]
-    cursor?: UserStatsWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: UserStatsScalarFieldEnum | UserStatsScalarFieldEnum[]
   }
 
   /**
@@ -12519,7 +12504,8 @@ export namespace Prisma {
     id: 'id',
     name: 'name',
     email: 'email',
-    password: 'password',
+    passwordHash: 'passwordHash',
+    displayName: 'displayName',
     image: 'image',
     isNewUser: 'isNewUser',
     createdAt: 'createdAt',
@@ -12880,14 +12866,15 @@ export namespace Prisma {
     id?: StringFilter<"User"> | string
     name?: StringFilter<"User"> | string
     email?: StringFilter<"User"> | string
-    password?: StringNullableFilter<"User"> | string | null
+    passwordHash?: StringNullableFilter<"User"> | string | null
+    displayName?: StringNullableFilter<"User"> | string | null
     image?: StringNullableFilter<"User"> | string | null
     isNewUser?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    profile?: XOR<UserProfileNullableScalarRelationFilter, UserProfileWhereInput> | null
     submissions?: SubmissionListRelationFilter
-    userProfile?: UserProfileListRelationFilter
-    userStats?: UserStatsListRelationFilter
+    stats?: XOR<UserStatsNullableScalarRelationFilter, UserStatsWhereInput> | null
     xpEvents?: XpEventListRelationFilter
     refreshTokens?: RefreshTokenListRelationFilter
   }
@@ -12896,14 +12883,15 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     email?: SortOrder
-    password?: SortOrderInput | SortOrder
+    passwordHash?: SortOrderInput | SortOrder
+    displayName?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
     isNewUser?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    profile?: UserProfileOrderByWithRelationInput
     submissions?: SubmissionOrderByRelationAggregateInput
-    userProfile?: UserProfileOrderByRelationAggregateInput
-    userStats?: UserStatsOrderByRelationAggregateInput
+    stats?: UserStatsOrderByWithRelationInput
     xpEvents?: XpEventOrderByRelationAggregateInput
     refreshTokens?: RefreshTokenOrderByRelationAggregateInput
   }
@@ -12915,14 +12903,15 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     name?: StringFilter<"User"> | string
-    password?: StringNullableFilter<"User"> | string | null
+    passwordHash?: StringNullableFilter<"User"> | string | null
+    displayName?: StringNullableFilter<"User"> | string | null
     image?: StringNullableFilter<"User"> | string | null
     isNewUser?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    profile?: XOR<UserProfileNullableScalarRelationFilter, UserProfileWhereInput> | null
     submissions?: SubmissionListRelationFilter
-    userProfile?: UserProfileListRelationFilter
-    userStats?: UserStatsListRelationFilter
+    stats?: XOR<UserStatsNullableScalarRelationFilter, UserStatsWhereInput> | null
     xpEvents?: XpEventListRelationFilter
     refreshTokens?: RefreshTokenListRelationFilter
   }, "id" | "email">
@@ -12931,7 +12920,8 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     email?: SortOrder
-    password?: SortOrderInput | SortOrder
+    passwordHash?: SortOrderInput | SortOrder
+    displayName?: SortOrderInput | SortOrder
     image?: SortOrderInput | SortOrder
     isNewUser?: SortOrder
     createdAt?: SortOrder
@@ -12948,7 +12938,8 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"User"> | string
     name?: StringWithAggregatesFilter<"User"> | string
     email?: StringWithAggregatesFilter<"User"> | string
-    password?: StringNullableWithAggregatesFilter<"User"> | string | null
+    passwordHash?: StringNullableWithAggregatesFilter<"User"> | string | null
+    displayName?: StringNullableWithAggregatesFilter<"User"> | string | null
     image?: StringNullableWithAggregatesFilter<"User"> | string | null
     isNewUser?: BoolWithAggregatesFilter<"User"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
@@ -13656,14 +13647,15 @@ export namespace Prisma {
     id?: string
     name: string
     email: string
-    password?: string | null
+    passwordHash?: string | null
+    displayName?: string | null
     image?: string | null
     isNewUser?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    profile?: UserProfileCreateNestedOneWithoutUserInput
     submissions?: SubmissionCreateNestedManyWithoutUserInput
-    userProfile?: UserProfileCreateNestedManyWithoutUserInput
-    userStats?: UserStatsCreateNestedManyWithoutUserInput
+    stats?: UserStatsCreateNestedOneWithoutUserInput
     xpEvents?: XpEventCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
   }
@@ -13672,14 +13664,15 @@ export namespace Prisma {
     id?: string
     name: string
     email: string
-    password?: string | null
+    passwordHash?: string | null
+    displayName?: string | null
     image?: string | null
     isNewUser?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    profile?: UserProfileUncheckedCreateNestedOneWithoutUserInput
     submissions?: SubmissionUncheckedCreateNestedManyWithoutUserInput
-    userProfile?: UserProfileUncheckedCreateNestedManyWithoutUserInput
-    userStats?: UserStatsUncheckedCreateNestedManyWithoutUserInput
+    stats?: UserStatsUncheckedCreateNestedOneWithoutUserInput
     xpEvents?: XpEventUncheckedCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   }
@@ -13688,14 +13681,15 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     isNewUser?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: UserProfileUpdateOneWithoutUserNestedInput
     submissions?: SubmissionUpdateManyWithoutUserNestedInput
-    userProfile?: UserProfileUpdateManyWithoutUserNestedInput
-    userStats?: UserStatsUpdateManyWithoutUserNestedInput
+    stats?: UserStatsUpdateOneWithoutUserNestedInput
     xpEvents?: XpEventUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
   }
@@ -13704,14 +13698,15 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     isNewUser?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: UserProfileUncheckedUpdateOneWithoutUserNestedInput
     submissions?: SubmissionUncheckedUpdateManyWithoutUserNestedInput
-    userProfile?: UserProfileUncheckedUpdateManyWithoutUserNestedInput
-    userStats?: UserStatsUncheckedUpdateManyWithoutUserNestedInput
+    stats?: UserStatsUncheckedUpdateOneWithoutUserNestedInput
     xpEvents?: XpEventUncheckedUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -13720,7 +13715,8 @@ export namespace Prisma {
     id?: string
     name: string
     email: string
-    password?: string | null
+    passwordHash?: string | null
+    displayName?: string | null
     image?: string | null
     isNewUser?: boolean
     createdAt?: Date | string
@@ -13731,7 +13727,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     isNewUser?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13742,7 +13739,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     isNewUser?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -13854,7 +13852,7 @@ export namespace Prisma {
     onboardingCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutUserProfileInput
+    user: UserCreateNestedOneWithoutProfileInput
   }
 
   export type UserProfileUncheckedCreateInput = {
@@ -13904,7 +13902,7 @@ export namespace Prisma {
     onboardingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutUserProfileNestedInput
+    user?: UserUpdateOneRequiredWithoutProfileNestedInput
   }
 
   export type UserProfileUncheckedUpdateInput = {
@@ -14396,7 +14394,7 @@ export namespace Prisma {
     longestStreak?: number
     lastActiveDate?: Date | string | null
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutUserStatsInput
+    user: UserCreateNestedOneWithoutStatsInput
   }
 
   export type UserStatsUncheckedCreateInput = {
@@ -14418,7 +14416,7 @@ export namespace Prisma {
     longestStreak?: IntFieldUpdateOperationsInput | number
     lastActiveDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutUserStatsNestedInput
+    user?: UserUpdateOneRequiredWithoutStatsNestedInput
   }
 
   export type UserStatsUncheckedUpdateInput = {
@@ -14572,22 +14570,20 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type UserProfileNullableScalarRelationFilter = {
+    is?: UserProfileWhereInput | null
+    isNot?: UserProfileWhereInput | null
+  }
+
   export type SubmissionListRelationFilter = {
     every?: SubmissionWhereInput
     some?: SubmissionWhereInput
     none?: SubmissionWhereInput
   }
 
-  export type UserProfileListRelationFilter = {
-    every?: UserProfileWhereInput
-    some?: UserProfileWhereInput
-    none?: UserProfileWhereInput
-  }
-
-  export type UserStatsListRelationFilter = {
-    every?: UserStatsWhereInput
-    some?: UserStatsWhereInput
-    none?: UserStatsWhereInput
+  export type UserStatsNullableScalarRelationFilter = {
+    is?: UserStatsWhereInput | null
+    isNot?: UserStatsWhereInput | null
   }
 
   export type XpEventListRelationFilter = {
@@ -14611,14 +14607,6 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
-  export type UserProfileOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type UserStatsOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
   export type XpEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -14631,7 +14619,8 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     email?: SortOrder
-    password?: SortOrder
+    passwordHash?: SortOrder
+    displayName?: SortOrder
     image?: SortOrder
     isNewUser?: SortOrder
     createdAt?: SortOrder
@@ -14642,7 +14631,8 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     email?: SortOrder
-    password?: SortOrder
+    passwordHash?: SortOrder
+    displayName?: SortOrder
     image?: SortOrder
     isNewUser?: SortOrder
     createdAt?: SortOrder
@@ -14653,7 +14643,8 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     email?: SortOrder
-    password?: SortOrder
+    passwordHash?: SortOrder
+    displayName?: SortOrder
     image?: SortOrder
     isNewUser?: SortOrder
     createdAt?: SortOrder
@@ -15421,6 +15412,12 @@ export namespace Prisma {
     xpDelta?: SortOrder
   }
 
+  export type UserProfileCreateNestedOneWithoutUserInput = {
+    create?: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserProfileCreateOrConnectWithoutUserInput
+    connect?: UserProfileWhereUniqueInput
+  }
+
   export type SubmissionCreateNestedManyWithoutUserInput = {
     create?: XOR<SubmissionCreateWithoutUserInput, SubmissionUncheckedCreateWithoutUserInput> | SubmissionCreateWithoutUserInput[] | SubmissionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SubmissionCreateOrConnectWithoutUserInput | SubmissionCreateOrConnectWithoutUserInput[]
@@ -15428,18 +15425,10 @@ export namespace Prisma {
     connect?: SubmissionWhereUniqueInput | SubmissionWhereUniqueInput[]
   }
 
-  export type UserProfileCreateNestedManyWithoutUserInput = {
-    create?: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput> | UserProfileCreateWithoutUserInput[] | UserProfileUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: UserProfileCreateOrConnectWithoutUserInput | UserProfileCreateOrConnectWithoutUserInput[]
-    createMany?: UserProfileCreateManyUserInputEnvelope
-    connect?: UserProfileWhereUniqueInput | UserProfileWhereUniqueInput[]
-  }
-
-  export type UserStatsCreateNestedManyWithoutUserInput = {
-    create?: XOR<UserStatsCreateWithoutUserInput, UserStatsUncheckedCreateWithoutUserInput> | UserStatsCreateWithoutUserInput[] | UserStatsUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: UserStatsCreateOrConnectWithoutUserInput | UserStatsCreateOrConnectWithoutUserInput[]
-    createMany?: UserStatsCreateManyUserInputEnvelope
-    connect?: UserStatsWhereUniqueInput | UserStatsWhereUniqueInput[]
+  export type UserStatsCreateNestedOneWithoutUserInput = {
+    create?: XOR<UserStatsCreateWithoutUserInput, UserStatsUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserStatsCreateOrConnectWithoutUserInput
+    connect?: UserStatsWhereUniqueInput
   }
 
   export type XpEventCreateNestedManyWithoutUserInput = {
@@ -15456,6 +15445,12 @@ export namespace Prisma {
     connect?: RefreshTokenWhereUniqueInput | RefreshTokenWhereUniqueInput[]
   }
 
+  export type UserProfileUncheckedCreateNestedOneWithoutUserInput = {
+    create?: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserProfileCreateOrConnectWithoutUserInput
+    connect?: UserProfileWhereUniqueInput
+  }
+
   export type SubmissionUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<SubmissionCreateWithoutUserInput, SubmissionUncheckedCreateWithoutUserInput> | SubmissionCreateWithoutUserInput[] | SubmissionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SubmissionCreateOrConnectWithoutUserInput | SubmissionCreateOrConnectWithoutUserInput[]
@@ -15463,18 +15458,10 @@ export namespace Prisma {
     connect?: SubmissionWhereUniqueInput | SubmissionWhereUniqueInput[]
   }
 
-  export type UserProfileUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput> | UserProfileCreateWithoutUserInput[] | UserProfileUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: UserProfileCreateOrConnectWithoutUserInput | UserProfileCreateOrConnectWithoutUserInput[]
-    createMany?: UserProfileCreateManyUserInputEnvelope
-    connect?: UserProfileWhereUniqueInput | UserProfileWhereUniqueInput[]
-  }
-
-  export type UserStatsUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<UserStatsCreateWithoutUserInput, UserStatsUncheckedCreateWithoutUserInput> | UserStatsCreateWithoutUserInput[] | UserStatsUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: UserStatsCreateOrConnectWithoutUserInput | UserStatsCreateOrConnectWithoutUserInput[]
-    createMany?: UserStatsCreateManyUserInputEnvelope
-    connect?: UserStatsWhereUniqueInput | UserStatsWhereUniqueInput[]
+  export type UserStatsUncheckedCreateNestedOneWithoutUserInput = {
+    create?: XOR<UserStatsCreateWithoutUserInput, UserStatsUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserStatsCreateOrConnectWithoutUserInput
+    connect?: UserStatsWhereUniqueInput
   }
 
   export type XpEventUncheckedCreateNestedManyWithoutUserInput = {
@@ -15507,6 +15494,16 @@ export namespace Prisma {
     set?: Date | string
   }
 
+  export type UserProfileUpdateOneWithoutUserNestedInput = {
+    create?: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserProfileCreateOrConnectWithoutUserInput
+    upsert?: UserProfileUpsertWithoutUserInput
+    disconnect?: UserProfileWhereInput | boolean
+    delete?: UserProfileWhereInput | boolean
+    connect?: UserProfileWhereUniqueInput
+    update?: XOR<XOR<UserProfileUpdateToOneWithWhereWithoutUserInput, UserProfileUpdateWithoutUserInput>, UserProfileUncheckedUpdateWithoutUserInput>
+  }
+
   export type SubmissionUpdateManyWithoutUserNestedInput = {
     create?: XOR<SubmissionCreateWithoutUserInput, SubmissionUncheckedCreateWithoutUserInput> | SubmissionCreateWithoutUserInput[] | SubmissionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SubmissionCreateOrConnectWithoutUserInput | SubmissionCreateOrConnectWithoutUserInput[]
@@ -15521,32 +15518,14 @@ export namespace Prisma {
     deleteMany?: SubmissionScalarWhereInput | SubmissionScalarWhereInput[]
   }
 
-  export type UserProfileUpdateManyWithoutUserNestedInput = {
-    create?: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput> | UserProfileCreateWithoutUserInput[] | UserProfileUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: UserProfileCreateOrConnectWithoutUserInput | UserProfileCreateOrConnectWithoutUserInput[]
-    upsert?: UserProfileUpsertWithWhereUniqueWithoutUserInput | UserProfileUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: UserProfileCreateManyUserInputEnvelope
-    set?: UserProfileWhereUniqueInput | UserProfileWhereUniqueInput[]
-    disconnect?: UserProfileWhereUniqueInput | UserProfileWhereUniqueInput[]
-    delete?: UserProfileWhereUniqueInput | UserProfileWhereUniqueInput[]
-    connect?: UserProfileWhereUniqueInput | UserProfileWhereUniqueInput[]
-    update?: UserProfileUpdateWithWhereUniqueWithoutUserInput | UserProfileUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: UserProfileUpdateManyWithWhereWithoutUserInput | UserProfileUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: UserProfileScalarWhereInput | UserProfileScalarWhereInput[]
-  }
-
-  export type UserStatsUpdateManyWithoutUserNestedInput = {
-    create?: XOR<UserStatsCreateWithoutUserInput, UserStatsUncheckedCreateWithoutUserInput> | UserStatsCreateWithoutUserInput[] | UserStatsUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: UserStatsCreateOrConnectWithoutUserInput | UserStatsCreateOrConnectWithoutUserInput[]
-    upsert?: UserStatsUpsertWithWhereUniqueWithoutUserInput | UserStatsUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: UserStatsCreateManyUserInputEnvelope
-    set?: UserStatsWhereUniqueInput | UserStatsWhereUniqueInput[]
-    disconnect?: UserStatsWhereUniqueInput | UserStatsWhereUniqueInput[]
-    delete?: UserStatsWhereUniqueInput | UserStatsWhereUniqueInput[]
-    connect?: UserStatsWhereUniqueInput | UserStatsWhereUniqueInput[]
-    update?: UserStatsUpdateWithWhereUniqueWithoutUserInput | UserStatsUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: UserStatsUpdateManyWithWhereWithoutUserInput | UserStatsUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: UserStatsScalarWhereInput | UserStatsScalarWhereInput[]
+  export type UserStatsUpdateOneWithoutUserNestedInput = {
+    create?: XOR<UserStatsCreateWithoutUserInput, UserStatsUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserStatsCreateOrConnectWithoutUserInput
+    upsert?: UserStatsUpsertWithoutUserInput
+    disconnect?: UserStatsWhereInput | boolean
+    delete?: UserStatsWhereInput | boolean
+    connect?: UserStatsWhereUniqueInput
+    update?: XOR<XOR<UserStatsUpdateToOneWithWhereWithoutUserInput, UserStatsUpdateWithoutUserInput>, UserStatsUncheckedUpdateWithoutUserInput>
   }
 
   export type XpEventUpdateManyWithoutUserNestedInput = {
@@ -15577,6 +15556,16 @@ export namespace Prisma {
     deleteMany?: RefreshTokenScalarWhereInput | RefreshTokenScalarWhereInput[]
   }
 
+  export type UserProfileUncheckedUpdateOneWithoutUserNestedInput = {
+    create?: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserProfileCreateOrConnectWithoutUserInput
+    upsert?: UserProfileUpsertWithoutUserInput
+    disconnect?: UserProfileWhereInput | boolean
+    delete?: UserProfileWhereInput | boolean
+    connect?: UserProfileWhereUniqueInput
+    update?: XOR<XOR<UserProfileUpdateToOneWithWhereWithoutUserInput, UserProfileUpdateWithoutUserInput>, UserProfileUncheckedUpdateWithoutUserInput>
+  }
+
   export type SubmissionUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<SubmissionCreateWithoutUserInput, SubmissionUncheckedCreateWithoutUserInput> | SubmissionCreateWithoutUserInput[] | SubmissionUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SubmissionCreateOrConnectWithoutUserInput | SubmissionCreateOrConnectWithoutUserInput[]
@@ -15591,32 +15580,14 @@ export namespace Prisma {
     deleteMany?: SubmissionScalarWhereInput | SubmissionScalarWhereInput[]
   }
 
-  export type UserProfileUncheckedUpdateManyWithoutUserNestedInput = {
-    create?: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput> | UserProfileCreateWithoutUserInput[] | UserProfileUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: UserProfileCreateOrConnectWithoutUserInput | UserProfileCreateOrConnectWithoutUserInput[]
-    upsert?: UserProfileUpsertWithWhereUniqueWithoutUserInput | UserProfileUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: UserProfileCreateManyUserInputEnvelope
-    set?: UserProfileWhereUniqueInput | UserProfileWhereUniqueInput[]
-    disconnect?: UserProfileWhereUniqueInput | UserProfileWhereUniqueInput[]
-    delete?: UserProfileWhereUniqueInput | UserProfileWhereUniqueInput[]
-    connect?: UserProfileWhereUniqueInput | UserProfileWhereUniqueInput[]
-    update?: UserProfileUpdateWithWhereUniqueWithoutUserInput | UserProfileUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: UserProfileUpdateManyWithWhereWithoutUserInput | UserProfileUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: UserProfileScalarWhereInput | UserProfileScalarWhereInput[]
-  }
-
-  export type UserStatsUncheckedUpdateManyWithoutUserNestedInput = {
-    create?: XOR<UserStatsCreateWithoutUserInput, UserStatsUncheckedCreateWithoutUserInput> | UserStatsCreateWithoutUserInput[] | UserStatsUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: UserStatsCreateOrConnectWithoutUserInput | UserStatsCreateOrConnectWithoutUserInput[]
-    upsert?: UserStatsUpsertWithWhereUniqueWithoutUserInput | UserStatsUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: UserStatsCreateManyUserInputEnvelope
-    set?: UserStatsWhereUniqueInput | UserStatsWhereUniqueInput[]
-    disconnect?: UserStatsWhereUniqueInput | UserStatsWhereUniqueInput[]
-    delete?: UserStatsWhereUniqueInput | UserStatsWhereUniqueInput[]
-    connect?: UserStatsWhereUniqueInput | UserStatsWhereUniqueInput[]
-    update?: UserStatsUpdateWithWhereUniqueWithoutUserInput | UserStatsUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: UserStatsUpdateManyWithWhereWithoutUserInput | UserStatsUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: UserStatsScalarWhereInput | UserStatsScalarWhereInput[]
+  export type UserStatsUncheckedUpdateOneWithoutUserNestedInput = {
+    create?: XOR<UserStatsCreateWithoutUserInput, UserStatsUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserStatsCreateOrConnectWithoutUserInput
+    upsert?: UserStatsUpsertWithoutUserInput
+    disconnect?: UserStatsWhereInput | boolean
+    delete?: UserStatsWhereInput | boolean
+    connect?: UserStatsWhereUniqueInput
+    update?: XOR<XOR<UserStatsUpdateToOneWithWhereWithoutUserInput, UserStatsUpdateWithoutUserInput>, UserStatsUncheckedUpdateWithoutUserInput>
   }
 
   export type XpEventUncheckedUpdateManyWithoutUserNestedInput = {
@@ -15673,9 +15644,9 @@ export namespace Prisma {
     set: string[]
   }
 
-  export type UserCreateNestedOneWithoutUserProfileInput = {
-    create?: XOR<UserCreateWithoutUserProfileInput, UserUncheckedCreateWithoutUserProfileInput>
-    connectOrCreate?: UserCreateOrConnectWithoutUserProfileInput
+  export type UserCreateNestedOneWithoutProfileInput = {
+    create?: XOR<UserCreateWithoutProfileInput, UserUncheckedCreateWithoutProfileInput>
+    connectOrCreate?: UserCreateOrConnectWithoutProfileInput
     connect?: UserWhereUniqueInput
   }
 
@@ -15722,12 +15693,12 @@ export namespace Prisma {
     set?: Date | string | null
   }
 
-  export type UserUpdateOneRequiredWithoutUserProfileNestedInput = {
-    create?: XOR<UserCreateWithoutUserProfileInput, UserUncheckedCreateWithoutUserProfileInput>
-    connectOrCreate?: UserCreateOrConnectWithoutUserProfileInput
-    upsert?: UserUpsertWithoutUserProfileInput
+  export type UserUpdateOneRequiredWithoutProfileNestedInput = {
+    create?: XOR<UserCreateWithoutProfileInput, UserUncheckedCreateWithoutProfileInput>
+    connectOrCreate?: UserCreateOrConnectWithoutProfileInput
+    upsert?: UserUpsertWithoutProfileInput
     connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutUserProfileInput, UserUpdateWithoutUserProfileInput>, UserUncheckedUpdateWithoutUserProfileInput>
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutProfileInput, UserUpdateWithoutProfileInput>, UserUncheckedUpdateWithoutProfileInput>
   }
 
   export type WritingPromptCreatetopicTagsInput = {
@@ -16003,18 +15974,18 @@ export namespace Prisma {
     update?: XOR<XOR<AnalysisRunUpdateToOneWithWhereWithoutMistakesInput, AnalysisRunUpdateWithoutMistakesInput>, AnalysisRunUncheckedUpdateWithoutMistakesInput>
   }
 
-  export type UserCreateNestedOneWithoutUserStatsInput = {
-    create?: XOR<UserCreateWithoutUserStatsInput, UserUncheckedCreateWithoutUserStatsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutUserStatsInput
+  export type UserCreateNestedOneWithoutStatsInput = {
+    create?: XOR<UserCreateWithoutStatsInput, UserUncheckedCreateWithoutStatsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutStatsInput
     connect?: UserWhereUniqueInput
   }
 
-  export type UserUpdateOneRequiredWithoutUserStatsNestedInput = {
-    create?: XOR<UserCreateWithoutUserStatsInput, UserUncheckedCreateWithoutUserStatsInput>
-    connectOrCreate?: UserCreateOrConnectWithoutUserStatsInput
-    upsert?: UserUpsertWithoutUserStatsInput
+  export type UserUpdateOneRequiredWithoutStatsNestedInput = {
+    create?: XOR<UserCreateWithoutStatsInput, UserUncheckedCreateWithoutStatsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutStatsInput
+    upsert?: UserUpsertWithoutStatsInput
     connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutUserStatsInput, UserUpdateWithoutUserStatsInput>, UserUncheckedUpdateWithoutUserStatsInput>
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutStatsInput, UserUpdateWithoutStatsInput>, UserUncheckedUpdateWithoutStatsInput>
   }
 
   export type UserCreateNestedOneWithoutXpEventsInput = {
@@ -16373,40 +16344,6 @@ export namespace Prisma {
     _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
-  export type SubmissionCreateWithoutUserInput = {
-    id?: string
-    title?: string | null
-    genre: $Enums.SubmissionGenre
-    body: string
-    wordCount: number
-    createdAt?: Date | string
-    prompt?: WritingPromptCreateNestedOneWithoutSubmissionsInput
-    analysisRuns?: AnalysisRunCreateNestedManyWithoutSubmissionInput
-    mistakes?: MistakeCreateNestedManyWithoutSubmissionInput
-  }
-
-  export type SubmissionUncheckedCreateWithoutUserInput = {
-    id?: string
-    promptId?: string | null
-    title?: string | null
-    genre: $Enums.SubmissionGenre
-    body: string
-    wordCount: number
-    createdAt?: Date | string
-    analysisRuns?: AnalysisRunUncheckedCreateNestedManyWithoutSubmissionInput
-    mistakes?: MistakeUncheckedCreateNestedManyWithoutSubmissionInput
-  }
-
-  export type SubmissionCreateOrConnectWithoutUserInput = {
-    where: SubmissionWhereUniqueInput
-    create: XOR<SubmissionCreateWithoutUserInput, SubmissionUncheckedCreateWithoutUserInput>
-  }
-
-  export type SubmissionCreateManyUserInputEnvelope = {
-    data: SubmissionCreateManyUserInput | SubmissionCreateManyUserInput[]
-    skipDuplicates?: boolean
-  }
-
   export type UserProfileCreateWithoutUserInput = {
     id?: string
     primaryRole: $Enums.PrimaryRole
@@ -16460,8 +16397,37 @@ export namespace Prisma {
     create: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput>
   }
 
-  export type UserProfileCreateManyUserInputEnvelope = {
-    data: UserProfileCreateManyUserInput | UserProfileCreateManyUserInput[]
+  export type SubmissionCreateWithoutUserInput = {
+    id?: string
+    title?: string | null
+    genre: $Enums.SubmissionGenre
+    body: string
+    wordCount: number
+    createdAt?: Date | string
+    prompt?: WritingPromptCreateNestedOneWithoutSubmissionsInput
+    analysisRuns?: AnalysisRunCreateNestedManyWithoutSubmissionInput
+    mistakes?: MistakeCreateNestedManyWithoutSubmissionInput
+  }
+
+  export type SubmissionUncheckedCreateWithoutUserInput = {
+    id?: string
+    promptId?: string | null
+    title?: string | null
+    genre: $Enums.SubmissionGenre
+    body: string
+    wordCount: number
+    createdAt?: Date | string
+    analysisRuns?: AnalysisRunUncheckedCreateNestedManyWithoutSubmissionInput
+    mistakes?: MistakeUncheckedCreateNestedManyWithoutSubmissionInput
+  }
+
+  export type SubmissionCreateOrConnectWithoutUserInput = {
+    where: SubmissionWhereUniqueInput
+    create: XOR<SubmissionCreateWithoutUserInput, SubmissionUncheckedCreateWithoutUserInput>
+  }
+
+  export type SubmissionCreateManyUserInputEnvelope = {
+    data: SubmissionCreateManyUserInput | SubmissionCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -16488,11 +16454,6 @@ export namespace Prisma {
   export type UserStatsCreateOrConnectWithoutUserInput = {
     where: UserStatsWhereUniqueInput
     create: XOR<UserStatsCreateWithoutUserInput, UserStatsUncheckedCreateWithoutUserInput>
-  }
-
-  export type UserStatsCreateManyUserInputEnvelope = {
-    data: UserStatsCreateManyUserInput | UserStatsCreateManyUserInput[]
-    skipDuplicates?: boolean
   }
 
   export type XpEventCreateWithoutUserInput = {
@@ -16553,6 +16514,65 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type UserProfileUpsertWithoutUserInput = {
+    update: XOR<UserProfileUpdateWithoutUserInput, UserProfileUncheckedUpdateWithoutUserInput>
+    create: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput>
+    where?: UserProfileWhereInput
+  }
+
+  export type UserProfileUpdateToOneWithWhereWithoutUserInput = {
+    where?: UserProfileWhereInput
+    data: XOR<UserProfileUpdateWithoutUserInput, UserProfileUncheckedUpdateWithoutUserInput>
+  }
+
+  export type UserProfileUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    primaryRole?: EnumPrimaryRoleFieldUpdateOperationsInput | $Enums.PrimaryRole
+    englishReadingSelfScore?: IntFieldUpdateOperationsInput | number
+    englishWritingSelfScore?: IntFieldUpdateOperationsInput | number
+    primaryGoal?: NullableEnumPrimaryGoalFieldUpdateOperationsInput | $Enums.PrimaryGoal | null
+    weeklyTimeMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    interestTags?: UserProfileUpdateinterestTagsInput | string[]
+    preferredGenres?: UserProfileUpdatepreferredGenresInput | $Enums.SubmissionGenre[]
+    localePreference?: StringFieldUpdateOperationsInput | string
+    grammarScore?: NullableIntFieldUpdateOperationsInput | number | null
+    vocabularyScore?: NullableIntFieldUpdateOperationsInput | number | null
+    fluencyScore?: NullableIntFieldUpdateOperationsInput | number | null
+    pronunciationScore?: NullableIntFieldUpdateOperationsInput | number | null
+    targetScoreGoal?: NullableIntFieldUpdateOperationsInput | number | null
+    dailyGoalMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    preferredLearningStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    weakAreas?: UserProfileUpdateweakAreasInput | string[]
+    initialAssessmentDone?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserProfileUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    primaryRole?: EnumPrimaryRoleFieldUpdateOperationsInput | $Enums.PrimaryRole
+    englishReadingSelfScore?: IntFieldUpdateOperationsInput | number
+    englishWritingSelfScore?: IntFieldUpdateOperationsInput | number
+    primaryGoal?: NullableEnumPrimaryGoalFieldUpdateOperationsInput | $Enums.PrimaryGoal | null
+    weeklyTimeMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    interestTags?: UserProfileUpdateinterestTagsInput | string[]
+    preferredGenres?: UserProfileUpdatepreferredGenresInput | $Enums.SubmissionGenre[]
+    localePreference?: StringFieldUpdateOperationsInput | string
+    grammarScore?: NullableIntFieldUpdateOperationsInput | number | null
+    vocabularyScore?: NullableIntFieldUpdateOperationsInput | number | null
+    fluencyScore?: NullableIntFieldUpdateOperationsInput | number | null
+    pronunciationScore?: NullableIntFieldUpdateOperationsInput | number | null
+    targetScoreGoal?: NullableIntFieldUpdateOperationsInput | number | null
+    dailyGoalMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    preferredLearningStyle?: NullableStringFieldUpdateOperationsInput | string | null
+    weakAreas?: UserProfileUpdateweakAreasInput | string[]
+    initialAssessmentDone?: BoolFieldUpdateOperationsInput | boolean
+    onboardingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SubmissionUpsertWithWhereUniqueWithoutUserInput = {
     where: SubmissionWhereUniqueInput
     update: XOR<SubmissionUpdateWithoutUserInput, SubmissionUncheckedUpdateWithoutUserInput>
@@ -16583,78 +16603,35 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Submission"> | Date | string
   }
 
-  export type UserProfileUpsertWithWhereUniqueWithoutUserInput = {
-    where: UserProfileWhereUniqueInput
-    update: XOR<UserProfileUpdateWithoutUserInput, UserProfileUncheckedUpdateWithoutUserInput>
-    create: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput>
-  }
-
-  export type UserProfileUpdateWithWhereUniqueWithoutUserInput = {
-    where: UserProfileWhereUniqueInput
-    data: XOR<UserProfileUpdateWithoutUserInput, UserProfileUncheckedUpdateWithoutUserInput>
-  }
-
-  export type UserProfileUpdateManyWithWhereWithoutUserInput = {
-    where: UserProfileScalarWhereInput
-    data: XOR<UserProfileUpdateManyMutationInput, UserProfileUncheckedUpdateManyWithoutUserInput>
-  }
-
-  export type UserProfileScalarWhereInput = {
-    AND?: UserProfileScalarWhereInput | UserProfileScalarWhereInput[]
-    OR?: UserProfileScalarWhereInput[]
-    NOT?: UserProfileScalarWhereInput | UserProfileScalarWhereInput[]
-    id?: StringFilter<"UserProfile"> | string
-    userId?: StringFilter<"UserProfile"> | string
-    primaryRole?: EnumPrimaryRoleFilter<"UserProfile"> | $Enums.PrimaryRole
-    englishReadingSelfScore?: IntFilter<"UserProfile"> | number
-    englishWritingSelfScore?: IntFilter<"UserProfile"> | number
-    primaryGoal?: EnumPrimaryGoalNullableFilter<"UserProfile"> | $Enums.PrimaryGoal | null
-    weeklyTimeMinutes?: IntNullableFilter<"UserProfile"> | number | null
-    interestTags?: StringNullableListFilter<"UserProfile">
-    preferredGenres?: EnumSubmissionGenreNullableListFilter<"UserProfile">
-    localePreference?: StringFilter<"UserProfile"> | string
-    grammarScore?: IntNullableFilter<"UserProfile"> | number | null
-    vocabularyScore?: IntNullableFilter<"UserProfile"> | number | null
-    fluencyScore?: IntNullableFilter<"UserProfile"> | number | null
-    pronunciationScore?: IntNullableFilter<"UserProfile"> | number | null
-    targetScoreGoal?: IntNullableFilter<"UserProfile"> | number | null
-    dailyGoalMinutes?: IntNullableFilter<"UserProfile"> | number | null
-    preferredLearningStyle?: StringNullableFilter<"UserProfile"> | string | null
-    weakAreas?: StringNullableListFilter<"UserProfile">
-    initialAssessmentDone?: BoolFilter<"UserProfile"> | boolean
-    onboardingCompletedAt?: DateTimeNullableFilter<"UserProfile"> | Date | string | null
-    createdAt?: DateTimeFilter<"UserProfile"> | Date | string
-    updatedAt?: DateTimeFilter<"UserProfile"> | Date | string
-  }
-
-  export type UserStatsUpsertWithWhereUniqueWithoutUserInput = {
-    where: UserStatsWhereUniqueInput
+  export type UserStatsUpsertWithoutUserInput = {
     update: XOR<UserStatsUpdateWithoutUserInput, UserStatsUncheckedUpdateWithoutUserInput>
     create: XOR<UserStatsCreateWithoutUserInput, UserStatsUncheckedCreateWithoutUserInput>
+    where?: UserStatsWhereInput
   }
 
-  export type UserStatsUpdateWithWhereUniqueWithoutUserInput = {
-    where: UserStatsWhereUniqueInput
+  export type UserStatsUpdateToOneWithWhereWithoutUserInput = {
+    where?: UserStatsWhereInput
     data: XOR<UserStatsUpdateWithoutUserInput, UserStatsUncheckedUpdateWithoutUserInput>
   }
 
-  export type UserStatsUpdateManyWithWhereWithoutUserInput = {
-    where: UserStatsScalarWhereInput
-    data: XOR<UserStatsUpdateManyMutationInput, UserStatsUncheckedUpdateManyWithoutUserInput>
+  export type UserStatsUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    totalXp?: IntFieldUpdateOperationsInput | number
+    level?: IntFieldUpdateOperationsInput | number
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    longestStreak?: IntFieldUpdateOperationsInput | number
+    lastActiveDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type UserStatsScalarWhereInput = {
-    AND?: UserStatsScalarWhereInput | UserStatsScalarWhereInput[]
-    OR?: UserStatsScalarWhereInput[]
-    NOT?: UserStatsScalarWhereInput | UserStatsScalarWhereInput[]
-    id?: StringFilter<"UserStats"> | string
-    userId?: StringFilter<"UserStats"> | string
-    totalXp?: IntFilter<"UserStats"> | number
-    level?: IntFilter<"UserStats"> | number
-    currentStreak?: IntFilter<"UserStats"> | number
-    longestStreak?: IntFilter<"UserStats"> | number
-    lastActiveDate?: DateTimeNullableFilter<"UserStats"> | Date | string | null
-    updatedAt?: DateTimeFilter<"UserStats"> | Date | string
+  export type UserStatsUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    totalXp?: IntFieldUpdateOperationsInput | number
+    level?: IntFieldUpdateOperationsInput | number
+    currentStreak?: IntFieldUpdateOperationsInput | number
+    longestStreak?: IntFieldUpdateOperationsInput | number
+    lastActiveDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type XpEventUpsertWithWhereUniqueWithoutUserInput = {
@@ -16720,14 +16697,15 @@ export namespace Prisma {
     id?: string
     name: string
     email: string
-    password?: string | null
+    passwordHash?: string | null
+    displayName?: string | null
     image?: string | null
     isNewUser?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    profile?: UserProfileCreateNestedOneWithoutUserInput
     submissions?: SubmissionCreateNestedManyWithoutUserInput
-    userProfile?: UserProfileCreateNestedManyWithoutUserInput
-    userStats?: UserStatsCreateNestedManyWithoutUserInput
+    stats?: UserStatsCreateNestedOneWithoutUserInput
     xpEvents?: XpEventCreateNestedManyWithoutUserInput
   }
 
@@ -16735,14 +16713,15 @@ export namespace Prisma {
     id?: string
     name: string
     email: string
-    password?: string | null
+    passwordHash?: string | null
+    displayName?: string | null
     image?: string | null
     isNewUser?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    profile?: UserProfileUncheckedCreateNestedOneWithoutUserInput
     submissions?: SubmissionUncheckedCreateNestedManyWithoutUserInput
-    userProfile?: UserProfileUncheckedCreateNestedManyWithoutUserInput
-    userStats?: UserStatsUncheckedCreateNestedManyWithoutUserInput
+    stats?: UserStatsUncheckedCreateNestedOneWithoutUserInput
     xpEvents?: XpEventUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -16766,14 +16745,15 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     isNewUser?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: UserProfileUpdateOneWithoutUserNestedInput
     submissions?: SubmissionUpdateManyWithoutUserNestedInput
-    userProfile?: UserProfileUpdateManyWithoutUserNestedInput
-    userStats?: UserStatsUpdateManyWithoutUserNestedInput
+    stats?: UserStatsUpdateOneWithoutUserNestedInput
     xpEvents?: XpEventUpdateManyWithoutUserNestedInput
   }
 
@@ -16781,89 +16761,94 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     isNewUser?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: UserProfileUncheckedUpdateOneWithoutUserNestedInput
     submissions?: SubmissionUncheckedUpdateManyWithoutUserNestedInput
-    userProfile?: UserProfileUncheckedUpdateManyWithoutUserNestedInput
-    userStats?: UserStatsUncheckedUpdateManyWithoutUserNestedInput
+    stats?: UserStatsUncheckedUpdateOneWithoutUserNestedInput
     xpEvents?: XpEventUncheckedUpdateManyWithoutUserNestedInput
   }
 
-  export type UserCreateWithoutUserProfileInput = {
+  export type UserCreateWithoutProfileInput = {
     id?: string
     name: string
     email: string
-    password?: string | null
+    passwordHash?: string | null
+    displayName?: string | null
     image?: string | null
     isNewUser?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     submissions?: SubmissionCreateNestedManyWithoutUserInput
-    userStats?: UserStatsCreateNestedManyWithoutUserInput
+    stats?: UserStatsCreateNestedOneWithoutUserInput
     xpEvents?: XpEventCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
   }
 
-  export type UserUncheckedCreateWithoutUserProfileInput = {
+  export type UserUncheckedCreateWithoutProfileInput = {
     id?: string
     name: string
     email: string
-    password?: string | null
+    passwordHash?: string | null
+    displayName?: string | null
     image?: string | null
     isNewUser?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     submissions?: SubmissionUncheckedCreateNestedManyWithoutUserInput
-    userStats?: UserStatsUncheckedCreateNestedManyWithoutUserInput
+    stats?: UserStatsUncheckedCreateNestedOneWithoutUserInput
     xpEvents?: XpEventUncheckedCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutUserProfileInput = {
+  export type UserCreateOrConnectWithoutProfileInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutUserProfileInput, UserUncheckedCreateWithoutUserProfileInput>
+    create: XOR<UserCreateWithoutProfileInput, UserUncheckedCreateWithoutProfileInput>
   }
 
-  export type UserUpsertWithoutUserProfileInput = {
-    update: XOR<UserUpdateWithoutUserProfileInput, UserUncheckedUpdateWithoutUserProfileInput>
-    create: XOR<UserCreateWithoutUserProfileInput, UserUncheckedCreateWithoutUserProfileInput>
+  export type UserUpsertWithoutProfileInput = {
+    update: XOR<UserUpdateWithoutProfileInput, UserUncheckedUpdateWithoutProfileInput>
+    create: XOR<UserCreateWithoutProfileInput, UserUncheckedCreateWithoutProfileInput>
     where?: UserWhereInput
   }
 
-  export type UserUpdateToOneWithWhereWithoutUserProfileInput = {
+  export type UserUpdateToOneWithWhereWithoutProfileInput = {
     where?: UserWhereInput
-    data: XOR<UserUpdateWithoutUserProfileInput, UserUncheckedUpdateWithoutUserProfileInput>
+    data: XOR<UserUpdateWithoutProfileInput, UserUncheckedUpdateWithoutProfileInput>
   }
 
-  export type UserUpdateWithoutUserProfileInput = {
+  export type UserUpdateWithoutProfileInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     isNewUser?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     submissions?: SubmissionUpdateManyWithoutUserNestedInput
-    userStats?: UserStatsUpdateManyWithoutUserNestedInput
+    stats?: UserStatsUpdateOneWithoutUserNestedInput
     xpEvents?: XpEventUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutUserProfileInput = {
+  export type UserUncheckedUpdateWithoutProfileInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     isNewUser?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     submissions?: SubmissionUncheckedUpdateManyWithoutUserNestedInput
-    userStats?: UserStatsUncheckedUpdateManyWithoutUserNestedInput
+    stats?: UserStatsUncheckedUpdateOneWithoutUserNestedInput
     xpEvents?: XpEventUncheckedUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -16922,13 +16907,14 @@ export namespace Prisma {
     id?: string
     name: string
     email: string
-    password?: string | null
+    passwordHash?: string | null
+    displayName?: string | null
     image?: string | null
     isNewUser?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    userProfile?: UserProfileCreateNestedManyWithoutUserInput
-    userStats?: UserStatsCreateNestedManyWithoutUserInput
+    profile?: UserProfileCreateNestedOneWithoutUserInput
+    stats?: UserStatsCreateNestedOneWithoutUserInput
     xpEvents?: XpEventCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
   }
@@ -16937,13 +16923,14 @@ export namespace Prisma {
     id?: string
     name: string
     email: string
-    password?: string | null
+    passwordHash?: string | null
+    displayName?: string | null
     image?: string | null
     isNewUser?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
-    userProfile?: UserProfileUncheckedCreateNestedManyWithoutUserInput
-    userStats?: UserStatsUncheckedCreateNestedManyWithoutUserInput
+    profile?: UserProfileUncheckedCreateNestedOneWithoutUserInput
+    stats?: UserStatsUncheckedCreateNestedOneWithoutUserInput
     xpEvents?: XpEventUncheckedCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   }
@@ -17075,13 +17062,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     isNewUser?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    userProfile?: UserProfileUpdateManyWithoutUserNestedInput
-    userStats?: UserStatsUpdateManyWithoutUserNestedInput
+    profile?: UserProfileUpdateOneWithoutUserNestedInput
+    stats?: UserStatsUpdateOneWithoutUserNestedInput
     xpEvents?: XpEventUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
   }
@@ -17090,13 +17078,14 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     isNewUser?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    userProfile?: UserProfileUncheckedUpdateManyWithoutUserNestedInput
-    userStats?: UserStatsUncheckedUpdateManyWithoutUserNestedInput
+    profile?: UserProfileUncheckedUpdateOneWithoutUserNestedInput
+    stats?: UserStatsUncheckedUpdateOneWithoutUserNestedInput
     xpEvents?: XpEventUncheckedUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -17461,78 +17450,82 @@ export namespace Prisma {
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
-  export type UserCreateWithoutUserStatsInput = {
+  export type UserCreateWithoutStatsInput = {
     id?: string
     name: string
     email: string
-    password?: string | null
+    passwordHash?: string | null
+    displayName?: string | null
     image?: string | null
     isNewUser?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    profile?: UserProfileCreateNestedOneWithoutUserInput
     submissions?: SubmissionCreateNestedManyWithoutUserInput
-    userProfile?: UserProfileCreateNestedManyWithoutUserInput
     xpEvents?: XpEventCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
   }
 
-  export type UserUncheckedCreateWithoutUserStatsInput = {
+  export type UserUncheckedCreateWithoutStatsInput = {
     id?: string
     name: string
     email: string
-    password?: string | null
+    passwordHash?: string | null
+    displayName?: string | null
     image?: string | null
     isNewUser?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    profile?: UserProfileUncheckedCreateNestedOneWithoutUserInput
     submissions?: SubmissionUncheckedCreateNestedManyWithoutUserInput
-    userProfile?: UserProfileUncheckedCreateNestedManyWithoutUserInput
     xpEvents?: XpEventUncheckedCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
-  export type UserCreateOrConnectWithoutUserStatsInput = {
+  export type UserCreateOrConnectWithoutStatsInput = {
     where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutUserStatsInput, UserUncheckedCreateWithoutUserStatsInput>
+    create: XOR<UserCreateWithoutStatsInput, UserUncheckedCreateWithoutStatsInput>
   }
 
-  export type UserUpsertWithoutUserStatsInput = {
-    update: XOR<UserUpdateWithoutUserStatsInput, UserUncheckedUpdateWithoutUserStatsInput>
-    create: XOR<UserCreateWithoutUserStatsInput, UserUncheckedCreateWithoutUserStatsInput>
+  export type UserUpsertWithoutStatsInput = {
+    update: XOR<UserUpdateWithoutStatsInput, UserUncheckedUpdateWithoutStatsInput>
+    create: XOR<UserCreateWithoutStatsInput, UserUncheckedCreateWithoutStatsInput>
     where?: UserWhereInput
   }
 
-  export type UserUpdateToOneWithWhereWithoutUserStatsInput = {
+  export type UserUpdateToOneWithWhereWithoutStatsInput = {
     where?: UserWhereInput
-    data: XOR<UserUpdateWithoutUserStatsInput, UserUncheckedUpdateWithoutUserStatsInput>
+    data: XOR<UserUpdateWithoutStatsInput, UserUncheckedUpdateWithoutStatsInput>
   }
 
-  export type UserUpdateWithoutUserStatsInput = {
+  export type UserUpdateWithoutStatsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     isNewUser?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: UserProfileUpdateOneWithoutUserNestedInput
     submissions?: SubmissionUpdateManyWithoutUserNestedInput
-    userProfile?: UserProfileUpdateManyWithoutUserNestedInput
     xpEvents?: XpEventUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
   }
 
-  export type UserUncheckedUpdateWithoutUserStatsInput = {
+  export type UserUncheckedUpdateWithoutStatsInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     isNewUser?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: UserProfileUncheckedUpdateOneWithoutUserNestedInput
     submissions?: SubmissionUncheckedUpdateManyWithoutUserNestedInput
-    userProfile?: UserProfileUncheckedUpdateManyWithoutUserNestedInput
     xpEvents?: XpEventUncheckedUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -17541,14 +17534,15 @@ export namespace Prisma {
     id?: string
     name: string
     email: string
-    password?: string | null
+    passwordHash?: string | null
+    displayName?: string | null
     image?: string | null
     isNewUser?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    profile?: UserProfileCreateNestedOneWithoutUserInput
     submissions?: SubmissionCreateNestedManyWithoutUserInput
-    userProfile?: UserProfileCreateNestedManyWithoutUserInput
-    userStats?: UserStatsCreateNestedManyWithoutUserInput
+    stats?: UserStatsCreateNestedOneWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
   }
 
@@ -17556,14 +17550,15 @@ export namespace Prisma {
     id?: string
     name: string
     email: string
-    password?: string | null
+    passwordHash?: string | null
+    displayName?: string | null
     image?: string | null
     isNewUser?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    profile?: UserProfileUncheckedCreateNestedOneWithoutUserInput
     submissions?: SubmissionUncheckedCreateNestedManyWithoutUserInput
-    userProfile?: UserProfileUncheckedCreateNestedManyWithoutUserInput
-    userStats?: UserStatsUncheckedCreateNestedManyWithoutUserInput
+    stats?: UserStatsUncheckedCreateNestedOneWithoutUserInput
     refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -17587,14 +17582,15 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     isNewUser?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: UserProfileUpdateOneWithoutUserNestedInput
     submissions?: SubmissionUpdateManyWithoutUserNestedInput
-    userProfile?: UserProfileUpdateManyWithoutUserNestedInput
-    userStats?: UserStatsUpdateManyWithoutUserNestedInput
+    stats?: UserStatsUpdateOneWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
   }
 
@@ -17602,14 +17598,15 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
-    password?: NullableStringFieldUpdateOperationsInput | string | null
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
     image?: NullableStringFieldUpdateOperationsInput | string | null
     isNewUser?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: UserProfileUncheckedUpdateOneWithoutUserNestedInput
     submissions?: SubmissionUncheckedUpdateManyWithoutUserNestedInput
-    userProfile?: UserProfileUncheckedUpdateManyWithoutUserNestedInput
-    userStats?: UserStatsUncheckedUpdateManyWithoutUserNestedInput
+    stats?: UserStatsUncheckedUpdateOneWithoutUserNestedInput
     refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -17621,40 +17618,6 @@ export namespace Prisma {
     body: string
     wordCount: number
     createdAt?: Date | string
-  }
-
-  export type UserProfileCreateManyUserInput = {
-    id?: string
-    primaryRole: $Enums.PrimaryRole
-    englishReadingSelfScore: number
-    englishWritingSelfScore: number
-    primaryGoal?: $Enums.PrimaryGoal | null
-    weeklyTimeMinutes?: number | null
-    interestTags?: UserProfileCreateinterestTagsInput | string[]
-    preferredGenres?: UserProfileCreatepreferredGenresInput | $Enums.SubmissionGenre[]
-    localePreference?: string
-    grammarScore?: number | null
-    vocabularyScore?: number | null
-    fluencyScore?: number | null
-    pronunciationScore?: number | null
-    targetScoreGoal?: number | null
-    dailyGoalMinutes?: number | null
-    preferredLearningStyle?: string | null
-    weakAreas?: UserProfileCreateweakAreasInput | string[]
-    initialAssessmentDone?: boolean
-    onboardingCompletedAt?: Date | string | null
-    createdAt?: Date | string
-    updatedAt?: Date | string
-  }
-
-  export type UserStatsCreateManyUserInput = {
-    id?: string
-    totalXp?: number
-    level?: number
-    currentStreak?: number
-    longestStreak?: number
-    lastActiveDate?: Date | string | null
-    updatedAt?: Date | string
   }
 
   export type XpEventCreateManyUserInput = {
@@ -17708,108 +17671,6 @@ export namespace Prisma {
     body?: StringFieldUpdateOperationsInput | string
     wordCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type UserProfileUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    primaryRole?: EnumPrimaryRoleFieldUpdateOperationsInput | $Enums.PrimaryRole
-    englishReadingSelfScore?: IntFieldUpdateOperationsInput | number
-    englishWritingSelfScore?: IntFieldUpdateOperationsInput | number
-    primaryGoal?: NullableEnumPrimaryGoalFieldUpdateOperationsInput | $Enums.PrimaryGoal | null
-    weeklyTimeMinutes?: NullableIntFieldUpdateOperationsInput | number | null
-    interestTags?: UserProfileUpdateinterestTagsInput | string[]
-    preferredGenres?: UserProfileUpdatepreferredGenresInput | $Enums.SubmissionGenre[]
-    localePreference?: StringFieldUpdateOperationsInput | string
-    grammarScore?: NullableIntFieldUpdateOperationsInput | number | null
-    vocabularyScore?: NullableIntFieldUpdateOperationsInput | number | null
-    fluencyScore?: NullableIntFieldUpdateOperationsInput | number | null
-    pronunciationScore?: NullableIntFieldUpdateOperationsInput | number | null
-    targetScoreGoal?: NullableIntFieldUpdateOperationsInput | number | null
-    dailyGoalMinutes?: NullableIntFieldUpdateOperationsInput | number | null
-    preferredLearningStyle?: NullableStringFieldUpdateOperationsInput | string | null
-    weakAreas?: UserProfileUpdateweakAreasInput | string[]
-    initialAssessmentDone?: BoolFieldUpdateOperationsInput | boolean
-    onboardingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type UserProfileUncheckedUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    primaryRole?: EnumPrimaryRoleFieldUpdateOperationsInput | $Enums.PrimaryRole
-    englishReadingSelfScore?: IntFieldUpdateOperationsInput | number
-    englishWritingSelfScore?: IntFieldUpdateOperationsInput | number
-    primaryGoal?: NullableEnumPrimaryGoalFieldUpdateOperationsInput | $Enums.PrimaryGoal | null
-    weeklyTimeMinutes?: NullableIntFieldUpdateOperationsInput | number | null
-    interestTags?: UserProfileUpdateinterestTagsInput | string[]
-    preferredGenres?: UserProfileUpdatepreferredGenresInput | $Enums.SubmissionGenre[]
-    localePreference?: StringFieldUpdateOperationsInput | string
-    grammarScore?: NullableIntFieldUpdateOperationsInput | number | null
-    vocabularyScore?: NullableIntFieldUpdateOperationsInput | number | null
-    fluencyScore?: NullableIntFieldUpdateOperationsInput | number | null
-    pronunciationScore?: NullableIntFieldUpdateOperationsInput | number | null
-    targetScoreGoal?: NullableIntFieldUpdateOperationsInput | number | null
-    dailyGoalMinutes?: NullableIntFieldUpdateOperationsInput | number | null
-    preferredLearningStyle?: NullableStringFieldUpdateOperationsInput | string | null
-    weakAreas?: UserProfileUpdateweakAreasInput | string[]
-    initialAssessmentDone?: BoolFieldUpdateOperationsInput | boolean
-    onboardingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type UserProfileUncheckedUpdateManyWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    primaryRole?: EnumPrimaryRoleFieldUpdateOperationsInput | $Enums.PrimaryRole
-    englishReadingSelfScore?: IntFieldUpdateOperationsInput | number
-    englishWritingSelfScore?: IntFieldUpdateOperationsInput | number
-    primaryGoal?: NullableEnumPrimaryGoalFieldUpdateOperationsInput | $Enums.PrimaryGoal | null
-    weeklyTimeMinutes?: NullableIntFieldUpdateOperationsInput | number | null
-    interestTags?: UserProfileUpdateinterestTagsInput | string[]
-    preferredGenres?: UserProfileUpdatepreferredGenresInput | $Enums.SubmissionGenre[]
-    localePreference?: StringFieldUpdateOperationsInput | string
-    grammarScore?: NullableIntFieldUpdateOperationsInput | number | null
-    vocabularyScore?: NullableIntFieldUpdateOperationsInput | number | null
-    fluencyScore?: NullableIntFieldUpdateOperationsInput | number | null
-    pronunciationScore?: NullableIntFieldUpdateOperationsInput | number | null
-    targetScoreGoal?: NullableIntFieldUpdateOperationsInput | number | null
-    dailyGoalMinutes?: NullableIntFieldUpdateOperationsInput | number | null
-    preferredLearningStyle?: NullableStringFieldUpdateOperationsInput | string | null
-    weakAreas?: UserProfileUpdateweakAreasInput | string[]
-    initialAssessmentDone?: BoolFieldUpdateOperationsInput | boolean
-    onboardingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type UserStatsUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    totalXp?: IntFieldUpdateOperationsInput | number
-    level?: IntFieldUpdateOperationsInput | number
-    currentStreak?: IntFieldUpdateOperationsInput | number
-    longestStreak?: IntFieldUpdateOperationsInput | number
-    lastActiveDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type UserStatsUncheckedUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    totalXp?: IntFieldUpdateOperationsInput | number
-    level?: IntFieldUpdateOperationsInput | number
-    currentStreak?: IntFieldUpdateOperationsInput | number
-    longestStreak?: IntFieldUpdateOperationsInput | number
-    lastActiveDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type UserStatsUncheckedUpdateManyWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    totalXp?: IntFieldUpdateOperationsInput | number
-    level?: IntFieldUpdateOperationsInput | number
-    currentStreak?: IntFieldUpdateOperationsInput | number
-    longestStreak?: IntFieldUpdateOperationsInput | number
-    lastActiveDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type XpEventUpdateWithoutUserInput = {

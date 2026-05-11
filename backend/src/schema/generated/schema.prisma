@@ -60,17 +60,17 @@ enum PillarCode {
 }
 
 model User {
-  id       String  @id @default(uuid())
-  name     String
-  email    String  @unique
-  password String?
-  image    String?
+  id           String  @id @default(uuid())
+  name         String
+  email        String  @unique
+  passwordHash String?
+  displayName  String?
+  image        String?
 
-  submissions Submission[]
-  userProfile UserProfile[]
-  userStats   UserStats[]
-  xpEvents    XpEvent[]
-
+  profile       UserProfile?
+  submissions   Submission[]
+  stats         UserStats?
+  xpEvents      XpEvent[]
   refreshTokens RefreshToken[]
 
   isNewUser Boolean @default(true)
@@ -108,19 +108,18 @@ model UserProfile {
   englishWritingSelfScore Int // 1-5
   primaryGoal             PrimaryGoal?
   weeklyTimeMinutes       Int?
-  interestTags            String[] // FINANCE, SPORTS, etc.
+  interestTags            String[]
   preferredGenres         SubmissionGenre[]
   localePreference        String            @default("en-US")
-  grammarScore            Int? // AI assessed (0–100)
+  grammarScore            Int?
   vocabularyScore         Int?
   fluencyScore            Int?
   pronunciationScore      Int?
-
-  targetScoreGoal        Int? // optional (like IELTS band target)
-  dailyGoalMinutes       Int? // realistic habit building
-  preferredLearningStyle String? // visual, conversation, quiz, etc.
-  weakAreas              String[] // ["grammar", "speaking", "confidence"]
-  initialAssessmentDone  Boolean  @default(false)
+  targetScoreGoal         Int?
+  dailyGoalMinutes        Int?
+  preferredLearningStyle  String?
+  weakAreas               String[]
+  initialAssessmentDone   Boolean           @default(false)
 
   onboardingCompletedAt DateTime?
   createdAt             DateTime  @default(now())

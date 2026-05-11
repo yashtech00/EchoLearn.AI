@@ -4,10 +4,24 @@ import jwt from "jsonwebtoken";
 
 export const Protect = async (req, res, next) => {
     try {
-        // First try Authorization header (access token)
+        // First try accessToken from cookie (HTTP-only)
+        let accessToken = req.cookies?.accessToken;
+        
+        if (accessToken) {
+            try {
+                const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
+                req.user = { userId: decoded.id };
+                return next();
+            } catch (jwtError) {
+                // Access token invalid, try other methods
+                console.log("Access token from cookie invalid, trying header");
+            }
+        }
+
+        // Try Authorization header (access token)
         const authHeader = req.headers.authorization;
         if (authHeader && authHeader.startsWith('Bearer ')) {
-            const accessToken = authHeader.split(' ')[1];
+            accessToken = authHeader.split(' ')[1];
             
             try {
                 const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
@@ -15,7 +29,7 @@ export const Protect = async (req, res, next) => {
                 return next();
             } catch (jwtError) {
                 // Access token invalid, try refresh token
-                console.log("Access token invalid, trying refresh token");
+                console.log("Access token from header invalid, trying refresh token");
             }
         }
 

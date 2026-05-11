@@ -5,6 +5,7 @@ import { ConnectionDb } from "./config/db.js";
 import auth_router from "./routes/auth_routes.js";
 import session from "express-session";
 import user_profile_router from "./routes/user_profile_routes.js";
+import mistake_memory_router from "./routes/mistake_memory_routes.js";
 import cookieParser from "cookie-parser";
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.options(/.*/, cors());
 
 app.use("/api/v1/auth", auth_router);
 app.use("/api/v1/profile", user_profile_router);
+app.use("/api/v1/writing", mistake_memory_router);
 // Health check
 app.get("/health", (_, res) => res.json({ status: "ok", timestamp: new Date().toISOString() }));
 

@@ -5,12 +5,6 @@ CREATE SCHEMA IF NOT EXISTS "public";
 CREATE TYPE "PrimaryRole" AS ENUM ('STUDENT', 'WORKING_PROFESSIONAL', 'OTHER');
 
 -- CreateEnum
-CREATE TYPE "EducationLevel" AS ENUM ('HIGH_SCHOOL', 'UNDERGRAD', 'GRADUATE', 'OTHER');
-
--- CreateEnum
-CREATE TYPE "InstitutionContext" AS ENUM ('SCHOOL', 'COLLEGE', 'WORKPLACE', 'SELF_STUDY');
-
--- CreateEnum
 CREATE TYPE "PrimaryGoal" AS ENUM ('EXAM', 'JOB_COMMUNICATION', 'ACADEMIC', 'RELOCATION', 'CASUAL');
 
 -- CreateEnum
@@ -59,9 +53,6 @@ CREATE TABLE "UserProfile" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "primaryRole" "PrimaryRole" NOT NULL,
-    "educationLevel" "EducationLevel",
-    "intitutionContext" TEXT,
-    "occupationTitle" TEXT,
     "englishReadingSelfScore" INTEGER NOT NULL,
     "englishWritingSelfScore" INTEGER NOT NULL,
     "primaryGoal" "PrimaryGoal",

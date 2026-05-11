@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, BookOpen, Target, BarChart3, Settings, LogOut, User } from "lucide-react";
+import { Home, BookOpen, Target, BarChart3, Settings, LogOut, User, PenTool, Brain } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
 interface SidebarItem {
@@ -12,10 +12,9 @@ interface SidebarItem {
 
 const sidebarItems: SidebarItem[] = [
   { id: "home", label: "Dashboard", icon: Home, path: "/Dashboard" },
-  { id: "lessons", label: "Lessons", icon: BookOpen, path: "/Dashboard/Lessons" },
-  { id: "goals", label: "Goals", icon: Target, path: "/Dashboard/Goals" },
-  { id: "progress", label: "Progress", icon: BarChart3, path: "/Dashboard/Progress" },
-  { id: "settings", label: "Settings", icon: Settings, path: "/Dashboard/Settings" },
+  { id: "writing", label: "Writing Coach", icon: PenTool, path: "/Dashboard/WritingCoach" },
+  { id: "mistakes", label: "Mistake Memory", icon: Brain, path: "/Dashboard/MistakeMemory" },
+ 
 ];
 
 interface DashboardSidebarProps {

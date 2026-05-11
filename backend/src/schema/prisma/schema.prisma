@@ -35,6 +35,14 @@ enum SubmissionGenre {
 
 enum AnalysisStatus {
   PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum SubmissionStatus {
+  PENDING
+  PROCESSING
   COMPLETED
   FAILED
 }
@@ -61,17 +69,17 @@ enum PillarCode {
 }
 
 model User {
-  id       String  @id @default(uuid())
-  name     String
-  email    String  @unique
-  password String?
-  image    String?
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String?
+  displayName  String?
+  image        String?
 
+  profile     UserProfile?
   submissions Submission[]
-  userProfile UserProfile[]
-  userStats   UserStats[]
+  stats       UserStats?
   xpEvents    XpEvent[]
-
   refreshTokens RefreshToken[]
 
   isNewUser Boolean @default(true)
@@ -109,18 +117,17 @@ model UserProfile {
   englishWritingSelfScore Int // 1-5
   primaryGoal             PrimaryGoal?
   weeklyTimeMinutes       Int?
-  interestTags            String[] // FINANCE, SPORTS, etc.
+  interestTags            String[]
   preferredGenres         SubmissionGenre[]
   localePreference        String            @default("en-US")
-  grammarScore            Int? // AI assessed (0–100)
+  grammarScore            Int?
   vocabularyScore         Int?
   fluencyScore            Int?
   pronunciationScore      Int?
-
-  targetScoreGoal         Int? // optional (like IELTS band target)
-  dailyGoalMinutes        Int? // realistic habit building
-  preferredLearningStyle  String? // visual, conversation, quiz, etc.
-  weakAreas               String[] // ["grammar", "speaking", "confidence"]
+  targetScoreGoal         Int?
+  dailyGoalMinutes        Int?
+  preferredLearningStyle  String?
+  weakAreas               String[]
   initialAssessmentDone   Boolean           @default(false)
 
   onboardingCompletedAt DateTime?
@@ -155,12 +162,20 @@ model Submission {
   body      String          @db.Text
   wordCount Int
 
+  status         SubmissionStatus @default(PENDING)
+  analysisJson   Json?
+  rawAIResponse  String?          @db.Text
+  errorMessage   String?
+  completedAt    DateTime?
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   analysisRuns AnalysisRun[]
   mistakes     Mistake[]
 
   @@index([userId, createdAt])
+  @@index([status])
 }
 
 model AnalysisRun {
@@ -231,9 +246,9 @@ model UserStats {
 }
 
 model XpEvent {
-  id     String @id @default(cuid())
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   eventType String
   xpDelta   Int

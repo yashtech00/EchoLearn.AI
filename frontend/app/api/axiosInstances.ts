@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { tokenManager } from '@/lib/tokenManager';
 
 // Backend URL is injected at runtime by the server (layout.js) so Railway env vars work without rebuild
 // Backend default port is 3000 (see backend/index.js)
@@ -17,20 +16,14 @@ const axiosInstance = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    withCredentials: true,
+    withCredentials: true, // Important: this sends cookies
 });
 
-// Request interceptor to add auth token and ensure correct baseURL (runtime-injected)
+// Request interceptor to ensure correct baseURL (runtime-injected)
 axiosInstance.interceptors.request.use(
     (config) => {
         config.baseURL = getBaseURL();
-        // Get token from token manager
-        const token = tokenManager.getAccessToken();
-
-        if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        }
-
+        
         // Let browser set Content-Type with boundary for FormData (file uploads)
         if (config.data instanceof FormData) {
             delete config.headers['Content-Type'];
@@ -64,55 +57,27 @@ axiosInstance.interceptors.response.use(
                     // Mark request as retried to prevent infinite loops
                     originalRequest._retry = true;
 
-                    // If already refreshing, queue the request
-                    if (tokenManager.isRefreshing()) {
-                        return new Promise((resolve) => {
-                            tokenManager.addRefreshSubscriber((token: string) => {
-                                originalRequest.headers.Authorization = `Bearer ${token}`;
-                                resolve(axiosInstance(originalRequest));
-                            });
-                        });
-                    }
-
-                    // Start refresh process
-                    tokenManager.setRefreshing(true);
-
                     try {
-                        // Call refresh endpoint
-                        const response = await axios.post(
+                        // Call refresh endpoint (cookies are sent automatically with withCredentials: true)
+                        await axios.post(
                             getBaseURL() + 'auth/refresh',
                             {},
                             { withCredentials: true }
                         );
-
-                        const newAccessToken = response.data.accessToken;
                         
-                        // Update token manager
-                        tokenManager.setAccessToken(newAccessToken);
-                        
-                        // Notify all queued requests
-                        tokenManager.notifyRefreshSubscribers(newAccessToken);
-                        
-                        // Retry original request with new token
-                        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+                        // Retry original request (new cookies will be sent automatically)
                         return axiosInstance(originalRequest);
                     } catch (refreshError) {
-                        // Refresh failed - clear tokens and redirect to login
-                        tokenManager.clearAccessToken();
-                        tokenManager.clearRefreshSubscribers();
-                        
+                        // Refresh failed - redirect to login
                         if (typeof window !== 'undefined') {
                             window.location.href = '/auth/login';
                         }
                         
                         return Promise.reject(refreshError);
-                    } finally {
-                        tokenManager.setRefreshing(false);
                     }
                 } else {
                     // Auth request failed - redirect to login
                     if (typeof window !== 'undefined') {
-                        tokenManager.clearAccessToken();
                         window.location.href = '/auth/login';
                     }
                 }

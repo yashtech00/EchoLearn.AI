@@ -42,7 +42,7 @@ export const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 12);
 
         const newUser = await prisma.user.create({
-            data: { name, email, password: hashedPassword },
+            data: { name, email, passwordHash: hashedPassword },
         });
 
         // tokens
@@ -72,9 +72,16 @@ export const register = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            path: "/",
+            maxAge: 15 * 60 * 1000, // 15 minutes
+        });
+
         return res.status(201).json({
             message: "User registered successfully",
-            accessToken,
             user: { id: newUser.id, name: newUser.name, email: newUser.email, isNewUser: newUser.isNewUser },
         });
 
@@ -136,8 +143,15 @@ export const login = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            path: "/",
+            maxAge: 15 * 60 * 1000, // 15 minutes
+        });
+
         return res.status(200).json({
-            accessToken,
             user: { id: user.id, name: user.name, email: user.email, isNewUser: user.isNewUser },
         });
 
@@ -198,8 +212,16 @@ export const refresh = async (req, res) => {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             sameSite: "lax",
-            path: "/api/auth/refresh",
+            path: "/",
             maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            path: "/",
+            maxAge: 15 * 60 * 1000, // 15 minutes
         });
 
         return res.json({ accessToken });
@@ -230,6 +252,10 @@ export const logout = async (req, res) => {
         }
 
         res.clearCookie("refreshToken", {
+            path: "/",
+        });
+
+        res.clearCookie("accessToken", {
             path: "/",
         });
 
@@ -383,14 +409,22 @@ export const googleAuth = (req, res) => {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
-        path: "/api/auth/refresh",
+        path: "/",
         maxAge: 7 * 24 * 60 * 60 * 1000,
       });
-  
+
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        path: "/",
+        maxAge: 15 * 60 * 1000, // 15 minutes
+      });
+
       // 🔥 redirect
       return res.redirect(
         frontendUrl(
-          `/oauth-success?accessToken=${encodeURIComponent(accessToken)}&isNewUser=${user.isNewUser}`
+          `/oauth-success?isNewUser=${user.isNewUser}`
         )
       );
   

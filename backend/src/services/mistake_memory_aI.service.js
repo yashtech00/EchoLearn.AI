@@ -14,10 +14,6 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const PRIMARY_MODEL = "gemini-2.5-flash";
 const FALLBACK_MODEL = "gemini-1.5-flash";
 
-const GENERATION_CONFIG = {
-  responseMimeType: "application/json",
-};
-
 const PILLARS = [
   "VERB_SYSTEMS",
   "AGREEMENT_GRAMMAR",
@@ -44,13 +40,26 @@ const PILLAR_LIST = PILLARS.join(" | ");
 const sleep = (ms) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
-const createModel = (modelName = PRIMARY_MODEL) => {
+/**
+ * Create Gemini Model
+ */
+const createModel = ({
+  modelName = PRIMARY_MODEL,
+  temperature = 0.3,
+}) => {
   return genAI.getGenerativeModel({
     model: modelName,
-    generationConfig: GENERATION_CONFIG,
+
+    generationConfig: {
+      responseMimeType: "application/json",
+      temperature,
+    },
   });
 };
 
+/**
+ * Safe JSON Parse
+ */
 const safeJsonParse = (text, fallback) => {
   try {
     return JSON.parse(text);
@@ -61,6 +70,9 @@ const safeJsonParse = (text, fallback) => {
   }
 };
 
+/**
+ * Build User Context
+ */
 const buildProfileContext = (profile) => {
   if (!profile) return "No user profile provided.";
 
@@ -69,16 +81,20 @@ Role: ${profile.primaryRole || "Unknown"}
 Reading Level: ${profile.englishReadingSelfScore || 0}/5
 Writing Level: ${profile.englishWritingSelfScore || 0}/5
 Goal: ${profile.primaryGoal || "Unknown"}
-Interests: ${
-    profile.interestTags?.length
-      ? profile.interestTags.join(", ")
-      : "None"
-  }
-Genres: ${
-    profile.preferredGenres?.length
-      ? profile.preferredGenres.join(", ")
-      : "None"
-  }
+
+Interests:
+${
+  profile.interestTags?.length
+    ? profile.interestTags.join(", ")
+    : "None"
+}
+
+Preferred Genres:
+${
+  profile.preferredGenres?.length
+    ? profile.preferredGenres.join(", ")
+    : "None"
+}
 `;
 };
 
@@ -87,6 +103,7 @@ Genres: ${
  */
 const generateWithRetry = async ({
   prompt,
+  temperature = 0.3,
   maxAttempts = 3,
   retryDelay = 10000,
 }) => {
@@ -95,7 +112,10 @@ const generateWithRetry = async ({
   const models = [PRIMARY_MODEL, FALLBACK_MODEL];
 
   for (const modelName of models) {
-    const model = createModel(modelName);
+    const model = createModel({
+      modelName,
+      temperature,
+    });
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
@@ -153,9 +173,12 @@ export const analyzeMistakeMemory = async (
       errorDensityPer100Words: 0,
       byPillar: [],
     },
+
     mistakes: [],
+
     feedback:
       "Your writing looks good. Keep practicing consistently.",
+
     score: 85,
   };
 
@@ -180,6 +203,7 @@ Return ONLY valid JSON:
   "summary": {
     "mistakeCount": number,
     "errorDensityPer100Words": number,
+
     "byPillar": [
       {
         "pillar": string,
@@ -187,21 +211,35 @@ Return ONLY valid JSON:
       }
     ]
   },
+
   "mistakes": [
     {
       "pillar": string,
+
       "subtype": string,
-      "severity": "LOW" | "MEDIUM" | "HIGH",
+
+      "severity":
+        "LOW" |
+        "MEDIUM" |
+        "HIGH",
+
       "startOffset": number,
       "endOffset": number,
+
       "surfaceText": string,
+
       "message": string,
+
       "suggestion": string,
+
       "canonicalRuleId": string,
+
       "confidence": number
     }
   ],
+
   "feedback": string,
+
   "score": number
 }
 
@@ -209,10 +247,17 @@ Rules:
 - Use ONLY allowed pillars
 - Calculate offsets carefully
 - Give actionable suggestions
+- Avoid duplicate mistakes
+- Be strict but fair
 - Return pure JSON only
 `;
 
-    const text = await generateWithRetry({ prompt });
+    const text = await generateWithRetry({
+      prompt,
+
+      // LOW temperature for consistency
+      temperature: 0.1,
+    });
 
     const analysisData = safeJsonParse(text, fallback);
 
@@ -221,7 +266,10 @@ Rules:
       data: analysisData,
     };
   } catch (error) {
-    console.error("Analyze Mistake Memory Error:", error);
+    console.error(
+      "Analyze Mistake Memory Error:",
+      error
+    );
 
     return {
       success: false,
@@ -240,13 +288,15 @@ export const generateTopic = async (userProfile) => {
   const fallback = {
     topic:
       "Describe how technology improves your travel experiences.",
+
     genre: "SHORT_ESSAY",
+
     wordTarget: 150,
   };
 
   try {
     const prompt = `
-You are an English writing coach.
+You are a creative English writing coach.
 
 User Context:
 ${buildProfileContext(userProfile)}
@@ -258,9 +308,15 @@ Requirements:
 - Practical and engaging
 - Match user's English level
 - Relevant to user interests/goals
+- Creative and non-repetitive
+- Encourage opinion/thought expression
 
 Allowed Genres:
-GENERAL | WORK_EMAIL | SHORT_ESSAY | DIARY | ACADEMIC_PARAGRAPH
+GENERAL |
+WORK_EMAIL |
+SHORT_ESSAY |
+DIARY |
+ACADEMIC_PARAGRAPH
 
 Return ONLY valid JSON:
 
@@ -271,7 +327,12 @@ Return ONLY valid JSON:
 }
 `;
 
-    const text = await generateWithRetry({ prompt });
+    const text = await generateWithRetry({
+      prompt,
+
+      // HIGH temperature for creativity
+      temperature: 0.9,
+    });
 
     const topicData = safeJsonParse(text, fallback);
 

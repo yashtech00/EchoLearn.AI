@@ -189,6 +189,11 @@ export const getSubmissionStatus = async (req, res) => {
         errorMessage: true,
         completedAt: true,
         createdAt: true,
+        title: true,
+        genre: true,
+        body: true,
+        wordCount: true,
+        mistakes: true,
       },
     });
 
@@ -203,6 +208,11 @@ export const getSubmissionStatus = async (req, res) => {
       errorMessage: submission.errorMessage,
       completedAt: submission.completedAt,
       createdAt: submission.createdAt,
+      title: submission.title,
+      genre: submission.genre,
+      body: submission.body,
+      wordCount: submission.wordCount,
+      mistakes: submission.mistakes,
     });
   } catch (error) {
     console.error("Error getting submission status:", error);
@@ -217,13 +227,16 @@ export const getSubmissions = async (req, res) => {
 
     const submissions = await prisma.submission.findMany({
       where: { userId },
-      include: {
-        analysisRuns: {
-          where: { status: "COMPLETED" },
-          orderBy: { completedAt: "desc" },
-          take: 1,
-        },
-        mistakes: true,
+      select: {
+        id: true,
+        wordCount: true,
+        createdAt: true,
+        status: true,
+        title: true,
+        genre: true,
+        _count: {
+          select: { mistakes: true }
+        }
       },
       orderBy: {
         createdAt: "desc",
@@ -268,7 +281,6 @@ export const getMistakes = async (req, res) => {
         submission: {
           select: {
             id: true,
-            body: true,
             createdAt: true,
           },
         },
@@ -316,11 +328,17 @@ export const getAnalyticsSummary = async (req, res) => {
       where.createdAt = { gte: dateFrom };
     }
 
-    // Get submissions in window
+    // Get submissions in window with minimal fields
     const submissions = await prisma.submission.findMany({
       where,
-      include: {
-        mistakes: true,
+      select: {
+        wordCount: true,
+        mistakes: {
+          select: {
+            pillar: true,
+            subtype: true
+          }
+        }
       },
     });
 
@@ -482,6 +500,69 @@ export const getTopics = async (req, res) => {
     });
   } catch (error) {
     console.error("Error generating topic:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const rewriteSubmission = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { id } = req.params;
+    const { genre, targetWordCount, body, metadata } = req.body;
+
+    if (!body) {
+      return res.status(400).json({ message: "Body is required" });
+    }
+
+    const previousSubmission = await prisma.submission.findFirst({
+      where: { id, userId },
+    });
+
+    if (!previousSubmission) {
+      return res.status(404).json({ message: "Original submission not found" });
+    }
+
+    const wordCount = body.trim().split(/\s+/).length;
+
+    // Create submission with PENDING status
+    const submission = await prisma.submission.create({
+      data: {
+        userId,
+        promptId: previousSubmission.promptId || null,
+        title: previousSubmission.title || null,
+        genre: genre || previousSubmission.genre,
+        body,
+        wordCount,
+        status: "PENDING",
+      },
+    });
+
+    // Get user profile for AI context
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        profile: true,
+      },
+    });
+
+    // Add job to BullMQ queue for async processing
+    const { addSubmissionJob } = await import("../config/queue.js");
+    await addSubmissionJob({
+      submissionId: submission.id,
+      userId,
+      content: body,
+      genre,
+      userProfile: user?.profile || null,
+    });
+
+    // Return immediately with submission ID and status
+    return res.status(201).json({
+      message: "Submission created successfully",
+      submissionId: submission.id,
+      status: "PENDING",
+    });
+  } catch (error) {
+    console.error("Error creating submission:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

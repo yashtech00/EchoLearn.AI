@@ -8,7 +8,8 @@ import {
   getUserStats,
   getWritingPrompts,
   getTopics,
-  getSubmissionStatus
+  getSubmissionStatus,
+  rewriteSubmission
 } from "../controller/mistake_memory_controller.js";
 
 const mistakeMemoryRouter = express.Router();
@@ -28,5 +29,7 @@ mistakeMemoryRouter.get("/me/stats", Protect, getUserStats);
 mistakeMemoryRouter.get("/prompts", Protect, getWritingPrompts);
 
 mistakeMemoryRouter.get("/get-topics", Protect, getTopics);
+
+mistakeMemoryRouter.patch("/submission/:id/rewrite",Protect,rewriteSubmission)
 
 export default mistakeMemoryRouter;

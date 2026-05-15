@@ -1,18 +1,53 @@
 "use client";
 
-import { useState } from "react";
-import { PenTool, Sparkles, BookOpen, TrendingUp, Lightbulb, Award, Flame, AlertCircle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { 
+  PenTool, 
+  Sparkles, 
+  BookOpen, 
+  TrendingUp, 
+  Lightbulb, 
+  Award, 
+  Flame, 
+  AlertCircle,
+  Timer,
+  Type,
+  CloudCheck,
+  Settings,
+  Maximize2,
+  Bold,
+  Italic,
+  List,
+  ChevronRight,
+  Save,
+  CheckCircle2,
+  Clock
+} from "lucide-react";
 import { createSubmission, getTopic, getSubmissionStatus } from "@/app/api/writing/writing_api";
+import { Button } from "@/components/ui/button";
 
 export default function WritingCoachPage() {
   const [content, setContent] = useState("");
-  const [topic, setTopic] = useState("");
-  const [genre, setGenre] = useState("GENERAL");
+  const [topic, setTopic] = useState("The Ethical Implications of Post-Quantum Cryptography");
+  const [description, setDescription] = useState("In this session, explore the intersection of advanced mathematics and global privacy. Focus on maintaining a professional yet accessible tone.");
+  const [genre, setGenre] = useState("Critical Analysis");
+  const [targetLevel, setTargetLevel] = useState("C2 Proficiency");
+  const [wordTarget, setWordTarget] = useState(150);
   const [loading, setLoading] = useState(false);
   const [loadingTopic, setLoadingTopic] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [analysisStatus, setAnalysisStatus] = useState<"idle" | "analyzing" | "completed" | "failed" | "timeout">("idle");
+  const [wordCount, setWordCount] = useState(0);
+  const [currentSubmissionId, setCurrentSubmissionId] = useState<string | null>(null);
+  const [showToolbar, setShowToolbar] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const words = content.trim() ? content.trim().split(/\s+/).length : 0;
+    setWordCount(words);
+  }, [content]);
 
   const handleGetTopic = async () => {
     setLoadingTopic(true);
@@ -20,6 +55,17 @@ export default function WritingCoachPage() {
       const response = await getTopic();
       setTopic(response.topic);
       setGenre(response.genre || "GENERAL");
+      if (response.wordTarget) setWordTarget(response.wordTarget);
+      
+      // Personalized description based on genre
+      const descMap: Record<string, string> = {
+        GENERAL: "Write a balanced response to this prompt. Focus on variety in sentence structure.",
+        WORK_EMAIL: "Maintain a professional, concise, and respectful tone appropriate for a workplace setting.",
+        SHORT_ESSAY: "Develop a structured argument with a clear introduction, body, and conclusion.",
+        DIARY: "Express your personal thoughts and feelings in a casual yet reflective narrative style.",
+        ACADEMIC_PARAGRAPH: "Focus on academic precision, formal register, and cohesive logical flow."
+      };
+      setDescription(descMap[response.genre] || "Explore the nuances of this topic. Focus on clarity and precise vocabulary.");
     } catch (error) {
       console.error("Error generating topic:", error);
     } finally {
@@ -39,7 +85,6 @@ export default function WritingCoachPage() {
     setAnalysisStatus("analyzing");
 
     try {
-      // Submit writing - returns immediately with submissionId
       const response = await createSubmission({
         body: content,
         genre,
@@ -47,15 +92,12 @@ export default function WritingCoachPage() {
       });
 
       const submissionId = response.submissionId;
-      console.log("Submission created:", submissionId);
-
-      // Poll for status every 2 seconds
+      setCurrentSubmissionId(submissionId);
+      
       const pollInterval = setInterval(async () => {
         try {
           const statusResponse = await getSubmissionStatus(submissionId);
           const { status, analysis, errorMessage } = statusResponse;
-
-          console.log("Submission status:", status);
 
           if (status === "COMPLETED") {
             clearInterval(pollInterval);
@@ -68,9 +110,7 @@ export default function WritingCoachPage() {
             setAnalysisStatus("failed");
             setLoading(false);
           }
-          // If PENDING or PROCESSING, continue polling
         } catch (pollError) {
-          console.error("Polling error:", pollError);
           clearInterval(pollInterval);
           setError("Failed to check analysis status");
           setLoading(false);
@@ -78,312 +118,367 @@ export default function WritingCoachPage() {
         }
       }, 2000);
 
-      // Set a timeout to stop polling after 2 minutes
       setTimeout(() => {
         clearInterval(pollInterval);
         if (loading) {
-          setError("Analysis is taking longer than expected. Please check back later.");
+          setError("Analysis is taking longer than expected.");
           setLoading(false);
           setAnalysisStatus("timeout");
         }
       }, 120000);
 
     } catch (error) {
-      console.error("Error submitting writing:", error);
       setError("Failed to submit writing. Please try again.");
       setLoading(false);
       setAnalysisStatus("failed");
     }
   };
 
-  const getPillarColor = (pillar: string) => {
-    const colors: Record<string, string> = {
-      VERB_SYSTEMS: "bg-blue-100 text-blue-700 border-blue-200",
-      AGREEMENT_GRAMMAR: "bg-purple-100 text-purple-700 border-purple-200",
-      DETERMINERS_QUANTITY: "bg-pink-100 text-pink-700 border-pink-200",
-      PREPOSITIONS_PHRASAL: "bg-orange-100 text-orange-700 border-orange-200",
-      LEXICAL_COLLOCATION: "bg-green-100 text-green-700 border-green-200",
-      CLARITY_AMBIGUITY: "bg-red-100 text-red-700 border-red-200",
-      COHESION_FLOW: "bg-indigo-100 text-indigo-700 border-indigo-200",
-      INFO_STRUCTURE: "bg-teal-100 text-teal-700 border-teal-200",
-      REGISTER_TONE: "bg-yellow-100 text-yellow-700 border-yellow-200",
-      PUNCTUATION_MECHANICS: "bg-gray-100 text-gray-700 border-gray-200",
-      SPELLING_ORTHOGRAPHY: "bg-rose-100 text-rose-700 border-rose-200",
-      GENRE_PRAGMATICS: "bg-cyan-100 text-cyan-700 border-cyan-200",
-    };
-    return colors[pillar] || "bg-gray-100 text-gray-700 border-gray-200";
-  };
+  const handleFormat = (type: 'bold' | 'italic' | 'list' | 'rewrite') => {
+    const textarea = document.getElementById('editor-textarea') as HTMLTextAreaElement;
+    if (!textarea) return;
 
-  const getSeverityColor = (severity: string) => {
-    const colors: Record<string, string> = {
-      LOW: "bg-green-100 text-green-700",
-      MEDIUM: "bg-yellow-100 text-yellow-700",
-      HIGH: "bg-red-100 text-red-700",
-    };
-    return colors[severity] || "bg-gray-100 text-gray-700";
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = content.substring(start, end);
+    
+    if (!selectedText && type === 'rewrite') return;
+
+    let newText = '';
+    
+    if (type === 'bold') {
+      newText = `**${selectedText}**`;
+    } else if (type === 'italic') {
+      newText = `*${selectedText}*`;
+    } else if (type === 'list') {
+      newText = `\n- ${selectedText}`;
+    } else if (type === 'rewrite') {
+      newText = `[Rewrite: ${selectedText}]`;
+    }
+
+    const newContent = content.substring(0, start) + newText + content.substring(end);
+    setContent(newContent);
+    
+    setTimeout(() => {
+      textarea.focus();
+      const offset = type === 'list' ? 3 : type === 'bold' ? 2 : type === 'italic' ? 1 : 10;
+      textarea.setSelectionRange(start + offset, end + offset);
+    }, 0);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/20">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-              <PenTool className="w-6 h-6 text-white" />
+    <div className="flex h-[calc(100vh-4.5rem)] bg-[#faf6f0] overflow-hidden text-[#2e3230]" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
+
+      {/* Main Content - Editor */}
+      <div className="flex-1 flex flex-col h-full bg-[#faf6f0] relative">
+        {/* Editor Header */}
+        <div className="h-16 border-b border-[#4a7c59]/10 flex items-center justify-between px-8 bg-[#faf6f0]/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
+          <div className="flex items-center gap-8">
+            <div className="flex items-center gap-2 font-medium">
+              <Timer className="w-4 h-4 text-[#4a7c59]" />
+              <span className="text-sm tabular-nums text-[#4a7c59]">25:00</span>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">AI Writing Coach</h1>
-              <p className="text-gray-600">Submit your writing for AI-powered feedback</p>
+            <div className="flex items-center gap-2 font-medium border-l border-[#4a7c59]/20 pl-8">
+              <Type className="w-4 h-4 text-[#705c30]" />
+              <span className="text-sm uppercase tracking-wider text-[10px] font-bold text-[#705c30]">{wordCount} / {wordTarget} Words</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2 text-[#4a7c59] font-bold text-[10px] uppercase tracking-widest">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#4a7c59] animate-pulse" />
+              Autosaved
+            </div>
+            
+            <div className="flex items-center gap-4 text-[#705c30]/60 border-l border-[#4a7c59]/20 pl-4 relative">
+              <Settings 
+                className={`w-5 h-5 cursor-pointer transition-colors ${showToolbar ? 'text-[#4a7c59] rotate-45' : 'hover:text-[#4a7c59]'}`}
+                onClick={() => setShowToolbar(!showToolbar)}
+              />
+             
+
+              {/* Formatting Toolbar Tooltip */}
+              {showToolbar && (
+                <div className="absolute top-full right-0 mt-3 flex items-center gap-1 bg-[#faf6f0]/95 backdrop-blur-md border border-[#4a7c59]/10 rounded-[12px] p-1.5 animate-in fade-in zoom-in-95 duration-200 z-50 origin-top-right shadow-xl">
+                  <button 
+                    onClick={() => handleFormat('bold')}
+                    className="p-2 hover:bg-[#4a7c59]/10 rounded-[8px] transition-colors text-[#2e3230]/70 hover:text-[#4a7c59]"
+                    title="Bold"
+                  >
+                    <Bold className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => handleFormat('italic')}
+                    className="p-2 hover:bg-[#4a7c59]/10 rounded-[8px] transition-colors text-[#2e3230]/70 hover:text-[#4a7c59]"
+                    title="Italic"
+                  >
+                    <Italic className="w-4 h-4" />
+                  </button>
+                  <button 
+                    onClick={() => handleFormat('list')}
+                    className="p-2 hover:bg-[#4a7c59]/10 rounded-[8px] transition-colors text-[#2e3230]/70 hover:text-[#4a7c59]"
+                    title="List"
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                  <div className="w-px h-5 bg-[#4a7c59]/20 mx-1" />
+                </div>
+              )}
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Writing Input */}
-          <div className="space-y-6">
-            {/* Topic Section */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-              <div className="flex items-center justify-between mb-4">
-                <label className="block text-sm font-semibold text-gray-900">
-                  Writing Topic
-                </label>
-                <button
-                  onClick={handleGetTopic}
-                  disabled={loadingTopic}
-                  className="px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center gap-2"
-                >
-                  {loadingTopic ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <Lightbulb className="w-4 h-4" />
-                      Get Topic
-                    </>
-                  )}
-                </button>
-              </div>
-              {topic ? (
-                <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
-                  <p className="text-gray-800 font-medium">{topic}</p>
-                </div>
-              ) : (
-                <p className="text-gray-500 text-sm italic">
-                  Click "Get Topic" to receive a personalized writing prompt
-                </p>
-              )}
-            </div>
+        {/* Editor Body */}
+        <div className="flex-1 overflow-y-auto p-12 scrollbar-hide flex flex-col">
+          <textarea
+            id="editor-textarea"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Begin your intellectual journey here..."
+            className="w-full min-h-[500px] flex-1 text-2xl text-[#2e3230] placeholder:text-[#a0a5a0] focus:outline-none resize-none bg-transparent"
+            style={{ fontFamily: "'Literata', serif", lineHeight: "1.8" }}
+          />
+        </div>
 
-            {/* Writing Area */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-              <label className="block text-sm font-semibold text-gray-900 mb-3">
-                Your Writing
-              </label>
-              <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Write or paste your text here for AI analysis..."
-                className="w-full h-64 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none text-gray-700"
-              />
-              <div className="flex items-center justify-between mt-4">
-                <span className="text-sm text-gray-500">
-                  {content.length} characters
-                </span>
-                <button
-                  onClick={handleSubmit}
-                  disabled={!content.trim() || loading}
-                  className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center gap-2"
-                >
-                  {loading ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      Analyzing...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-5 h-5" />
-                      Analyze Writing
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
+        {/* Editor Footer */}
+        <div className="h-24 border-t border-[#4a7c59]/10 flex items-center justify-between px-12 bg-[#faf6f0]/80 backdrop-blur-md shrink-0">
+          <button className="flex items-center gap-2 px-6 py-3 border border-[#4a7c59]/20 rounded-[12px] text-[#4a7c59] font-bold text-sm hover:bg-[#4a7c59]/5 transition-all bg-[#faf6f0]">
+            <Save className="w-4 h-4" />
+            Save Draft
+          </button>
 
-          </div>
-
-          {/* Results */}
-          <div className="space-y-6">
-            {error ? (
-              <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <h3 className="font-semibold text-red-900 mb-1">Error</h3>
-                    <p className="text-red-700">{error}</p>
-                    <button
-                      onClick={() => setError(null)}
-                      className="mt-3 text-sm text-red-600 hover:text-red-800 font-medium"
-                    >
-                      Dismiss
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : analysisStatus === "analyzing" ? (
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-12 text-center">
-                <div className="w-20 h-20 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Analyzing Your Writing...</h3>
-                <p className="text-gray-600">This may take 20-60 seconds. Please wait.</p>
-              </div>
-            ) : result ? (
+          <button
+            onClick={handleSubmit}
+            disabled={!content.trim() || loading}
+            className="flex items-center gap-3 px-8 py-4 bg-[#4a7c59] hover:bg-[#3d6649] disabled:opacity-50 disabled:cursor-not-allowed rounded-[12px] text-white font-bold text-[15px] transition-all group"
+            style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}
+          >
+            {loading ? (
+              <Sparkles className="w-5 h-5 animate-spin" />
+            ) : (
               <>
-                {/* XP & Streak Card */}
-                {result.gamification && (
-                  <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-6 text-white">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Award className="w-8 h-8" />
-                        <div>
-                          <p className="text-sm font-medium opacity-90">XP Earned</p>
-                          <p className="text-2xl font-bold">+{result.gamification.xpAwarded}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <Flame className="w-8 h-8" />
-                        <div>
-                          <p className="text-sm font-medium opacity-90">Streak</p>
-                          <p className="text-2xl font-bold">{result.gamification.userStats.currentStreakDays} days</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
+                Submit session
+                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </>
+            )}
+          </button>
+        </div>
 
-                {/* Score Card */}
-                <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-bold">Writing Score</h2>
-                    <div className="text-4xl font-extrabold">
-                      {result.analysis?.summary?.score || 75}
-                    </div>
-                  </div>
-                  <div className="w-full bg-white/20 rounded-full h-3">
-                    <div
-                      className="bg-white h-3 rounded-full transition-all duration-500"
-                      style={{ width: `${result.analysis?.summary?.score || 75}%` }}
-                    />
-                  </div>
-                </div>
+        {/* Overlay Results / Error */}
+        {(result || error || analysisStatus === "analyzing") && (
+          <div className="absolute inset-0 bg-[#faf6f0]/80 backdrop-blur-md z-20 flex items-center justify-center p-12 overflow-y-auto">
+            <div className="max-w-3xl w-full bg-[#faf6f0] rounded-[12px] border border-[#4a7c59]/10 p-10 relative" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
+              <button 
+                onClick={() => { setResult(null); setError(null); setAnalysisStatus("idle"); }}
+                className="absolute top-6 right-6 w-10 h-10 rounded-full bg-[#4a7c59]/5 flex items-center justify-center text-[#705c30]/70 hover:text-[#4a7c59] transition-colors"
+              >
+                <Maximize2 className="w-5 h-5" />
+              </button>
 
-                {/* Summary */}
-                {result.analysis?.summary && (
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-                    <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <TrendingUp className="w-5 h-5 text-indigo-600" />
-                      Analysis Summary
-                    </h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="p-3 bg-gray-50 rounded-lg">
-                        <p className="text-2xl font-bold text-gray-900">
-                          {result.analysis.summary.mistakeCount}
-                        </p>
-                        <p className="text-sm text-gray-600">Mistakes Found</p>
-                      </div>
-                      <div className="p-3 bg-gray-50 rounded-lg">
-                        <p className="text-2xl font-bold text-gray-900">
-                          {result.analysis.summary.errorDensityPer100Words?.toFixed(2)}
-                        </p>
-                        <p className="text-sm text-gray-600">Error Density / 100 words</p>
-                      </div>
-                    </div>
+              {analysisStatus === "analyzing" ? (
+                <div className="py-12 text-center space-y-6">
+                  <div className="relative w-24 h-24 mx-auto">
+                    <div className="absolute inset-0 border-4 border-[#4a7c59]/20 rounded-full" />
+                    <div className="absolute inset-0 border-4 border-[#4a7c59] rounded-full border-t-transparent animate-spin" />
                   </div>
-                )}
-
-                {/* Feedback */}
-                {result.analysis?.feedback && (
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-                    <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <Sparkles className="w-5 h-5 text-indigo-600" />
-                      AI Feedback
-                    </h3>
-                    <p className="text-gray-700 leading-relaxed">
-                      {result.analysis.feedback}
+                  <div>
+                    <h3 className="text-2xl font-bold text-[#2e3230]" style={{ fontFamily: "'Literata', serif" }}>Deep AI Analysis</h3>
+                    <p className="text-[#4a7c59]/80 mt-2 font-medium italic">
+                      "Perfection is attained not when there is nothing more to add, but when there is nothing left to take away."
                     </p>
                   </div>
-                )}
-
-                {/* Mistakes */}
-                {result.analysis?.mistakes && result.analysis.mistakes.length > 0 && (
-                  <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-                    <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <BookOpen className="w-5 h-5 text-purple-600" />
-                      Identified Mistakes ({result.analysis.mistakes.length})
-                    </h3>
-                    <div className="space-y-3 max-h-96 overflow-y-auto">
-                      {result.analysis.mistakes.map((mistake: any, index: number) => (
-                        <div
-                          key={index}
-                          className="p-4 bg-red-50 border border-red-200 rounded-xl"
-                        >
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex items-center gap-2">
-                              <span
-                                className={`text-xs font-semibold px-2 py-1 rounded border ${getPillarColor(mistake.pillar)}`}
-                              >
-                                {mistake.pillar.replace(/_/g, " ")}
-                              </span>
-                              {mistake.severity && (
-                                <span
-                                  className={`text-xs font-semibold px-2 py-1 rounded ${getSeverityColor(mistake.severity)}`}
-                                >
-                                  {mistake.severity}
-                                </span>
-                              )}
-                            </div>
-                            {mistake.confidence && (
-                              <span className="text-xs text-gray-500">
-                                {Math.round(mistake.confidence * 100)}% confidence
-                              </span>
-                            )}
-                          </div>
-                          {mistake.surfaceText && (
-                            <p className="text-sm text-gray-700 mb-2">
-                              <span className="line-through text-red-600">
-                                {mistake.surfaceText}
-                              </span>
-                            </p>
-                          )}
-                          <p className="text-sm text-gray-700 mb-2">{mistake.message}</p>
-                          {mistake.suggestion && (
-                            <p className="text-sm text-green-700 font-medium">
-                              → {mistake.suggestion}
-                            </p>
-                          )}
-                        </div>
-                      ))}
+                </div>
+              ) : error ? (
+                <div className="text-center py-8 space-y-6">
+                  <div className="w-16 h-16 bg-[#705c30]/10 text-[#705c30] rounded-full flex items-center justify-center mx-auto">
+                    <AlertCircle className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-[#2e3230]" style={{ fontFamily: "'Literata', serif" }}>Something went wrong</h3>
+                    <p className="text-gray-500 mt-2">{error}</p>
+                  </div>
+                  <Button onClick={() => setError(null)} variant="outline" className="rounded-[12px] px-8 border-[#4a7c59] text-[#4a7c59] bg-[#faf6f0]">Dismiss</Button>
+                </div>
+              ) : result && (
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                  {/* Result Header */}
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-3xl font-bold text-[#2e3230]" style={{ fontFamily: "'Literata', serif" }}>Analysis Complete</h2>
+                      <p className="text-[#2e3230]/70 font-medium">Session feedback and performance summary</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <p className="text-xs font-black text-[#705c30] uppercase tracking-widest">Writing Score</p>
+                        <p className="text-4xl font-black text-[#4a7c59]">{result.analysis?.score || 75}</p>
+                      </div>
                     </div>
                   </div>
-                )}
-              </>
-            ) : (
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-12 text-center">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center mx-auto mb-4">
-                  <PenTool className="w-10 h-10 text-indigo-600" />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Feedback Card */}
+                    <div className="bg-[#4a7c59]/5 rounded-[12px] p-6 border border-[#4a7c59]/10">
+                      <h4 className="flex items-center gap-2 font-bold text-[#4a7c59] mb-4">
+                        <Sparkles className="w-5 h-5 text-[#705c30]" />
+                        AI Feedback
+                      </h4>
+                      <p className="text-[#2e3230]/80 leading-relaxed font-medium">
+                        {result.analysis?.feedback}
+                      </p>
+                    </div>
+
+                    {/* Stats Card */}
+                    <div className="bg-[#faf6f0] rounded-[12px] p-6 border border-[#4a7c59]/10" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
+                      <h4 className="flex items-center gap-2 font-bold text-[#2e3230] mb-4">
+                        <TrendingUp className="w-5 h-5 text-[#4a7c59]" />
+                        Quick Stats
+                      </h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white/50 rounded-[12px] p-4">
+                          <p className="text-2xl font-black text-[#2e3230]">{result.analysis?.summary?.mistakeCount}</p>
+                          <p className="text-[10px] font-bold text-[#705c30] uppercase tracking-widest">Mistakes</p>
+                        </div>
+                        <div className="bg-white/50 rounded-[12px] p-4">
+                          <p className="text-2xl font-black text-[#2e3230]">
+                            {result.analysis?.summary?.errorDensityPer100Words?.toFixed(1)}
+                          </p>
+                          <p className="text-[10px] font-bold text-[#705c30] uppercase tracking-widest">Density</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Mistakes List */}
+                  {result.analysis?.mistakes && result.analysis.mistakes.length > 0 && (
+                    <div className="space-y-4">
+                      <h4 className="font-bold text-[#2e3230] flex items-center gap-2">
+                        <AlertCircle className="w-5 h-5 text-[#705c30]" />
+                        Identified Opportunities
+                      </h4>
+                      <div className="grid grid-cols-1 gap-3 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin">
+                        {result.analysis.mistakes.map((mistake: any, idx: number) => (
+                          <div key={idx} className="bg-white/50 border border-[#4a7c59]/10 rounded-[12px] p-5 hover:border-[#4a7c59]/30 transition-colors group">
+                            <div className="flex justify-between items-start mb-2">
+                              <span className="text-[10px] font-black bg-[#4a7c59]/10 text-[#4a7c59] px-2 py-0.5 rounded-md uppercase tracking-widest border border-[#4a7c59]/20">
+                                {mistake.pillar?.replace(/_/g, " ")}
+                              </span>
+                              <span className={`text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest ${
+                                mistake.severity === 'HIGH' ? 'bg-[#705c30]/10 text-[#705c30] border border-[#705c30]/20' : 
+                                mistake.severity === 'MEDIUM' ? 'bg-amber-100/50 text-amber-700 border border-amber-200' : 
+                                'bg-[#4a7c59]/10 text-[#4a7c59] border border-[#4a7c59]/20'
+                              }`}>
+                                {mistake.severity}
+                              </span>
+                            </div>
+                            <p className="text-sm text-[#2e3230] font-medium mb-1">
+                              <span className="text-[#705c30] line-through mr-2 opacity-70">{mistake.surfaceText}</span>
+                              <span className="text-[#4a7c59] font-bold">→ {mistake.suggestion}</span>
+                            </p>
+                            <p className="text-xs text-[#2e3230]/70 italic leading-relaxed transition-colors">{mistake.message}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="pt-4">
+                    <Button 
+                      onClick={() => { 
+                        if (currentSubmissionId) {
+                          router.push(`/Dashboard/WritingCoach/Report?submissionId=${currentSubmissionId}`);
+                        }
+                      }} 
+                      className="w-full py-6 rounded-[12px] bg-[#4a7c59] hover:bg-[#3d6649] text-white font-bold text-lg transition-all"
+                      style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}
+                    >
+                      View Detailed Report
+                      <ChevronRight className="w-5 h-5 ml-2" />
+                    </Button>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  Ready to Analyze
-                </h3>
-                <p className="text-gray-600">
-                  Write or paste your text on the left and click "Analyze Writing" to get AI-powered feedback.
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Sidebar - Writing Context */}
+      <div className="w-[400px] bg-[#f4ebd9] h-full overflow-y-auto border-l border-[#4a7c59]/10 p-8 flex flex-col gap-8 scrollbar-hide shrink-0">
+        {/* Genre Badge */}
+        <div>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[12px] bg-[#4a7c59]/10 text-[#4a7c59] text-[10px] font-bold uppercase tracking-wider border border-[#4a7c59]/20">
+            <BookOpen className="w-3 h-3" />
+            Creative Writing
+          </span>
+        </div>
+
+        {/* Title & Description */}
+        <div className="space-y-4">
+          <h1 className="text-3xl font-bold text-[#2e3230] leading-tight tracking-tight" style={{ fontFamily: "'Literata', serif" }}>
+            {topic}
+          </h1>
+          <p className="text-[#2e3230]/80 text-[15px] leading-relaxed font-medium">
+            {description}
+          </p>
+        </div>
+
+        {/* Level & Genre Cards */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-[#faf6f0] rounded-[12px] p-4 border border-[#4a7c59]/10" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
+            <p className="text-[10px] font-bold text-[#705c30] uppercase tracking-widest mb-1">Target Level</p>
+            <p className="text-[#4a7c59] font-bold text-[14px]">{targetLevel}</p>
+          </div>
+          <div className="bg-[#faf6f0] rounded-[12px] p-4 border border-[#4a7c59]/10" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
+            <p className="text-[10px] font-bold text-[#705c30] uppercase tracking-widest mb-1">Genre</p>
+            <p className="text-[#4a7c59] font-bold text-[14px]">{genre}</p>
+          </div>
+        </div>
+
+        {/* Writing Tips */}
+        <div className="space-y-4">
+          <h3 className="text-xl font-bold text-[#2e3230]" style={{ fontFamily: "'Literata', serif" }}>Writing Tips</h3>
+          <div className="space-y-3">
+            <div className="bg-[#faf6f0] rounded-[12px] p-5 border-l-4 border-[#4a7c59] border-y border-r border-[#4a7c59]/10" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
+              <h4 className="font-bold text-[#2e3230] text-sm mb-1">Use Tentative Language</h4>
+              <p className="text-[#2e3230]/70 text-xs leading-relaxed">
+                When discussing future tech, use "it could be argued" or "potential ramifications" to maintain objectivity.
+              </p>
+            </div>
+            <div className="bg-[#faf6f0] rounded-[12px] p-5 border-l-4 border-[#4a7c59] border-y border-r border-[#4a7c59]/10" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
+              <h4 className="font-bold text-[#2e3230] text-sm mb-1">Active Voice Priority</h4>
+              <p className="text-[#2e3230]/70 text-xs leading-relaxed">
+                Avoid passive structures to make your technical arguments more direct and impactful.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Active Focus Areas */}
+        <div className="space-y-4 pb-8">
+          <h3 className="text-xl font-bold text-[#2e3230]" style={{ fontFamily: "'Literata', serif" }}>Active Focus Areas</h3>
+          <div className="bg-[#faf6f0] rounded-[12px] p-5 border border-[#4a7c59]/20 relative overflow-hidden group hover:border-[#4a7c59]/40 transition-all duration-300" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <h4 className="font-bold text-[#2e3230] text-sm">Collocation Precision</h4>
+                <p className="text-[#2e3230]/70 text-xs leading-relaxed mt-1">
+                  Your previous sessions showed confusion here.
                 </p>
               </div>
-            )}
+              <span className="text-[9px] font-black text-[#705c30] uppercase tracking-widest opacity-80">Remedying</span>
+            </div>
+            <div className="h-1.5 w-full bg-[#4a7c59]/10 rounded-full overflow-hidden">
+              <div className="h-full w-[65%] bg-[#4a7c59] rounded-full" />
+            </div>
           </div>
+          
+          <button 
+            onClick={handleGetTopic}
+            disabled={loadingTopic}
+            className="w-full py-4 rounded-[12px] bg-[#faf6f0] border border-[#4a7c59]/20 text-[#4a7c59] text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#4a7c59]/5 transition-all duration-300 mt-4"
+          >
+            {loadingTopic ? <Sparkles className="w-4 h-4 animate-spin text-[#705c30]" /> : <Lightbulb className="w-4 h-4 text-[#705c30]" />}
+            New Writing Prompt
+          </button>
         </div>
       </div>
     </div>

@@ -3,33 +3,47 @@
 "use client";
 
 import { Search, Flame } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
-const navbarConfig: Record<string, string[]> = {
-  dashboard: ["Overview", "Insights"],
-
-  writing: ["Practice", "Memory", "Coach", "Reports", "Rewrite"],
-
-  games: [
-    "Spot The Slip",
-    "Tone Shift",
-    "Collocation Match",
-    "Grammar Rush",
-    "Word Sprint",
+const navbarConfig: Record<string, { label: string; path: string }[]> = {
+  dashboard: [
+    { label: "Overview", path: "/Dashboard" },
+    { label: "Insights", path: "/Dashboard/Insights" },
   ],
 
-  playground: ["Prompt of the Day", "Sandbox", "Challenges"],
+  writing: [
+    { label: "Practice", path: "/Dashboard/WritingCoach/practice" },
+    { label: "Memory", path: "/Dashboard/WritingCoach/MistakeMemory" },
+    { label: "Coach", path: "/Dashboard/WritingCoach/Coach" },
+    { label: "Reports", path: "/Dashboard/WritingCoach/Report" },
+    { label: "Rewrite", path: "/Dashboard/WritingCoach/Rewrite" },
+  ],
+
+  games: [
+    { label: "Spot The Slip", path: "/Dashboard/Games/SpotTheSlip" },
+    { label: "Tone Shift", path: "/Dashboard/Games/ToneShift" },
+    { label: "Collocation Match", path: "/Dashboard/Games/CollocationMatch" },
+    { label: "Grammar Rush", path: "/Dashboard/Games/GrammarRush" },
+    { label: "Word Sprint", path: "/Dashboard/Games/WordSprint" },
+  ],
+
+  playground: [
+    { label: "Prompt of the Day", path: "/Dashboard/Playground/DailyPrompt" },
+    { label: "Sandbox", path: "/Dashboard/Playground/Sandbox" },
+    { label: "Challenges", path: "/Dashboard/Playground/Challenges" },
+  ],
 
   progress: [
-    "XP & Levels",
-    "Streaks",
-    "Weekly Review",
-    "Achievements",
+    { label: "XP & Levels", path: "/Dashboard/Progress/XP" },
+    { label: "Streaks", path: "/Dashboard/Progress/Streaks" },
+    { label: "Weekly Review", path: "/Dashboard/Progress/WeeklyReview" },
+    { label: "Achievements", path: "/Dashboard/Progress/Achievements" },
   ],
 };
 
 export default function DashboardNavbar() {
   const pathname = usePathname();
+  const router = useRouter();
 
   let activeSection = "dashboard";
 
@@ -41,40 +55,50 @@ export default function DashboardNavbar() {
     activeSection = "playground";
   } else if (pathname.includes("/Progress")) {
     activeSection = "progress";
+  } else if (pathname === "/Dashboard") {
+    activeSection = "dashboard";
   }
 
   const navbarItems = navbarConfig[activeSection] || [];
 
   return (
-    <header className="fixed top-0 left-64 right-0 h-16 bg-white border-b border-gray-200 z-40">
+    <header className="fixed top-0 left-64 right-0 h-16 bg-background border-b border-border z-40 font-sans">
       <div className="h-full px-6 flex items-center justify-between">
         {/* LEFT */}
         <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
-          {navbarItems.map((item) => (
-            <button
-              key={item}
-              className="px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 hover:bg-gray-100 text-gray-700"
-            >
-              {item}
-            </button>
-          ))}
+          {navbarItems.map((item) => {
+            const isActive = pathname === item.path;
+            return (
+              <button
+                key={item.label}
+                onClick={() => router.push(item.path)}
+                className={`px-4 py-2 rounded-[12px] text-sm font-medium whitespace-nowrap transition-all duration-200 ${
+                  isActive 
+                    ? "bg-primary/10 text-primary font-bold" 
+                    : "hover:bg-primary/5 text-foreground/70 hover:text-primary"
+                }`}
+              >
+                {item.label}
+              </button>
+            );
+          })}
         </div>
 
         {/* RIGHT */}
         <div className="flex items-center gap-4">
           {/* SEARCH */}
-          <div className="hidden md:flex items-center gap-2 bg-gray-100 rounded-2xl px-4 py-2 w-80">
-            <Search className="w-4 h-4 text-gray-400" />
+          <div className="hidden md:flex items-center gap-2 bg-primary/5 border border-border rounded-[12px] px-4 py-2 w-80">
+            <Search className="w-4 h-4 text-primary/50" />
 
             <input
               type="text"
               placeholder="Search lessons, topics..."
-              className="bg-transparent outline-none text-sm w-full"
+              className="bg-transparent outline-none text-sm w-full text-foreground placeholder:text-foreground/40"
             />
           </div>
 
           {/* STREAK */}
-          <div className="flex items-center gap-2 bg-orange-50 text-orange-600 px-4 py-2 rounded-2xl">
+          <div className="flex items-center gap-2 bg-accent/10 text-accent px-4 py-2 rounded-[12px]">
             <Flame className="w-4 h-4" />
 
             <span className="text-sm font-semibold">

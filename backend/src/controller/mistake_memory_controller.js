@@ -126,23 +126,10 @@ export const createSubmission = async (req, res) => {
       return res.status(400).json({ message: "Body is required" });
     }
 
-    // Get user with profile
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        profile: true,
-        stats: true,
-      },
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
     // Calculate word count
     const wordCount = body.trim().split(/\s+/).length;
 
-    // Create submission
+    // Create submission with PENDING status
     const submission = await prisma.submission.create({
       data: {
         userId,
@@ -151,160 +138,74 @@ export const createSubmission = async (req, res) => {
         genre,
         body,
         wordCount,
-      },
-    });
-
-    // Create analysis run
-    const analysisRun = await prisma.analysisRun.create({
-      data: {
-        submissionId: submission.id,
         status: "PENDING",
-        analyzerModel: "gemini-1.5-flash",
-        analyzerVersion: "1.0.0",
-        rulesetVersion: "pillars-12@2026-01-01",
       },
     });
 
-    // Call AI service with user profile context
-    const AIResponse = await analyzeMistakeMemory(body, user.profile);
-
-    if (!AIResponse.success) {
-      await prisma.analysisRun.update({
-        where: { id: analysisRun.id },
-        data: {
-          status: "FAILED",
-          errorMessage: AIResponse.error,
-          completedAt: new Date(),
-        },
-      });
-      return res.status(500).json({ message: "AI analysis failed", error: AIResponse.error });
-    }
-
-    const analysisData = AIResponse.data;
-
-    // Update analysis run with results
-    await prisma.analysisRun.update({
-      where: { id: analysisRun.id },
-      data: {
-        status: "COMPLETED",
-        summaryJson: analysisData.summary,
-        rawModelOutput: analysisData,
-        completedAt: new Date(),
+    // Get user profile for AI context
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        profile: true,
       },
     });
 
-    // Create mistakes
-    const mistakes = await Promise.all(
-      analysisData.mistakes.map((mistake) =>
-        prisma.mistake.create({
-          data: {
-            submissionId: submission.id,
-            analysisRunId: analysisRun.id,
-            pillar: mistake.pillar,
-            subtype: mistake.subtype,
-            severity: mistake.severity,
-            startOffset: mistake.startOffset,
-            endOffset: mistake.endOffset,
-            surfaceText: mistake.surfaceText,
-            message: mistake.message,
-            suggestion: mistake.suggestion,
-            canonicalRuleId: mistake.canonicalRuleId,
-            confidence: mistake.confidence,
-          },
-        })
-      )
-    );
-
-    // Calculate XP
-    let xpAwarded = XP_BASE_SUBMISSION;
-    
-    // Add word count bonus (capped)
-    const wordBonus = Math.min(Math.floor(wordCount / 50) * XP_PER_50_WORDS, XP_WORD_CAP);
-    xpAwarded += wordBonus;
-
-    // Get or create user stats for streak calculation
-    let userStats = user.stats;
-    if (!userStats) {
-      userStats = await prisma.userStats.create({
-        data: {
-          userId,
-          totalXp: 0,
-          level: 1,
-          currentStreak: 0,
-          longestStreak: 0,
-        },
-      });
-    }
-
-    // Update streak and get bonus
-    const streakBonus = await updateStreak(userId, userStats);
-    xpAwarded += streakBonus;
-
-    // Award XP
-    const xpReasons = ["SUBMISSION_ANALYZED"];
-    if (streakBonus > 0) {
-      xpReasons.push("STREAK_BONUS");
-      await awardXP(userId, streakBonus, "STREAK_BONUS", { currentStreak: userStats.currentStreak });
-    }
-    await awardXP(userId, XP_BASE_SUBMISSION + wordBonus, "SUBMISSION_ANALYZED", {
+    // Add job to BullMQ queue for async processing
+    const { addSubmissionJob } = await import("../config/queue.js");
+    await addSubmissionJob({
       submissionId: submission.id,
-      mistakeCount: analysisData.mistakes.length,
-      wordCount,
+      userId,
+      content: body,
+      genre,
+      userProfile: user?.profile || null,
     });
 
-    // Get updated user stats
-    const updatedUserStats = await prisma.userStats.findUnique({
-      where: { userId },
-    });
-
+    // Return immediately with submission ID and status
     return res.status(201).json({
-      message: "Submission created and analyzed successfully",
-      submission: {
-        id: submission.id,
-        userId: submission.userId,
-        promptId: submission.promptId,
-        title: submission.title,
-        genre: submission.genre,
-        body: submission.body,
-        wordCount: submission.wordCount,
-        createdAt: submission.createdAt,
-      },
-      analysis: {
-        runId: analysisRun.id,
-        status: "COMPLETED",
-        analyzerModel: analysisRun.analyzerModel,
-        analyzerVersion: analysisRun.analyzerVersion,
-        rulesetVersion: analysisRun.rulesetVersion,
-        completedAt: analysisRun.completedAt,
-        summary: analysisData.summary,
-        mistakes: mistakes.map((m) => ({
-          id: m.id,
-          submissionId: m.submissionId,
-          pillar: m.pillar,
-          subtype: m.subtype,
-          severity: m.severity,
-          startOffset: m.startOffset,
-          endOffset: m.endOffset,
-          surfaceText: m.surfaceText,
-          message: m.message,
-          suggestion: m.suggestion,
-          canonicalRuleId: m.canonicalRuleId,
-          confidence: m.confidence,
-        })),
-      },
-      gamification: {
-        xpAwarded,
-        reasons: xpReasons,
-        userStats: {
-          totalXp: updatedUserStats.totalXp,
-          level: updatedUserStats.level,
-          currentStreakDays: updatedUserStats.currentStreak,
-          longestStreakDays: updatedUserStats.longestStreak,
-        },
-      },
+      message: "Submission created successfully",
+      submissionId: submission.id,
+      status: "PENDING",
     });
   } catch (error) {
     console.error("Error creating submission:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getSubmissionStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userId } = req.user;
+
+    const submission = await prisma.submission.findFirst({
+      where: {
+        id,
+        userId,
+      },
+      select: {
+        id: true,
+        status: true,
+        analysisJson: true,
+        errorMessage: true,
+        completedAt: true,
+        createdAt: true,
+      },
+    });
+
+    if (!submission) {
+      return res.status(404).json({ message: "Submission not found" });
+    }
+
+    return res.status(200).json({
+      submissionId: submission.id,
+      status: submission.status,
+      analysis: submission.analysisJson,
+      errorMessage: submission.errorMessage,
+      completedAt: submission.completedAt,
+      createdAt: submission.createdAt,
+    });
+  } catch (error) {
+    console.error("Error getting submission status:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -346,7 +247,11 @@ export const getMistakes = async (req, res) => {
     const { userId } = req.user;
     const { pillar, subtype, dateFrom, dateTo, limit = 50 } = req.query;
 
-    const where = { userId };
+    const where = {
+      submission: {
+        userId
+      }
+    };
     
     if (pillar) where.pillar = pillar;
     if (subtype) where.subtype = subtype;

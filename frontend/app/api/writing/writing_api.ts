@@ -6,15 +6,23 @@ export const createSubmission = async (data: {
   genre: string;
   body: string;
   targetWordCount?: number;
-  metadata?: {
-    clientTimeZone?: string;
-  };
+  metadata?: any;
 }) => {
   try {
     const response = await axiosInstance.post('/writing/submissions', data);
     return response.data;
   } catch (error) {
     console.error("Error creating submission:", error);
+    throw error;
+  }
+};
+
+export const getSubmissionStatus = async (submissionId: string) => {
+  try {
+    const response = await axiosInstance.get(`/writing/submissions/${submissionId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error getting submission status:", error);
     throw error;
   }
 };
@@ -26,7 +34,7 @@ export const getSubmissions = async (limit = 10, offset = 0) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching submissions:", error);
+    console.error("Error getting submissions:", error);
     throw error;
   }
 };
@@ -34,15 +42,16 @@ export const getSubmissions = async (limit = 10, offset = 0) => {
 export const getMistakes = async (params?: {
   pillar?: string;
   subtype?: string;
-  dateFrom?: string;
-  dateTo?: string;
+  startDate?: string;
+  endDate?: string;
   limit?: number;
+  offset?: number;
 }) => {
   try {
     const response = await axiosInstance.get('/writing/me/mistakes', { params });
     return response.data;
   } catch (error) {
-    console.error("Error fetching mistakes:", error);
+    console.error("Error getting mistakes:", error);
     throw error;
   }
 };
@@ -54,7 +63,7 @@ export const getAnalyticsSummary = async (window = "30d") => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching analytics summary:", error);
+    console.error("Error getting analytics summary:", error);
     throw error;
   }
 };
@@ -64,7 +73,7 @@ export const getUserStats = async () => {
     const response = await axiosInstance.get('/writing/me/stats');
     return response.data;
   } catch (error) {
-    console.error("Error fetching user stats:", error);
+    console.error("Error getting user stats:", error);
     throw error;
   }
 };
@@ -76,7 +85,7 @@ export const getWritingPrompts = async (genre?: string, limit = 10) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching writing prompts:", error);
+    console.error("Error getting writing prompts:", error);
     throw error;
   }
 };
@@ -86,7 +95,7 @@ export const getTopic = async () => {
     const response = await axiosInstance.get('/writing/get-topics');
     return response.data;
   } catch (error) {
-    console.error("Error generating topic:", error);
+    console.error("Error getting topic:", error);
     throw error;
   }
 };

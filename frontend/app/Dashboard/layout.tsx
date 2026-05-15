@@ -1,24 +1,22 @@
-"use client";
+// app/Dashboard/layout.tsx
 
-import { useState } from "react";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import DashboardSidebar from "@/components/Dashboard/DashboardSidebar";
 import DashboardNavbar from "@/components/Dashboard/DashboardNavbar";
+import DashboardSidebar from "@/components/Dashboard/DashboardSidebar";
 
-export default function DashboardLayout({ children }: any) {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <DashboardSidebar />
 
-    return (
-        <ProtectedRoute>
-            <div className="min-h-screen bg-gray-50">
-                <DashboardSidebar isOpen={isSidebarOpen} onToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
-                <DashboardNavbar onMenuToggle={() => setIsSidebarOpen(!isSidebarOpen)} />
-                <main className={`pt-16 transition-all duration-300 ${isSidebarOpen ? 'md:ml-64' : 'md:ml-20'}`}>
-                    <div className="p-6 md:p-8">
-                        {children}
-                    </div>
-                </main>
-            </div>
-        </ProtectedRoute>
-    )
+      <DashboardNavbar />
+
+      <main className="ml-64 pt-16 min-h-screen">
+        <div className="p-6">{children}</div>
+      </main>
+    </div>
+  );
 }

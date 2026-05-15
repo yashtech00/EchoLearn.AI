@@ -34,6 +34,14 @@ enum SubmissionGenre {
 
 enum AnalysisStatus {
   PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum SubmissionStatus {
+  PENDING
+  PROCESSING
   COMPLETED
   FAILED
 }
@@ -153,12 +161,20 @@ model Submission {
   body      String          @db.Text
   wordCount Int
 
+  status        SubmissionStatus @default(PENDING)
+  analysisJson  Json?
+  rawAIResponse String?          @db.Text
+  errorMessage  String?
+  completedAt   DateTime?
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
 
   analysisRuns AnalysisRun[]
   mistakes     Mistake[]
 
   @@index([userId, createdAt])
+  @@index([status])
 }
 
 model AnalysisRun {

@@ -7,9 +7,13 @@ import session from "express-session";
 import user_profile_router from "./routes/user_profile_routes.js";
 import mistake_memory_router from "./routes/mistake_memory_routes.js";
 import cookieParser from "cookie-parser";
+import { connectRedis, disconnectRedis } from "./config/redis.js";
+import { closeQueue } from "./config/queue.js";
+
 dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 8000;
 
 // Middleware
 app.use(cors({
@@ -42,13 +46,44 @@ app.use((req, res, next) => {
     console.log(req.method, req.url);
     next();
 });
-// Connect to Database then start server + worker
-ConnectionDb().then(() => {
-    
 
-    app.listen(process.env.PORT || 8000, () => {
+// Connect to Database and Redis then start server
+ConnectionDb().then(() => {
+    // Connect to Redis
+    connectRedis()
+        .then(() => {
+            console.log("✅ Redis connected");
+        })
+        .catch((error) => {
+            console.error("❌ Failed to connect to Redis:", error);
+            console.warn("⚠️  Continuing without Redis - queue operations will fail");
+        });
+
+    const server = app.listen(process.env.PORT || 8000, () => {
         console.log(`🚀 Server running on port ${process.env.PORT || 8000}`);
     });
+
+    // Graceful shutdown
+    const shutdown = async () => {
+        console.log("\n🛑 Shutting down gracefully...");
+        
+        // Close HTTP server
+        server.close(() => {
+            console.log("✅ HTTP server closed");
+        });
+        
+        // Close queue
+        await closeQueue();
+        
+        // Disconnect from Redis
+        await disconnectRedis();
+        
+        console.log("✅ Shutdown complete");
+        process.exit(0);
+    };
+
+    process.on("SIGTERM", shutdown);
+    process.on("SIGINT", shutdown);
 }).catch((err) => {
     console.error("❌ Failed to connect to Database:", err.message);
     process.exit(1);

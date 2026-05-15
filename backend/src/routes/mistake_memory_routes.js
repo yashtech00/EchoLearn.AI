@@ -7,16 +7,14 @@ import {
   getAnalyticsSummary,
   getUserStats,
   getWritingPrompts,
-  getTopics
+  getTopics,
+  getSubmissionStatus
 } from "../controller/mistake_memory_controller.js";
 
 const mistakeMemoryRouter = express.Router();
 
-
-mistakeMemoryRouter.get("/get-topics", Protect, getTopics);
-
-// Submissions & analysis
 mistakeMemoryRouter.post("/submissions", Protect, createSubmission);
+mistakeMemoryRouter.get("/submissions/:id", Protect, getSubmissionStatus);
 mistakeMemoryRouter.get("/submissions", Protect, getSubmissions);
 
 // Mistakes & analytics
@@ -28,5 +26,7 @@ mistakeMemoryRouter.get("/me/stats", Protect, getUserStats);
 
 // Writing prompts
 mistakeMemoryRouter.get("/prompts", Protect, getWritingPrompts);
+
+mistakeMemoryRouter.get("/get-topics", Protect, getTopics);
 
 export default mistakeMemoryRouter;

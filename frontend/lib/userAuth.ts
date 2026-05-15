@@ -10,13 +10,6 @@ export const useAuth = () => {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const token = tokenManager.getAccessToken();
-                
-                if (!token) {
-                    setLoading(false);
-                    return;
-                }
-
                 const response = await getMe();
                 
                 if (response.user) {

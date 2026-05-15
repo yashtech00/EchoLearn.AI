@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { PenTool, Sparkles, BookOpen, TrendingUp, Lightbulb, Award, Flame } from "lucide-react";
-import { createSubmission, getTopic } from "@/app/api/writing/writing_api";
+import { PenTool, Sparkles, BookOpen, TrendingUp, Lightbulb, Award, Flame, AlertCircle } from "lucide-react";
+import { createSubmission, getTopic, getSubmissionStatus } from "@/app/api/writing/writing_api";
 
 export default function WritingCoachPage() {
   const [content, setContent] = useState("");
@@ -11,6 +11,8 @@ export default function WritingCoachPage() {
   const [loading, setLoading] = useState(false);
   const [loadingTopic, setLoadingTopic] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [analysisStatus, setAnalysisStatus] = useState<"idle" | "analyzing" | "completed" | "failed" | "timeout">("idle");
 
   const handleGetTopic = async () => {
     setLoadingTopic(true);
@@ -26,20 +28,71 @@ export default function WritingCoachPage() {
   };
 
   const handleSubmit = async () => {
-    if (!content.trim()) return;
+    if (!content.trim()) {
+      setError("Please enter some text to analyze");
+      return;
+    }
 
     setLoading(true);
+    setError(null);
+    setResult(null);
+    setAnalysisStatus("analyzing");
+
     try {
+      // Submit writing - returns immediately with submissionId
       const response = await createSubmission({
         body: content,
         genre,
         title: topic || undefined,
       });
-      setResult(response);
+
+      const submissionId = response.submissionId;
+      console.log("Submission created:", submissionId);
+
+      // Poll for status every 2 seconds
+      const pollInterval = setInterval(async () => {
+        try {
+          const statusResponse = await getSubmissionStatus(submissionId);
+          const { status, analysis, errorMessage } = statusResponse;
+
+          console.log("Submission status:", status);
+
+          if (status === "COMPLETED") {
+            clearInterval(pollInterval);
+            setResult({ analysis });
+            setAnalysisStatus("completed");
+            setLoading(false);
+          } else if (status === "FAILED") {
+            clearInterval(pollInterval);
+            setError(errorMessage || "Analysis failed. Please try again.");
+            setAnalysisStatus("failed");
+            setLoading(false);
+          }
+          // If PENDING or PROCESSING, continue polling
+        } catch (pollError) {
+          console.error("Polling error:", pollError);
+          clearInterval(pollInterval);
+          setError("Failed to check analysis status");
+          setLoading(false);
+          setAnalysisStatus("failed");
+        }
+      }, 2000);
+
+      // Set a timeout to stop polling after 2 minutes
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        if (loading) {
+          setError("Analysis is taking longer than expected. Please check back later.");
+          setLoading(false);
+          setAnalysisStatus("timeout");
+        }
+      }, 120000);
+
     } catch (error) {
       console.error("Error submitting writing:", error);
-    } finally {
+      setError("Failed to submit writing. Please try again.");
       setLoading(false);
+      setAnalysisStatus("failed");
     }
   };
 
@@ -161,29 +214,33 @@ export default function WritingCoachPage() {
               </div>
             </div>
 
-            {/* Features */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-                <BookOpen className="w-8 h-8 text-indigo-600 mx-auto mb-2" />
-                <h3 className="font-semibold text-gray-900 text-sm">Grammar</h3>
-                <p className="text-xs text-gray-600 mt-1">Fix errors</p>
-              </div>
-              <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-                <TrendingUp className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-                <h3 className="font-semibold text-gray-900 text-sm">Style</h3>
-                <p className="text-xs text-gray-600 mt-1">Improve flow</p>
-              </div>
-              <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-                <Sparkles className="w-8 h-8 text-pink-600 mx-auto mb-2" />
-                <h3 className="font-semibold text-gray-900 text-sm">Clarity</h3>
-                <p className="text-xs text-gray-600 mt-1">Enhance meaning</p>
-              </div>
-            </div>
           </div>
 
           {/* Results */}
           <div className="space-y-6">
-            {result ? (
+            {error ? (
+              <div className="bg-red-50 border border-red-200 rounded-2xl p-6">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h3 className="font-semibold text-red-900 mb-1">Error</h3>
+                    <p className="text-red-700">{error}</p>
+                    <button
+                      onClick={() => setError(null)}
+                      className="mt-3 text-sm text-red-600 hover:text-red-800 font-medium"
+                    >
+                      Dismiss
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : analysisStatus === "analyzing" ? (
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-12 text-center">
+                <div className="w-20 h-20 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Analyzing Your Writing...</h3>
+                <p className="text-gray-600">This may take 20-60 seconds. Please wait.</p>
+              </div>
+            ) : result ? (
               <>
                 {/* XP & Streak Card */}
                 {result.gamification && (

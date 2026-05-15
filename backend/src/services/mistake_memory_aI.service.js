@@ -1,112 +1,227 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
-import { log } from "node:console";
+
 dotenv.config();
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-export const analyzeMistakeMemory = async (content, profile) => {
+/**
+ * =========================
+ * CONFIG
+ * =========================
+ */
+
+const PRIMARY_MODEL = "gemini-2.5-flash";
+const FALLBACK_MODEL = "gemini-1.5-flash";
+
+const GENERATION_CONFIG = {
+  responseMimeType: "application/json",
+};
+
+const PILLARS = [
+  "VERB_SYSTEMS",
+  "AGREEMENT_GRAMMAR",
+  "DETERMINERS_QUANTITY",
+  "PREPOSITIONS_PHRASAL",
+  "LEXICAL_COLLOCATION",
+  "CLARITY_AMBIGUITY",
+  "COHESION_FLOW",
+  "INFO_STRUCTURE",
+  "REGISTER_TONE",
+  "PUNCTUATION_MECHANICS",
+  "SPELLING_ORTHOGRAPHY",
+  "GENRE_PRAGMATICS",
+];
+
+const PILLAR_LIST = PILLARS.join(" | ");
+
+/**
+ * =========================
+ * HELPERS
+ * =========================
+ */
+
+const sleep = (ms) =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+const createModel = (modelName = PRIMARY_MODEL) => {
+  return genAI.getGenerativeModel({
+    model: modelName,
+    generationConfig: GENERATION_CONFIG,
+  });
+};
+
+const safeJsonParse = (text, fallback) => {
   try {
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-      generationConfig: {
-        responseMimeType: "application/json",
-      },
-    });
+    return JSON.parse(text);
+  } catch (error) {
+    console.error("JSON Parse Error:", error.message);
 
-    // Build context from user profile if available
-    let profileContext = "";
-    if (profile) {
-      profileContext = `
-User Profile Context:
-- Role: ${profile.primaryRole}
-- English Self-Assessment (Reading): ${profile.englishReadingSelfScore}/5
-- English Self-Assessment (Writing): ${profile.englishWritingSelfScore}/5
-- Primary Goal: ${profile.primaryGoal}
-- Interests: ${profile.interestTags?.join(", ") || "Not specified"}
-- Preferred Genres: ${profile.preferredGenres?.join(", ") || "Not specified"}
+    return fallback;
+  }
+};
+
+const buildProfileContext = (profile) => {
+  if (!profile) return "No user profile provided.";
+
+  return `
+Role: ${profile.primaryRole || "Unknown"}
+Reading Level: ${profile.englishReadingSelfScore || 0}/5
+Writing Level: ${profile.englishWritingSelfScore || 0}/5
+Goal: ${profile.primaryGoal || "Unknown"}
+Interests: ${
+    profile.interestTags?.length
+      ? profile.interestTags.join(", ")
+      : "None"
+  }
+Genres: ${
+    profile.preferredGenres?.length
+      ? profile.preferredGenres.join(", ")
+      : "None"
+  }
 `;
+};
+
+/**
+ * Retry Wrapper
+ */
+const generateWithRetry = async ({
+  prompt,
+  maxAttempts = 3,
+  retryDelay = 10000,
+}) => {
+  let lastError;
+
+  const models = [PRIMARY_MODEL, FALLBACK_MODEL];
+
+  for (const modelName of models) {
+    const model = createModel(modelName);
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        console.log(
+          `[Gemini] Model=${modelName} Attempt=${attempt}/${maxAttempts}`
+        );
+
+        const result = await model.generateContent(prompt);
+
+        return result.response.text();
+      } catch (error) {
+        lastError = error;
+
+        console.error(
+          `[Gemini Error] Model=${modelName} Attempt=${attempt}`,
+          error.message
+        );
+
+        const shouldRetry =
+          error?.status === 500 ||
+          error?.status === 503 ||
+          error?.message?.includes("high demand");
+
+        if (!shouldRetry) {
+          throw error;
+        }
+
+        if (attempt < maxAttempts) {
+          console.log(
+            `Retrying in ${retryDelay / 1000} seconds...`
+          );
+
+          await sleep(retryDelay);
+        }
+      }
     }
+  }
 
-    const prompt = `You are an expert English writing coach specializing in the 12-pillar framework for writing analysis.
+  throw lastError;
+};
 
-${profileContext}
+/**
+ * =========================
+ * ANALYZE WRITING
+ * =========================
+ */
 
-Analyze the following writing and provide feedback in the 12-pillar framework:
+export const analyzeMistakeMemory = async (
+  content,
+  profile
+) => {
+  const fallback = {
+    summary: {
+      mistakeCount: 0,
+      errorDensityPer100Words: 0,
+      byPillar: [],
+    },
+    mistakes: [],
+    feedback:
+      "Your writing looks good. Keep practicing consistently.",
+    score: 85,
+  };
+
+  try {
+    const prompt = `
+You are an expert English writing evaluator.
+
+Allowed Pillars:
+${PILLAR_LIST}
+
+User Context:
+${buildProfileContext(profile)}
+
+Analyze this writing:
+"""
 ${content}
+"""
 
-Return a JSON response with this exact structure:
+Return ONLY valid JSON:
+
 {
   "summary": {
     "mistakeCount": number,
     "errorDensityPer100Words": number,
     "byPillar": [
       {
-        "pillar": "VERB_SYSTEMS" | "AGREEMENT_GRAMMAR" | "DETERMINERS_QUANTITY" | "PREPOSITIONS_PHRASAL" | "LEXICAL_COLLOCATION" | "CLARITY_AMBIGUITY" | "COHESION_FLOW" | "INFO_STRUCTURE" | "REGISTER_TONE" | "PUNCTUATION_MECHANICS" | "SPELLING_ORTHOGRAPHY" | "GENRE_PRAGMATICS",
+        "pillar": string,
         "count": number
       }
     ]
   },
   "mistakes": [
     {
-      "pillar": "VERB_SYSTEMS" | "AGREEMENT_GRAMMAR" | "DETERMINERS_QUANTITY" | "PREPOSITIONS_PHRASAL" | "LEXICAL_COLLOCATION" | "CLARITY_AMBIGUITY" | "COHESION_FLOW" | "INFO_STRUCTURE" | "REGISTER_TONE" | "PUNCTUATION_MECHANICS" | "SPELLING_ORTHOGRAPHY" | "GENRE_PRAGMATICS",
-      "subtype": string (e.g., "TENSE_CONSISTENCY", "COMMA_SPLICE"),
+      "pillar": string,
+      "subtype": string,
       "severity": "LOW" | "MEDIUM" | "HIGH",
-      "startOffset": number (character index in the original text),
-      "endOffset": number (character index in the original text),
-      "surfaceText": string (the exact text span that contains the mistake),
-      "message": string (clear explanation of the mistake),
-      "suggestion": string (corrected version or suggestion),
-      "canonicalRuleId": string (optional, e.g., "RULE.SVA_PLURAL_SUBJECT_WERE"),
-      "confidence": number (0-1)
+      "startOffset": number,
+      "endOffset": number,
+      "surfaceText": string,
+      "message": string,
+      "suggestion": string,
+      "canonicalRuleId": string,
+      "confidence": number
     }
   ],
-  "feedback": string (overall constructive feedback),
-  "score": number (0-100 overall writing score)
+  "feedback": string,
+  "score": number
 }
 
-Important:
-- Calculate character offsets accurately based on the original text
-- Provide specific, actionable feedback
-- Use appropriate severity levels
-- Include at least 3-5 mistakes if any exist
-- If the writing is excellent, still provide at least 1-2 minor suggestions
-- Calculate score based on mistake count, severity, and overall quality`;
+Rules:
+- Use ONLY allowed pillars
+- Calculate offsets carefully
+- Give actionable suggestions
+- Return pure JSON only
+`;
 
-console.log("analyzesd mistake memory Prompt", prompt);
+    const text = await generateWithRetry({ prompt });
 
-
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-
-    // Parse the JSON response
-    let analysisData;
-    try {
-      analysisData = JSON.parse(text);
-      console.log("analyzed data",analysisData);
-      
-    } catch (parseError) {
-      console.error("Failed to parse AI response as JSON:", parseError);
-      // Return a fallback response
-      analysisData = {
-        summary: {
-          mistakeCount: 0,
-          errorDensityPer100Words: 0,
-          byPillar: [],
-        },
-        mistakes: [],
-        feedback: "Your writing looks good! Keep practicing to improve further.",
-        score: 85,
-      };
-    }
+    const analysisData = safeJsonParse(text, fallback);
 
     return {
       success: true,
       data: analysisData,
     };
   } catch (error) {
-    console.error("Gemini Error:", error);
+    console.error("Analyze Mistake Memory Error:", error);
 
     return {
       success: false,
@@ -115,75 +230,57 @@ console.log("analyzesd mistake memory Prompt", prompt);
   }
 };
 
+/**
+ * =========================
+ * GENERATE TOPIC
+ * =========================
+ */
+
 export const generateTopic = async (userProfile) => {
+  const fallback = {
+    topic:
+      "Describe how technology improves your travel experiences.",
+    genre: "SHORT_ESSAY",
+    wordTarget: 150,
+  };
+
   try {
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
-      generationConfig: {
-        responseMimeType: "application/json",
-      },
-    });
+    const prompt = `
+You are an English writing coach.
 
-    // Build context from user profile if available
-    let profileContext = "";
-    if (userProfile) {
-      profileContext = `
-User Profile Context:
-- Role: ${userProfile.primaryRole}
-- English Self-Assessment (Reading): ${userProfile.englishReadingSelfScore}/5
-- English Self-Assessment (Writing): ${userProfile.englishWritingSelfScore}/5
-- Primary Goal: ${userProfile.primaryGoal}
-- Interests: ${userProfile.interestTags?.join(", ") || "Not specified"}
-- Preferred Genres: ${userProfile.preferredGenres?.join(", ") || "Not specified"}
-`;
-    }
+User Context:
+${buildProfileContext(userProfile)}
 
-    const prompt = `You are an expert English writing coach. Generate a personalized writing topic for the user based on their profile.
+Generate ONE personalized writing topic.
 
-${profileContext}
+Requirements:
+- 10-20 words
+- Practical and engaging
+- Match user's English level
+- Relevant to user interests/goals
 
-Generate a writing topic with these requirements:
-- The topic should be 2-3 lines
-- 10-20 words total
-- Should be relevant to the user's interests, goals, and preferred genres
-- Should be appropriate for their English level (writing self-score)
-- Should be engaging and practical
+Allowed Genres:
+GENERAL | WORK_EMAIL | SHORT_ESSAY | DIARY | ACADEMIC_PARAGRAPH
 
-Return a JSON response with this exact structure:
+Return ONLY valid JSON:
+
 {
-  "topic": string (the generated writing topic),
-  "genre": "GENERAL" | "WORK_EMAIL" | "SHORT_ESSAY" | "DIARY" | "ACADEMIC_PARAGRAPH",
-  "wordTarget": number (suggested word count: 100-200)
-}`;
+  "topic": string,
+  "genre": string,
+  "wordTarget": number
+}
+`;
 
-    console.log("prompt", prompt);
-    
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const text = await generateWithRetry({ prompt });
 
-    // Parse the JSON response
-    let topicData;
-    try {
-      topicData = JSON.parse(text);
-      console.log("topic Data", topicData);
-      
-    } catch (parseError) {
-      console.error("Failed to parse AI response as JSON:", parseError);
-      // Return a fallback response
-      topicData = {
-        topic: "Write about your favorite hobby and why you enjoy it.",
-        genre: "GENERAL",
-        wordTarget: 150,
-      };
-    }
+    const topicData = safeJsonParse(text, fallback);
 
     return {
       success: true,
       data: topicData,
     };
   } catch (error) {
-    console.error("Gemini Error:", error);
+    console.error("Generate Topic Error:", error);
 
     return {
       success: false,

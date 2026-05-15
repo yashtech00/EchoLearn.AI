@@ -1,51 +1,85 @@
+// components/dashboard/dashboard-navbar.tsx
+
 "use client";
 
-import { Bell, Search, Menu } from "lucide-react";
+import { Search, Flame } from "lucide-react";
+import { usePathname } from "next/navigation";
 
-interface DashboardNavbarProps {
-  onMenuToggle?: () => void;
-}
+const navbarConfig: Record<string, string[]> = {
+  dashboard: ["Overview", "Insights"],
 
-export default function DashboardNavbar({ onMenuToggle }: DashboardNavbarProps) {
+  writing: ["Practice", "Memory", "Coach", "Reports", "Rewrite"],
+
+  games: [
+    "Spot The Slip",
+    "Tone Shift",
+    "Collocation Match",
+    "Grammar Rush",
+    "Word Sprint",
+  ],
+
+  playground: ["Prompt of the Day", "Sandbox", "Challenges"],
+
+  progress: [
+    "XP & Levels",
+    "Streaks",
+    "Weekly Review",
+    "Achievements",
+  ],
+};
+
+export default function DashboardNavbar() {
+  const pathname = usePathname();
+
+  let activeSection = "dashboard";
+
+  if (pathname.includes("/WritingCoach")) {
+    activeSection = "writing";
+  } else if (pathname.includes("/Games")) {
+    activeSection = "games";
+  } else if (pathname.includes("/Playground")) {
+    activeSection = "playground";
+  } else if (pathname.includes("/Progress")) {
+    activeSection = "progress";
+  }
+
+  const navbarItems = navbarConfig[activeSection] || [];
+
   return (
-    <header className="fixed top-0 right-0 left-0 md:left-64 h-16 bg-white border-b border-gray-200 z-40">
-      <div className="h-full px-4 md:px-6 flex items-center justify-between">
-        {/* Left: Menu Toggle (mobile) and Search */}
+    <header className="fixed top-0 left-64 right-0 h-16 bg-white border-b border-gray-200 z-40">
+      <div className="h-full px-6 flex items-center justify-between">
+        {/* LEFT */}
+        <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+          {navbarItems.map((item) => (
+            <button
+              key={item}
+              className="px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-200 hover:bg-gray-100 text-gray-700"
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+
+        {/* RIGHT */}
         <div className="flex items-center gap-4">
-          <button
-            onClick={onMenuToggle}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-          >
-            <Menu className="w-5 h-5 text-gray-600" />
-          </button>
-          
-          <div className="hidden md:flex items-center gap-2 bg-gray-100 rounded-xl px-4 py-2 w-80">
+          {/* SEARCH */}
+          <div className="hidden md:flex items-center gap-2 bg-gray-100 rounded-2xl px-4 py-2 w-80">
             <Search className="w-4 h-4 text-gray-400" />
+
             <input
               type="text"
               placeholder="Search lessons, topics..."
-              className="bg-transparent border-none outline-none text-sm w-full text-gray-700 placeholder-gray-400"
+              className="bg-transparent outline-none text-sm w-full"
             />
           </div>
-        </div>
 
-        {/* Right: Notifications and User */}
-        <div className="flex items-center gap-3">
-          {/* Notification Bell */}
-          <button className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors">
-            <Bell className="w-5 h-5 text-gray-600" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
+          {/* STREAK */}
+          <div className="flex items-center gap-2 bg-orange-50 text-orange-600 px-4 py-2 rounded-2xl">
+            <Flame className="w-4 h-4" />
 
-          {/* User Avatar */}
-          <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
-            <div className="text-right hidden sm:block">
-              <p className="text-sm font-semibold text-gray-900">John Doe</p>
-              <p className="text-xs text-gray-500">Student</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold">
-              JD
-            </div>
+            <span className="text-sm font-semibold">
+              7 Day Streak
+            </span>
           </div>
         </div>
       </div>

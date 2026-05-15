@@ -98,11 +98,22 @@ export type SubmissionGenre = (typeof SubmissionGenre)[keyof typeof SubmissionGe
 
 export const AnalysisStatus: {
   PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
   COMPLETED: 'COMPLETED',
   FAILED: 'FAILED'
 };
 
 export type AnalysisStatus = (typeof AnalysisStatus)[keyof typeof AnalysisStatus]
+
+
+export const SubmissionStatus: {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+};
+
+export type SubmissionStatus = (typeof SubmissionStatus)[keyof typeof SubmissionStatus]
 
 
 export const MistakeSeverity: {
@@ -148,6 +159,10 @@ export const SubmissionGenre: typeof $Enums.SubmissionGenre
 export type AnalysisStatus = $Enums.AnalysisStatus
 
 export const AnalysisStatus: typeof $Enums.AnalysisStatus
+
+export type SubmissionStatus = $Enums.SubmissionStatus
+
+export const SubmissionStatus: typeof $Enums.SubmissionStatus
 
 export type MistakeSeverity = $Enums.MistakeSeverity
 
@@ -6671,7 +6686,12 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre | null
     body: string | null
     wordCount: number | null
+    status: $Enums.SubmissionStatus | null
+    rawAIResponse: string | null
+    errorMessage: string | null
+    completedAt: Date | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type SubmissionMaxAggregateOutputType = {
@@ -6682,7 +6702,12 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre | null
     body: string | null
     wordCount: number | null
+    status: $Enums.SubmissionStatus | null
+    rawAIResponse: string | null
+    errorMessage: string | null
+    completedAt: Date | null
     createdAt: Date | null
+    updatedAt: Date | null
   }
 
   export type SubmissionCountAggregateOutputType = {
@@ -6693,7 +6718,13 @@ export namespace Prisma {
     genre: number
     body: number
     wordCount: number
+    status: number
+    analysisJson: number
+    rawAIResponse: number
+    errorMessage: number
+    completedAt: number
     createdAt: number
+    updatedAt: number
     _all: number
   }
 
@@ -6714,7 +6745,12 @@ export namespace Prisma {
     genre?: true
     body?: true
     wordCount?: true
+    status?: true
+    rawAIResponse?: true
+    errorMessage?: true
+    completedAt?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type SubmissionMaxAggregateInputType = {
@@ -6725,7 +6761,12 @@ export namespace Prisma {
     genre?: true
     body?: true
     wordCount?: true
+    status?: true
+    rawAIResponse?: true
+    errorMessage?: true
+    completedAt?: true
     createdAt?: true
+    updatedAt?: true
   }
 
   export type SubmissionCountAggregateInputType = {
@@ -6736,7 +6777,13 @@ export namespace Prisma {
     genre?: true
     body?: true
     wordCount?: true
+    status?: true
+    analysisJson?: true
+    rawAIResponse?: true
+    errorMessage?: true
+    completedAt?: true
     createdAt?: true
+    updatedAt?: true
     _all?: true
   }
 
@@ -6834,7 +6881,13 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre
     body: string
     wordCount: number
+    status: $Enums.SubmissionStatus
+    analysisJson: JsonValue | null
+    rawAIResponse: string | null
+    errorMessage: string | null
+    completedAt: Date | null
     createdAt: Date
+    updatedAt: Date
     _count: SubmissionCountAggregateOutputType | null
     _avg: SubmissionAvgAggregateOutputType | null
     _sum: SubmissionSumAggregateOutputType | null
@@ -6864,7 +6917,13 @@ export namespace Prisma {
     genre?: boolean
     body?: boolean
     wordCount?: boolean
+    status?: boolean
+    analysisJson?: boolean
+    rawAIResponse?: boolean
+    errorMessage?: boolean
+    completedAt?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     prompt?: boolean | Submission$promptArgs<ExtArgs>
     analysisRuns?: boolean | Submission$analysisRunsArgs<ExtArgs>
@@ -6880,7 +6939,13 @@ export namespace Prisma {
     genre?: boolean
     body?: boolean
     wordCount?: boolean
+    status?: boolean
+    analysisJson?: boolean
+    rawAIResponse?: boolean
+    errorMessage?: boolean
+    completedAt?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     prompt?: boolean | Submission$promptArgs<ExtArgs>
   }, ExtArgs["result"]["submission"]>
@@ -6893,7 +6958,13 @@ export namespace Prisma {
     genre?: boolean
     body?: boolean
     wordCount?: boolean
+    status?: boolean
+    analysisJson?: boolean
+    rawAIResponse?: boolean
+    errorMessage?: boolean
+    completedAt?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     prompt?: boolean | Submission$promptArgs<ExtArgs>
   }, ExtArgs["result"]["submission"]>
@@ -6906,10 +6977,16 @@ export namespace Prisma {
     genre?: boolean
     body?: boolean
     wordCount?: boolean
+    status?: boolean
+    analysisJson?: boolean
+    rawAIResponse?: boolean
+    errorMessage?: boolean
+    completedAt?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
   }
 
-  export type SubmissionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "promptId" | "title" | "genre" | "body" | "wordCount" | "createdAt", ExtArgs["result"]["submission"]>
+  export type SubmissionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "promptId" | "title" | "genre" | "body" | "wordCount" | "status" | "analysisJson" | "rawAIResponse" | "errorMessage" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["submission"]>
   export type SubmissionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     prompt?: boolean | Submission$promptArgs<ExtArgs>
@@ -6942,7 +7019,13 @@ export namespace Prisma {
       genre: $Enums.SubmissionGenre
       body: string
       wordCount: number
+      status: $Enums.SubmissionStatus
+      analysisJson: Prisma.JsonValue | null
+      rawAIResponse: string | null
+      errorMessage: string | null
+      completedAt: Date | null
       createdAt: Date
+      updatedAt: Date
     }, ExtArgs["result"]["submission"]>
     composites: {}
   }
@@ -7377,7 +7460,13 @@ export namespace Prisma {
     readonly genre: FieldRef<"Submission", 'SubmissionGenre'>
     readonly body: FieldRef<"Submission", 'String'>
     readonly wordCount: FieldRef<"Submission", 'Int'>
+    readonly status: FieldRef<"Submission", 'SubmissionStatus'>
+    readonly analysisJson: FieldRef<"Submission", 'Json'>
+    readonly rawAIResponse: FieldRef<"Submission", 'String'>
+    readonly errorMessage: FieldRef<"Submission", 'String'>
+    readonly completedAt: FieldRef<"Submission", 'DateTime'>
     readonly createdAt: FieldRef<"Submission", 'DateTime'>
+    readonly updatedAt: FieldRef<"Submission", 'DateTime'>
   }
     
 
@@ -12580,7 +12669,13 @@ export namespace Prisma {
     genre: 'genre',
     body: 'body',
     wordCount: 'wordCount',
-    createdAt: 'createdAt'
+    status: 'status',
+    analysisJson: 'analysisJson',
+    rawAIResponse: 'rawAIResponse',
+    errorMessage: 'errorMessage',
+    completedAt: 'completedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
   };
 
   export type SubmissionScalarFieldEnum = (typeof SubmissionScalarFieldEnum)[keyof typeof SubmissionScalarFieldEnum]
@@ -12787,16 +12882,16 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'AnalysisStatus'
+   * Reference to a field of type 'SubmissionStatus'
    */
-  export type EnumAnalysisStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AnalysisStatus'>
+  export type EnumSubmissionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubmissionStatus'>
     
 
 
   /**
-   * Reference to a field of type 'AnalysisStatus[]'
+   * Reference to a field of type 'SubmissionStatus[]'
    */
-  export type ListEnumAnalysisStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AnalysisStatus[]'>
+  export type ListEnumSubmissionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubmissionStatus[]'>
     
 
 
@@ -12811,6 +12906,20 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'AnalysisStatus'
+   */
+  export type EnumAnalysisStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AnalysisStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'AnalysisStatus[]'
+   */
+  export type ListEnumAnalysisStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'AnalysisStatus[]'>
     
 
 
@@ -13246,7 +13355,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFilter<"Submission"> | $Enums.SubmissionGenre
     body?: StringFilter<"Submission"> | string
     wordCount?: IntFilter<"Submission"> | number
+    status?: EnumSubmissionStatusFilter<"Submission"> | $Enums.SubmissionStatus
+    analysisJson?: JsonNullableFilter<"Submission">
+    rawAIResponse?: StringNullableFilter<"Submission"> | string | null
+    errorMessage?: StringNullableFilter<"Submission"> | string | null
+    completedAt?: DateTimeNullableFilter<"Submission"> | Date | string | null
     createdAt?: DateTimeFilter<"Submission"> | Date | string
+    updatedAt?: DateTimeFilter<"Submission"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     prompt?: XOR<WritingPromptNullableScalarRelationFilter, WritingPromptWhereInput> | null
     analysisRuns?: AnalysisRunListRelationFilter
@@ -13261,7 +13376,13 @@ export namespace Prisma {
     genre?: SortOrder
     body?: SortOrder
     wordCount?: SortOrder
+    status?: SortOrder
+    analysisJson?: SortOrderInput | SortOrder
+    rawAIResponse?: SortOrderInput | SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
     prompt?: WritingPromptOrderByWithRelationInput
     analysisRuns?: AnalysisRunOrderByRelationAggregateInput
@@ -13279,7 +13400,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFilter<"Submission"> | $Enums.SubmissionGenre
     body?: StringFilter<"Submission"> | string
     wordCount?: IntFilter<"Submission"> | number
+    status?: EnumSubmissionStatusFilter<"Submission"> | $Enums.SubmissionStatus
+    analysisJson?: JsonNullableFilter<"Submission">
+    rawAIResponse?: StringNullableFilter<"Submission"> | string | null
+    errorMessage?: StringNullableFilter<"Submission"> | string | null
+    completedAt?: DateTimeNullableFilter<"Submission"> | Date | string | null
     createdAt?: DateTimeFilter<"Submission"> | Date | string
+    updatedAt?: DateTimeFilter<"Submission"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     prompt?: XOR<WritingPromptNullableScalarRelationFilter, WritingPromptWhereInput> | null
     analysisRuns?: AnalysisRunListRelationFilter
@@ -13294,7 +13421,13 @@ export namespace Prisma {
     genre?: SortOrder
     body?: SortOrder
     wordCount?: SortOrder
+    status?: SortOrder
+    analysisJson?: SortOrderInput | SortOrder
+    rawAIResponse?: SortOrderInput | SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     _count?: SubmissionCountOrderByAggregateInput
     _avg?: SubmissionAvgOrderByAggregateInput
     _max?: SubmissionMaxOrderByAggregateInput
@@ -13313,7 +13446,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreWithAggregatesFilter<"Submission"> | $Enums.SubmissionGenre
     body?: StringWithAggregatesFilter<"Submission"> | string
     wordCount?: IntWithAggregatesFilter<"Submission"> | number
+    status?: EnumSubmissionStatusWithAggregatesFilter<"Submission"> | $Enums.SubmissionStatus
+    analysisJson?: JsonNullableWithAggregatesFilter<"Submission">
+    rawAIResponse?: StringNullableWithAggregatesFilter<"Submission"> | string | null
+    errorMessage?: StringNullableWithAggregatesFilter<"Submission"> | string | null
+    completedAt?: DateTimeNullableWithAggregatesFilter<"Submission"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Submission"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Submission"> | Date | string
   }
 
   export type AnalysisRunWhereInput = {
@@ -14091,7 +14230,13 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre
     body: string
     wordCount: number
+    status?: $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: string | null
+    errorMessage?: string | null
+    completedAt?: Date | string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSubmissionsInput
     prompt?: WritingPromptCreateNestedOneWithoutSubmissionsInput
     analysisRuns?: AnalysisRunCreateNestedManyWithoutSubmissionInput
@@ -14106,7 +14251,13 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre
     body: string
     wordCount: number
+    status?: $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: string | null
+    errorMessage?: string | null
+    completedAt?: Date | string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
     analysisRuns?: AnalysisRunUncheckedCreateNestedManyWithoutSubmissionInput
     mistakes?: MistakeUncheckedCreateNestedManyWithoutSubmissionInput
   }
@@ -14117,7 +14268,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
     body?: StringFieldUpdateOperationsInput | string
     wordCount?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubmissionStatusFieldUpdateOperationsInput | $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSubmissionsNestedInput
     prompt?: WritingPromptUpdateOneWithoutSubmissionsNestedInput
     analysisRuns?: AnalysisRunUpdateManyWithoutSubmissionNestedInput
@@ -14132,7 +14289,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
     body?: StringFieldUpdateOperationsInput | string
     wordCount?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubmissionStatusFieldUpdateOperationsInput | $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     analysisRuns?: AnalysisRunUncheckedUpdateManyWithoutSubmissionNestedInput
     mistakes?: MistakeUncheckedUpdateManyWithoutSubmissionNestedInput
   }
@@ -14145,7 +14308,13 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre
     body: string
     wordCount: number
+    status?: $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: string | null
+    errorMessage?: string | null
+    completedAt?: Date | string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type SubmissionUpdateManyMutationInput = {
@@ -14154,7 +14323,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
     body?: StringFieldUpdateOperationsInput | string
     wordCount?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubmissionStatusFieldUpdateOperationsInput | $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SubmissionUncheckedUpdateManyInput = {
@@ -14165,7 +14340,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
     body?: StringFieldUpdateOperationsInput | string
     wordCount?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubmissionStatusFieldUpdateOperationsInput | $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AnalysisRunCreateInput = {
@@ -15028,6 +15209,36 @@ export namespace Prisma {
     _max?: NestedEnumSubmissionGenreFilter<$PrismaModel>
   }
 
+  export type EnumSubmissionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.SubmissionStatus | EnumSubmissionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSubmissionStatusFilter<$PrismaModel> | $Enums.SubmissionStatus
+  }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
   export type WritingPromptNullableScalarRelationFilter = {
     is?: WritingPromptWhereInput | null
     isNot?: WritingPromptWhereInput | null
@@ -15061,7 +15272,13 @@ export namespace Prisma {
     genre?: SortOrder
     body?: SortOrder
     wordCount?: SortOrder
+    status?: SortOrder
+    analysisJson?: SortOrder
+    rawAIResponse?: SortOrder
+    errorMessage?: SortOrder
+    completedAt?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type SubmissionAvgOrderByAggregateInput = {
@@ -15076,7 +15293,12 @@ export namespace Prisma {
     genre?: SortOrder
     body?: SortOrder
     wordCount?: SortOrder
+    status?: SortOrder
+    rawAIResponse?: SortOrder
+    errorMessage?: SortOrder
+    completedAt?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type SubmissionMinOrderByAggregateInput = {
@@ -15087,27 +15309,35 @@ export namespace Prisma {
     genre?: SortOrder
     body?: SortOrder
     wordCount?: SortOrder
+    status?: SortOrder
+    rawAIResponse?: SortOrder
+    errorMessage?: SortOrder
+    completedAt?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type SubmissionSumOrderByAggregateInput = {
     wordCount?: SortOrder
   }
 
-  export type EnumAnalysisStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.AnalysisStatus | EnumAnalysisStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.AnalysisStatus[] | ListEnumAnalysisStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.AnalysisStatus[] | ListEnumAnalysisStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumAnalysisStatusFilter<$PrismaModel> | $Enums.AnalysisStatus
+  export type EnumSubmissionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SubmissionStatus | EnumSubmissionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSubmissionStatusWithAggregatesFilter<$PrismaModel> | $Enums.SubmissionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSubmissionStatusFilter<$PrismaModel>
+    _max?: NestedEnumSubmissionStatusFilter<$PrismaModel>
   }
-  export type JsonNullableFilter<$PrismaModel = never> =
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
       >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
 
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
     equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
     path?: string[]
     mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
@@ -15122,6 +15352,16 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type EnumAnalysisStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AnalysisStatus | EnumAnalysisStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AnalysisStatus[] | ListEnumAnalysisStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AnalysisStatus[] | ListEnumAnalysisStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAnalysisStatusFilter<$PrismaModel> | $Enums.AnalysisStatus
   }
 
   export type SubmissionScalarRelationFilter = {
@@ -15175,32 +15415,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumAnalysisStatusFilter<$PrismaModel>
     _max?: NestedEnumAnalysisStatusFilter<$PrismaModel>
-  }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type EnumPillarCodeFilter<$PrismaModel = never> = {
@@ -15796,6 +16010,10 @@ export namespace Prisma {
     connect?: MistakeWhereUniqueInput | MistakeWhereUniqueInput[]
   }
 
+  export type EnumSubmissionStatusFieldUpdateOperationsInput = {
+    set?: $Enums.SubmissionStatus
+  }
+
   export type UserUpdateOneRequiredWithoutSubmissionsNestedInput = {
     create?: XOR<UserCreateWithoutSubmissionsInput, UserUncheckedCreateWithoutSubmissionsInput>
     connectOrCreate?: UserCreateOrConnectWithoutSubmissionsInput
@@ -16254,21 +16472,21 @@ export namespace Prisma {
     _max?: NestedEnumSubmissionGenreFilter<$PrismaModel>
   }
 
-  export type NestedEnumAnalysisStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.AnalysisStatus | EnumAnalysisStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.AnalysisStatus[] | ListEnumAnalysisStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.AnalysisStatus[] | ListEnumAnalysisStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumAnalysisStatusFilter<$PrismaModel> | $Enums.AnalysisStatus
+  export type NestedEnumSubmissionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.SubmissionStatus | EnumSubmissionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSubmissionStatusFilter<$PrismaModel> | $Enums.SubmissionStatus
   }
 
-  export type NestedEnumAnalysisStatusWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.AnalysisStatus | EnumAnalysisStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.AnalysisStatus[] | ListEnumAnalysisStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.AnalysisStatus[] | ListEnumAnalysisStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumAnalysisStatusWithAggregatesFilter<$PrismaModel> | $Enums.AnalysisStatus
+  export type NestedEnumSubmissionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SubmissionStatus | EnumSubmissionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSubmissionStatusWithAggregatesFilter<$PrismaModel> | $Enums.SubmissionStatus
     _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumAnalysisStatusFilter<$PrismaModel>
-    _max?: NestedEnumAnalysisStatusFilter<$PrismaModel>
+    _min?: NestedEnumSubmissionStatusFilter<$PrismaModel>
+    _max?: NestedEnumSubmissionStatusFilter<$PrismaModel>
   }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -16292,6 +16510,23 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedEnumAnalysisStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.AnalysisStatus | EnumAnalysisStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AnalysisStatus[] | ListEnumAnalysisStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AnalysisStatus[] | ListEnumAnalysisStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAnalysisStatusFilter<$PrismaModel> | $Enums.AnalysisStatus
+  }
+
+  export type NestedEnumAnalysisStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AnalysisStatus | EnumAnalysisStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.AnalysisStatus[] | ListEnumAnalysisStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AnalysisStatus[] | ListEnumAnalysisStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumAnalysisStatusWithAggregatesFilter<$PrismaModel> | $Enums.AnalysisStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAnalysisStatusFilter<$PrismaModel>
+    _max?: NestedEnumAnalysisStatusFilter<$PrismaModel>
   }
 
   export type NestedEnumPillarCodeFilter<$PrismaModel = never> = {
@@ -16403,7 +16638,13 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre
     body: string
     wordCount: number
+    status?: $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: string | null
+    errorMessage?: string | null
+    completedAt?: Date | string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
     prompt?: WritingPromptCreateNestedOneWithoutSubmissionsInput
     analysisRuns?: AnalysisRunCreateNestedManyWithoutSubmissionInput
     mistakes?: MistakeCreateNestedManyWithoutSubmissionInput
@@ -16416,7 +16657,13 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre
     body: string
     wordCount: number
+    status?: $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: string | null
+    errorMessage?: string | null
+    completedAt?: Date | string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
     analysisRuns?: AnalysisRunUncheckedCreateNestedManyWithoutSubmissionInput
     mistakes?: MistakeUncheckedCreateNestedManyWithoutSubmissionInput
   }
@@ -16600,7 +16847,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFilter<"Submission"> | $Enums.SubmissionGenre
     body?: StringFilter<"Submission"> | string
     wordCount?: IntFilter<"Submission"> | number
+    status?: EnumSubmissionStatusFilter<"Submission"> | $Enums.SubmissionStatus
+    analysisJson?: JsonNullableFilter<"Submission">
+    rawAIResponse?: StringNullableFilter<"Submission"> | string | null
+    errorMessage?: StringNullableFilter<"Submission"> | string | null
+    completedAt?: DateTimeNullableFilter<"Submission"> | Date | string | null
     createdAt?: DateTimeFilter<"Submission"> | Date | string
+    updatedAt?: DateTimeFilter<"Submission"> | Date | string
   }
 
   export type UserStatsUpsertWithoutUserInput = {
@@ -16859,7 +17112,13 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre
     body: string
     wordCount: number
+    status?: $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: string | null
+    errorMessage?: string | null
+    completedAt?: Date | string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSubmissionsInput
     analysisRuns?: AnalysisRunCreateNestedManyWithoutSubmissionInput
     mistakes?: MistakeCreateNestedManyWithoutSubmissionInput
@@ -16872,7 +17131,13 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre
     body: string
     wordCount: number
+    status?: $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: string | null
+    errorMessage?: string | null
+    completedAt?: Date | string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
     analysisRuns?: AnalysisRunUncheckedCreateNestedManyWithoutSubmissionInput
     mistakes?: MistakeUncheckedCreateNestedManyWithoutSubmissionInput
   }
@@ -17198,7 +17463,13 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre
     body: string
     wordCount: number
+    status?: $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: string | null
+    errorMessage?: string | null
+    completedAt?: Date | string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSubmissionsInput
     prompt?: WritingPromptCreateNestedOneWithoutSubmissionsInput
     mistakes?: MistakeCreateNestedManyWithoutSubmissionInput
@@ -17212,7 +17483,13 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre
     body: string
     wordCount: number
+    status?: $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: string | null
+    errorMessage?: string | null
+    completedAt?: Date | string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
     mistakes?: MistakeUncheckedCreateNestedManyWithoutSubmissionInput
   }
 
@@ -17280,7 +17557,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
     body?: StringFieldUpdateOperationsInput | string
     wordCount?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubmissionStatusFieldUpdateOperationsInput | $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSubmissionsNestedInput
     prompt?: WritingPromptUpdateOneWithoutSubmissionsNestedInput
     mistakes?: MistakeUpdateManyWithoutSubmissionNestedInput
@@ -17294,7 +17577,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
     body?: StringFieldUpdateOperationsInput | string
     wordCount?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubmissionStatusFieldUpdateOperationsInput | $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     mistakes?: MistakeUncheckedUpdateManyWithoutSubmissionNestedInput
   }
 
@@ -17320,7 +17609,13 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre
     body: string
     wordCount: number
+    status?: $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: string | null
+    errorMessage?: string | null
+    completedAt?: Date | string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSubmissionsInput
     prompt?: WritingPromptCreateNestedOneWithoutSubmissionsInput
     analysisRuns?: AnalysisRunCreateNestedManyWithoutSubmissionInput
@@ -17334,7 +17629,13 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre
     body: string
     wordCount: number
+    status?: $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: string | null
+    errorMessage?: string | null
+    completedAt?: Date | string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
     analysisRuns?: AnalysisRunUncheckedCreateNestedManyWithoutSubmissionInput
   }
 
@@ -17393,7 +17694,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
     body?: StringFieldUpdateOperationsInput | string
     wordCount?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubmissionStatusFieldUpdateOperationsInput | $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSubmissionsNestedInput
     prompt?: WritingPromptUpdateOneWithoutSubmissionsNestedInput
     analysisRuns?: AnalysisRunUpdateManyWithoutSubmissionNestedInput
@@ -17407,7 +17714,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
     body?: StringFieldUpdateOperationsInput | string
     wordCount?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubmissionStatusFieldUpdateOperationsInput | $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     analysisRuns?: AnalysisRunUncheckedUpdateManyWithoutSubmissionNestedInput
   }
 
@@ -17617,7 +17930,13 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre
     body: string
     wordCount: number
+    status?: $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: string | null
+    errorMessage?: string | null
+    completedAt?: Date | string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type XpEventCreateManyUserInput = {
@@ -17645,7 +17964,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
     body?: StringFieldUpdateOperationsInput | string
     wordCount?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubmissionStatusFieldUpdateOperationsInput | $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     prompt?: WritingPromptUpdateOneWithoutSubmissionsNestedInput
     analysisRuns?: AnalysisRunUpdateManyWithoutSubmissionNestedInput
     mistakes?: MistakeUpdateManyWithoutSubmissionNestedInput
@@ -17658,7 +17983,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
     body?: StringFieldUpdateOperationsInput | string
     wordCount?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubmissionStatusFieldUpdateOperationsInput | $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     analysisRuns?: AnalysisRunUncheckedUpdateManyWithoutSubmissionNestedInput
     mistakes?: MistakeUncheckedUpdateManyWithoutSubmissionNestedInput
   }
@@ -17670,7 +18001,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
     body?: StringFieldUpdateOperationsInput | string
     wordCount?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubmissionStatusFieldUpdateOperationsInput | $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type XpEventUpdateWithoutUserInput = {
@@ -17737,7 +18074,13 @@ export namespace Prisma {
     genre: $Enums.SubmissionGenre
     body: string
     wordCount: number
+    status?: $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: string | null
+    errorMessage?: string | null
+    completedAt?: Date | string | null
     createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type SubmissionUpdateWithoutPromptInput = {
@@ -17746,7 +18089,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
     body?: StringFieldUpdateOperationsInput | string
     wordCount?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubmissionStatusFieldUpdateOperationsInput | $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSubmissionsNestedInput
     analysisRuns?: AnalysisRunUpdateManyWithoutSubmissionNestedInput
     mistakes?: MistakeUpdateManyWithoutSubmissionNestedInput
@@ -17759,7 +18108,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
     body?: StringFieldUpdateOperationsInput | string
     wordCount?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubmissionStatusFieldUpdateOperationsInput | $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     analysisRuns?: AnalysisRunUncheckedUpdateManyWithoutSubmissionNestedInput
     mistakes?: MistakeUncheckedUpdateManyWithoutSubmissionNestedInput
   }
@@ -17771,7 +18126,13 @@ export namespace Prisma {
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
     body?: StringFieldUpdateOperationsInput | string
     wordCount?: IntFieldUpdateOperationsInput | number
+    status?: EnumSubmissionStatusFieldUpdateOperationsInput | $Enums.SubmissionStatus
+    analysisJson?: NullableJsonNullValueInput | InputJsonValue
+    rawAIResponse?: NullableStringFieldUpdateOperationsInput | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type AnalysisRunCreateManySubmissionInput = {

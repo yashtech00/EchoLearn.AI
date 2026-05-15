@@ -47,10 +47,7 @@ export default function SignInForm() {
         response = await login(email, password);
       }
 
-      if (response.accessToken) {
-        // Store token
-        localStorage.setItem("token", response.accessToken);
-        
+      if (response.user) {
         // Redirect based on isNewUser
         if (response.user?.isNewUser) {
           router.replace("/UserProfile");

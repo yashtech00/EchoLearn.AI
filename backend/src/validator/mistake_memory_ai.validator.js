@@ -13,7 +13,7 @@ export const createSubmissionValidator = z.object({
 });
 
 // AI Response schema for 12-pillar analysis
-export const aiAnalysisResponseValidator = z.object({
+export const analysisResponseValidator = z.object({
   summary: z.object({
     mistakeCount: z.number(),
     errorDensityPer100Words: z.number(),

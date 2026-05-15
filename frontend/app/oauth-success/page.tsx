@@ -10,16 +10,7 @@ export default function OAuthSuccessPage() {
 
   useEffect(() => {
     const handleAuth = async () => {
-      const accessToken = searchParams.get("accessToken");
       const isNewUser = searchParams.get("isNewUser");
-
-      if (!accessToken) {
-        router.replace("/auth/login");
-        return;
-      }
-
-      // Store access token in token manager
-      tokenManager.setAccessToken(accessToken);
 
       // Redirect based on isNewUser
       if (isNewUser === "true") {

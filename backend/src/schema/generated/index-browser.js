@@ -189,7 +189,13 @@ exports.Prisma.SubmissionScalarFieldEnum = {
   genre: 'genre',
   body: 'body',
   wordCount: 'wordCount',
-  createdAt: 'createdAt'
+  status: 'status',
+  analysisJson: 'analysisJson',
+  rawAIResponse: 'rawAIResponse',
+  errorMessage: 'errorMessage',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.AnalysisRunScalarFieldEnum = {
@@ -292,8 +298,16 @@ exports.SubmissionGenre = exports.$Enums.SubmissionGenre = {
   ACADEMIC_PARAGRAPH: 'ACADEMIC_PARAGRAPH'
 };
 
+exports.SubmissionStatus = exports.$Enums.SubmissionStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+};
+
 exports.AnalysisStatus = exports.$Enums.AnalysisStatus = {
   PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
   COMPLETED: 'COMPLETED',
   FAILED: 'FAILED'
 };

@@ -16,8 +16,11 @@ export const useAuth = () => {
                     setUser(response.user);
                     setIsNewUser(response.isNewUser);
                 }
-            } catch (error) {
-                console.error("Auth check failed:", error);
+            } catch (error: any) {
+                // Only log if it's not a 401, to keep the console clean for unauthenticated users
+                if (error.response?.status !== 401) {
+                    console.error("Auth check failed:", error);
+                }
                 // Clear invalid token
                 tokenManager.clearAccessToken();
             } finally {

@@ -121,7 +121,6 @@ export default function DashboardPage() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-20 -mt-20 blur-3xl" />
         <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent/10 rounded-full -ml-10 -mb-10 blur-2xl" />
       </div>
-      </div>
 
       {/* Stats Overview - Terra Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">

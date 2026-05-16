@@ -10,7 +10,8 @@ import {
   Zap, 
   Target, 
   Award,
-  ArrowRight
+  ArrowRight,
+  Sparkles
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

@@ -16,8 +16,11 @@ export const register = async (name: string, email: string, password: string) =>
         const response = await axiosInstance.post('/auth/register', { name, email, password });
         // Tokens are now set in HTTP-only cookies by the backend
         return response.data;
-    } catch (error) {
-        console.error("Register Error:", error);
+    } catch (error: any) {
+        // Only log if it's not a 401, to keep the console clean for unauthenticated users
+        if (error.response?.status !== 401) {
+            console.error("Register Error:", error);
+        }
         throw error;
     }
 };      
@@ -78,8 +81,11 @@ export const getMe = async () => {
     try{
         const response = await axiosInstance.get('/auth/me');
         return response.data;
-    } catch (error) {
-        console.error("Get Me Error:", error);
+    } catch (error: any) {
+        // Suppress 401 logging in console as it's an expected state for unauthenticated users
+        if (error.response?.status !== 401) {
+            console.error("Get Me Error:", error);
+        }
         throw error;
     }
 };

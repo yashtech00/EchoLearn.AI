@@ -123,3 +123,49 @@ export const updateUserProfile = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const getUserStats = async (req, res) => {
+  try {
+    const { userId } = req.user;
+
+    const userStats = await prisma.userStats.findUnique({
+      where: { userId },
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          }
+        }
+      }
+    });
+
+    if (!userStats) {
+      // Return default stats if none exist
+      return res.status(200).json({
+        stats: {
+          totalXp: 0,
+          level: 1,
+          currentStreak: 0,
+          longestStreak: 0,
+          lastActiveDate: null,
+        }
+      });
+    }
+
+    // Get recent activities (last 5)
+    const recentActivities = await prisma.userActivity.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 5
+    });
+
+    return res.status(200).json({
+      stats: userStats,
+      recentActivities
+    });
+  } catch (error) {
+    console.error("Error fetching user stats:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};

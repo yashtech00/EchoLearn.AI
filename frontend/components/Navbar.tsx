@@ -1,36 +1,44 @@
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export const Navbar = () => {
   return (
-    <nav className="w-full  backdrop-blur-md fixed top-0 z-50">
-      <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+    <nav className="w-full backdrop-blur-md fixed top-0 z-50 border-b border-primary/5 bg-background/80">
+      <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
         
         {/* Logo */}
-        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
-          EchoLearn<span className="text-secondary">.AI</span>
-        </h1>
+        <Link href="/" className="group">
+          <h1 className="text-2xl font-serif font-bold text-foreground tracking-tight flex items-center gap-1">
+            EchoLearn<span className="text-primary transition-colors group-hover:text-accent">.AI</span>
+          </h1>
+        </Link>
 
         {/* Center Nav Links */}
-        <ul className="hidden md:flex gap-8 text-gray-600 font-semibold">
-          <li className="hover:text-secondary cursor-pointer transition">
-            Programs
+        <ul className="hidden md:flex gap-10 text-muted-foreground font-sans font-medium">
+          <li className="hover:text-primary cursor-pointer transition-colors">
+            <Link href="/LandingPages/Program">Programs</Link>
           </li>
-          <li className="hover:text-secondary cursor-pointer transition">
-            Blog
+          <li className="hover:text-primary cursor-pointer transition-colors">
+            <Link href="/LandingPages/Blogs">Blog</Link>
           </li>
-          <li className="hover:text-secondary cursor-pointer transition">
-            About Us
+          <li className="hover:text-primary cursor-pointer transition-colors">
+            <Link href="/LandingPages/AboutUs">About Us</Link>
           </li>
         </ul>
 
         {/* Auth Buttons */}
-        <Link href="/auth/login">
         <div className="flex items-center gap-4">
-          <button className="border-2 border-black rounded-full px-4 py-2 text-gray-600 hover:text-white hover:bg-black  transition">
-            Sign In 
-          </button>
+          <Link href="/auth/login">
+            <Button variant="ghost" className="font-sans font-semibold text-muted-foreground hover:text-primary hover:bg-primary/5 rounded-[12px]">
+              Sign In
+            </Button>
+          </Link>
+          <Link href="/auth/login">
+            <Button className="bg-primary hover:bg-primary/90 text-white font-sans font-bold px-6 rounded-[12px] shadow-terra transition-all hover:scale-[1.02]">
+              Join Now
+            </Button>
+          </Link>
         </div>
-        </Link>
 
       </div>
     </nav>

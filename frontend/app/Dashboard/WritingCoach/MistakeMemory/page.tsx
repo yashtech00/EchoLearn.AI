@@ -12,25 +12,44 @@ export default function MistakeMemoryPage() {
   const [userStats, setUserStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
+  const [timeWindow, setTimeWindow] = useState<string>("30d");
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    loadAnalytics();
+  }, [timeWindow]);
+
+  const loadAnalytics = async () => {
+    setAnalyticsLoading(true);
+    try {
+      const analyticsData = await getAnalyticsSummary(timeWindow);
+      setAnalytics(analyticsData);
+    } catch (error) {
+      console.error("Error loading analytics:", error);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  };
+
   const loadData = async () => {
     setLoading(true);
     try {
-      const [submissionsData, mistakesData, analyticsData, userStatsData] = await Promise.all([
+      const [submissionsData, mistakesData, userStatsData] = await Promise.all([
         getSubmissions(10, 0),
         getMistakes({ limit: 50 }),
-        getAnalyticsSummary("30d"),
         getUserStats(),
       ]);
       setSubmissions(submissionsData.submissions || []);
       setMistakes(mistakesData.mistakes || []);
-      setAnalytics(analyticsData);
       setUserStats(userStatsData);
+      
+      // Load analytics with current timeWindow
+      await loadAnalytics();
     } catch (error) {
       console.error("Error loading data:", error);
     } finally {
@@ -142,6 +161,80 @@ export default function MistakeMemoryPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Mistakes List */}
           <div className="lg:col-span-2 space-y-6">
+
+
+            {/* Analytics Summary */}
+            {analytics && (
+              <div className="bg-background rounded-[12px] border border-border p-6 shadow-[var(--shadow-terra)]">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-xl font-bold text-foreground flex items-center gap-2 font-serif">
+                    <BarChart3 className="w-5 h-5 text-accent" />
+                    Analytics Summary
+                  </h2>
+                  <select
+                    value={timeWindow}
+                    onChange={(e) => setTimeWindow(e.target.value)}
+                    className="px-4 py-2 border border-border rounded-[12px] text-sm bg-background text-foreground font-medium focus:ring-2 focus:ring-primary focus:border-transparent outline-none cursor-pointer"
+                  >
+                    <option value="7d">Last 7 Days</option>
+                    <option value="30d">Last 30 Days</option>
+                    <option value="all">All Time</option>
+                  </select>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+                  <div className="p-4 bg-muted rounded-[12px] border border-border/50 text-center">
+                    <p className="text-2xl font-bold text-foreground">
+                      {analytics.submissionsCount}
+                    </p>
+                    <p className="text-xs font-medium text-foreground/70 mt-1 uppercase tracking-wider">Submissions</p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-[12px] border border-border/50 text-center">
+                    <p className="text-2xl font-bold text-foreground">
+                      {analytics.totalMistakes}
+                    </p>
+                    <p className="text-xs font-medium text-foreground/70 mt-1 uppercase tracking-wider">Mistakes</p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-[12px] border border-border/50 text-center">
+                    <p className="text-2xl font-bold text-foreground">
+                      {analytics.avgErrorDensityPer100Words?.toFixed(1)}
+                    </p>
+                    <p className="text-xs font-medium text-foreground/70 mt-1 uppercase tracking-wider">Per 100 Wds</p>
+                  </div>
+                  <div className="p-4 bg-muted rounded-[12px] border border-border/50 text-center">
+                    <p className="text-2xl font-bold text-foreground">
+                      {analytics.pillarMix?.length || 0}
+                    </p>
+                    <p className="text-xs font-medium text-foreground/70 mt-1 uppercase tracking-wider">Pillars</p>
+                  </div>
+                </div>
+
+                {analytics.topSubtypes && analytics.topSubtypes.length > 0 && (
+                  <div>
+                    <h3 className="font-bold text-foreground mb-4 font-serif text-lg">Top Recurring Patterns</h3>
+                    <div className="space-y-3">
+                      {analytics.topSubtypes.slice(0, 5).map((subtype: any, index: number) => (
+                        <div
+                          key={index}
+                          className="p-3 bg-muted border border-border/50 rounded-[12px] flex items-center justify-between group hover:border-primary/30 transition-colors"
+                        >
+                          <div>
+                            <p className="text-sm font-semibold text-foreground">
+                              {subtype.subtype}
+                            </p>
+                            <p className="text-xs font-medium text-foreground/60 mt-0.5">
+                              {subtype.pillar.replace(/_/g, " ")} • Recurrence: {subtype.recurrenceIndex?.toFixed(1)}
+                            </p>
+                          </div>
+                          <span className="text-sm font-bold text-destructive bg-destructive/10 px-3 py-1 rounded-[8px]">
+                            {subtype.count}x
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
             <div className="bg-background rounded-[12px] border border-border p-6 shadow-[var(--shadow-terra)]">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-foreground flex items-center gap-2 font-serif">
@@ -219,67 +312,6 @@ export default function MistakeMemoryPage() {
               )}
             </div>
 
-            {/* Analytics Summary */}
-            {analytics && (
-              <div className="bg-background rounded-[12px] border border-border p-6 shadow-[var(--shadow-terra)]">
-                <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2 font-serif">
-                  <BarChart3 className="w-5 h-5 text-accent" />
-                  Analytics Summary (30 days)
-                </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-                  <div className="p-4 bg-muted rounded-[12px] border border-border/50 text-center">
-                    <p className="text-2xl font-bold text-foreground">
-                      {analytics.submissionsCount}
-                    </p>
-                    <p className="text-xs font-medium text-foreground/70 mt-1 uppercase tracking-wider">Submissions</p>
-                  </div>
-                  <div className="p-4 bg-muted rounded-[12px] border border-border/50 text-center">
-                    <p className="text-2xl font-bold text-foreground">
-                      {analytics.totalMistakes}
-                    </p>
-                    <p className="text-xs font-medium text-foreground/70 mt-1 uppercase tracking-wider">Mistakes</p>
-                  </div>
-                  <div className="p-4 bg-muted rounded-[12px] border border-border/50 text-center">
-                    <p className="text-2xl font-bold text-foreground">
-                      {analytics.avgErrorDensityPer100Words?.toFixed(1)}
-                    </p>
-                    <p className="text-xs font-medium text-foreground/70 mt-1 uppercase tracking-wider">Per 100 Wds</p>
-                  </div>
-                  <div className="p-4 bg-muted rounded-[12px] border border-border/50 text-center">
-                    <p className="text-2xl font-bold text-foreground">
-                      {analytics.pillarMix?.length || 0}
-                    </p>
-                    <p className="text-xs font-medium text-foreground/70 mt-1 uppercase tracking-wider">Pillars</p>
-                  </div>
-                </div>
-
-                {analytics.topSubtypes && analytics.topSubtypes.length > 0 && (
-                  <div>
-                    <h3 className="font-bold text-foreground mb-4 font-serif text-lg">Top Recurring Patterns</h3>
-                    <div className="space-y-3">
-                      {analytics.topSubtypes.slice(0, 5).map((subtype: any, index: number) => (
-                        <div
-                          key={index}
-                          className="p-3 bg-muted border border-border/50 rounded-[12px] flex items-center justify-between group hover:border-primary/30 transition-colors"
-                        >
-                          <div>
-                            <p className="text-sm font-semibold text-foreground">
-                              {subtype.subtype}
-                            </p>
-                            <p className="text-xs font-medium text-foreground/60 mt-0.5">
-                              {subtype.pillar.replace(/_/g, " ")} • Recurrence: {subtype.recurrenceIndex?.toFixed(1)}
-                            </p>
-                          </div>
-                          <span className="text-sm font-bold text-destructive bg-destructive/10 px-3 py-1 rounded-[8px]">
-                            {subtype.count}x
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
 
             {/* Recent Submissions */}
             <div className="bg-background rounded-[12px] border border-border p-6 shadow-[var(--shadow-terra)]">
@@ -331,7 +363,7 @@ export default function MistakeMemoryPage() {
           {/* Sidebar / Pillar Breakdown */}
           <div className="space-y-6">
             {/* Tips */}
-            <div className="bg-primary rounded-[12px] p-6 text-primary-foreground shadow-[var(--shadow-terra)] relative overflow-hidden">
+            {/* <div className="bg-primary rounded-[12px] p-6 text-primary-foreground shadow-[var(--shadow-terra)] relative overflow-hidden">
               <div className="absolute -right-4 -top-4 opacity-10">
                 <Sparkles className="w-32 h-32" />
               </div>
@@ -342,7 +374,7 @@ export default function MistakeMemoryPage() {
               <p className="text-sm text-primary-foreground/90 leading-relaxed font-medium relative z-10">
                 Review your most common mistakes regularly. Focus on the pillars where you make the most errors. Practice writing sentences that use the correct forms to build muscle memory and avoid repeating the same errors.
               </p>
-            </div>
+            </div> */}
 
             <div className="bg-background rounded-[12px] border border-border p-6 shadow-[var(--shadow-terra)]">
               <h2 className="text-xl font-bold text-foreground mb-6 flex items-center gap-2 font-serif">

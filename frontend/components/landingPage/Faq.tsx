@@ -1,37 +1,38 @@
 "use client";
 import { useState } from "react";
+import { ChevronDown, ChevronUp, MessageCircleQuestion } from "lucide-react";
 
 export const FAQSection = () => {
   const faqs = [
     {
       question: "How does EchoLearn.AI improve my English?",
       answer:
-        "EchoLearn.AI uses AI to analyze your writing and speaking in real-time, providing corrections, suggestions, and personalized feedback based on your mistakes.",
+        "EchoLearn.AI uses AI to analyze your writing and speaking in real-time, providing corrections, suggestions, and personalized feedback based on your specific mistakes and learning patterns.",
     },
     {
       question: "Does it support speaking practice?",
       answer:
-        "Yes, you can practice speaking using your microphone and receive instant feedback on fluency, grammar, and sentence structure.",
+        "Yes, you can practice speaking using our immersive modules and receive instant feedback on fluency, grammar, and sentence structure.",
     },
     {
       question: "What is the Mistake Memory Engine?",
       answer:
-        "It tracks your repeated mistakes and helps you focus on improving weak areas with personalized insights and suggestions.",
+        "It's a unique system that tracks your repeated mistakes over time. Instead of just correcting you once, it helps you focus on eliminating long-term habits through targeted insights.",
     },
     {
       question: "Can I practice real-life conversations?",
       answer:
-        "Absolutely. Roleplay mode lets you simulate real scenarios like job interviews, meetings, and casual conversations with AI.",
+        "Absolutely. Roleplay mode lets you simulate scenarios like job interviews, workplace meetings, and casual travel conversations in a safe, AI-guided environment.",
     },
     {
       question: "Is EchoLearn.AI suitable for beginners?",
       answer:
-        "Yes, it adapts to your level and helps you improve step by step, whether you're a beginner or advanced learner.",
+        "Yes, the platform adapts to your current level. Whether you're building foundational confidence or polishing professional fluency, our feedback scales with your ability.",
     },
     {
       question: "Do I need to pay to use it?",
       answer:
-        "You can start with free features, and advanced capabilities may be added later as premium options.",
+        "You can start exploring EchoLearn with our core features. We aim to keep learning accessible while offering advanced AI capabilities for dedicated learners.",
     },
   ];
 
@@ -42,45 +43,54 @@ export const FAQSection = () => {
   };
 
   return (
-    <section className="py-24 px-6">
+    <section className="py-32 px-6 bg-background border-t border-primary/5">
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <span className="inline-block mb-4 px-3 py-1 text-xs font-semibold tracking-widest uppercase rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-            FAQ
+        <div className="text-center mb-16">
+          <span className="inline-flex items-center gap-2 rounded-full border border-primary/10 bg-primary/5 px-4 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-primary mb-8">
+            <MessageCircleQuestion className="h-4 w-4 text-accent" />
+            Curiosities
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">
-            Frequently Asked <span className="text-blue-400">Questions</span>
+          <h2 className="text-4xl md:text-5xl font-serif font-bold text-foreground mb-6">
+            Frequently Asked <span className="text-primary italic">Questions</span>
           </h2>
-          <p className="text-gray-400">
-            Everything you need to know about EchoLearn.AI
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+            Everything you need to know about starting your journey with EchoLearn.AI
           </p>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className={`rounded-xl bg-gray-900 border transition-all duration-200 ${
+              className={`rounded-[16px] bg-card border transition-all duration-300 ${
                 openIndex === index
-                  ? "border-blue-500"
-                  : "border-gray-800 hover:border-gray-700"
+                  ? "border-primary/20 shadow-terra"
+                  : "border-primary/5 hover:border-primary/20 shadow-sm"
               }`}
             >
               <button
                 onClick={() => toggle(index)}
-                className="w-full text-left px-5 py-4 flex justify-between items-center hover:bg-gray-800/50 rounded-xl transition-colors"
+                className="w-full text-left px-8 py-6 flex justify-between items-center transition-colors"
               >
-                <span className="font-medium text-white">{faq.question}</span>
-                <span className="text-orange-400 text-xl font-bold ml-4 shrink-0">
-                  {openIndex === index ? "−" : "+"}
+                <span className="text-lg font-serif font-bold text-foreground">{faq.question}</span>
+                <span className="text-primary transition-transform duration-300">
+                  {openIndex === index ? (
+                    <ChevronUp className="w-6 h-6" />
+                  ) : (
+                    <ChevronDown className="w-6 h-6" />
+                  )}
                 </span>
               </button>
 
-              {openIndex === index && (
-                <div className="px-5 pb-5 text-gray-400 text-sm leading-relaxed border-t border-gray-800 pt-3">
+              <div 
+                className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                  openIndex === index ? "max-h-[300px] opacity-100" : "max-h-0 opacity-0"
+                }`}
+              >
+                <div className="px-8 pb-8 text-muted-foreground leading-relaxed border-t border-primary/5 pt-6 font-medium">
                   {faq.answer}
                 </div>
-              )}
+              </div>
             </div>
           ))}
         </div>

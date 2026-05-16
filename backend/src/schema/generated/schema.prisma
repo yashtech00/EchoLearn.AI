@@ -79,6 +79,7 @@ model User {
   submissions   Submission[]
   stats         UserStats?
   xpEvents      XpEvent[]
+  activities    UserActivity[]
   refreshTokens RefreshToken[]
 
   isNewUser Boolean @default(true)
@@ -252,6 +253,22 @@ model XpEvent {
   eventType String
   xpDelta   Int
   payload   Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
+model UserActivity {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  activityType String
+  source       String // WRITING, GAME, PLAYGROUND
+  sourceId     String? // e.g., submissionId, gameId
+
+  xpEarned Int
 
   createdAt DateTime @default(now())
 

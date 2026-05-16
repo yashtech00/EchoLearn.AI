@@ -249,6 +249,16 @@ exports.Prisma.XpEventScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.UserActivityScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  activityType: 'activityType',
+  source: 'source',
+  sourceId: 'sourceId',
+  xpEarned: 'xpEarned',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -342,7 +352,8 @@ exports.Prisma.ModelName = {
   AnalysisRun: 'AnalysisRun',
   Mistake: 'Mistake',
   UserStats: 'UserStats',
-  XpEvent: 'XpEvent'
+  XpEvent: 'XpEvent',
+  UserActivity: 'UserActivity'
 };
 
 /**

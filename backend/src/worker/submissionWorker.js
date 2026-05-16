@@ -3,6 +3,7 @@ import { getRedisConnection } from '../config/redis.js';
 import prisma from '../lib/prisma.js';
 import { analyzeMistakeMemory } from '../services/mistake_memory_aI.service.js';
 import { analysisResponseValidator } from '../validator/mistake_memory_ai.validator.js';
+import { logUserActivity } from '../services/activity.service.js';
 
 /**
  * Background Worker for Writing Submissions
@@ -114,47 +115,24 @@ const worker = new Worker(
       if (mistakeCount === 0) xpEarned += 10;
       else if (mistakeCount <= 3) xpEarned += 5;
 
-      // Update user stats
-      const userStats = await prisma.userStats.findUnique({
-        where: { userId },
-      });
-
-      if (userStats) {
-        const newTotalXp = userStats.totalXp + xpEarned;
-        const newLevel = Math.floor(newTotalXp / 50) + 1;
-
-        await prisma.userStats.update({
-          where: { userId },
-          data: {
-            totalXp: newTotalXp,
-            level: newLevel,
-          },
-        });
-
-        // Create XP event
-        await prisma.xpEvent.create({
-          data: {
-            userId,
-            eventType: 'SUBMISSION_ANALYSIS',
-            xpDelta: xpEarned,
-            payload: {
-              submissionId,
-              score,
-              mistakeCount,
-            },
-          },
-        });
-      }
+      // Update user stats with unified activity service
+      const activityResult = await logUserActivity(
+        userId,
+        'SUBMISSION_ANALYSIS',
+        'WRITING',
+        submissionId,
+        xpEarned
+      );
 
       console.log(`✅ Submission ${submissionId} processed successfully`);
-      console.log(`   Score: ${score}, Mistakes: ${mistakeCount}, XP: +${xpEarned}`);
+      console.log(`   Score: ${score}, Mistakes: ${mistakeCount}, XP: +${activityResult.xpEarned} (including +${activityResult.streakBonus} streak bonus)`);
 
       return {
         success: true,
         submissionId,
         score,
         mistakeCount,
-        xpEarned,
+        xpEarned: activityResult.xpEarned,
       };
     } catch (error) {
       console.error(`❌ Error processing submission ${submissionId}:`, error);

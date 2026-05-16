@@ -10,12 +10,15 @@ export default function ProtectedRoute({ children }: any) {
     const pathname = usePathname();
 
     useEffect(() => {
-        if (!loading && !user) {
+        const publicRoutes = ["/", "/auth/login", "/auth/register", "/LandingPages/Program", "/LandingPages/Blogs", "/LandingPages/AboutUs"];
+        const isPublicRoute = publicRoutes.some(route => pathname === route);
+
+        if (!loading && !user && !isPublicRoute) {
             router.replace("/auth/login");
         } else if (!loading && user && isNewUser && pathname !== "/UserProfile") {
             router.replace("/UserProfile");
         }
-    }, [loading, user, isNewUser, pathname, router]);
+    }, [loading, user, isNewUser, router, pathname]);
 
     if (loading) return <div>Loading...</div>;
 

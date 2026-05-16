@@ -43,13 +43,6 @@ const sidebarSections = [
     icon: Sparkles,
     path: "/Dashboard/Playground",
   },
-
-  {
-    id: "progress",
-    title: "Progress",
-    icon: Brain,
-    path: "/Dashboard/Progress",
-  },
 ];
 
 export default function DashboardSidebar() {

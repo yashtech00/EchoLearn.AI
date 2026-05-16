@@ -70,7 +70,7 @@ export const getAnalyticsSummary = async (window = "30d") => {
 
 export const getUserStats = async () => {
   try {
-    const response = await axiosInstance.get('/writing/me/stats');
+    const response = await axiosInstance.get('/profile/stats');
     return response.data;
   } catch (error) {
     console.error("Error getting user stats:", error);

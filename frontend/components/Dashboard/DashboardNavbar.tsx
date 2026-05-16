@@ -2,8 +2,10 @@
 
 "use client";
 
-import { Search, Flame } from "lucide-react";
+import { Search, Flame, Zap } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { tokenManager } from "@/lib/tokenManager";
 
 const navbarConfig: Record<string, { label: string; path: string }[]> = {
   dashboard: [
@@ -14,7 +16,6 @@ const navbarConfig: Record<string, { label: string; path: string }[]> = {
   writing: [
     { label: "Practice", path: "/Dashboard/WritingCoach/practice" },
     { label: "Memory", path: "/Dashboard/WritingCoach/MistakeMemory" },
-    { label: "Coach", path: "/Dashboard/WritingCoach/Coach" },
     { label: "Reports", path: "/Dashboard/WritingCoach/Report" },
     { label: "Rewrite", path: "/Dashboard/WritingCoach/Rewrite" },
   ],
@@ -44,6 +45,31 @@ const navbarConfig: Record<string, { label: string; path: string }[]> = {
 export default function DashboardNavbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [stats, setStats] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const token = tokenManager.getAccessToken();
+        if (!token) return;
+
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/stats`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data.stats);
+        }
+      } catch (error) {
+        console.error("Error fetching stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   let activeSection = "dashboard";
 
@@ -98,13 +124,20 @@ export default function DashboardNavbar() {
           </div>
 
           {/* STREAK */}
-          <div className="flex items-center gap-2 bg-accent/10 text-accent px-4 py-2 rounded-[12px]">
-            <Flame className="w-4 h-4" />
-
-            <span className="text-sm font-semibold">
-              7 Day Streak
+          <div className="flex items-center gap-2 bg-orange-500/10 text-orange-600 px-4 py-2 rounded-[12px] border border-orange-500/20">
+            <Flame className={`w-4 h-4 ${(stats?.currentStreak || 0) > 0 ? "fill-orange-500" : ""}`} />
+            <span className="text-sm font-bold">
+              {stats?.currentStreak || 0} Day Streak
             </span>
           </div>
+
+          {/* XP / LEVEL */}
+          {/* <div className="flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-[12px] border border-primary/20">
+            <Zap className="w-4 h-4 fill-primary" />
+            <span className="text-sm font-bold">
+              Lvl {stats?.level || 0}
+            </span>
+          </div> */}
         </div>
       </div>
     </header>

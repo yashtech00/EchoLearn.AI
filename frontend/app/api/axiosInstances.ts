@@ -68,7 +68,8 @@ axiosInstance.interceptors.response.use(
                         // Retry original request (new cookies will be sent automatically)
                         return axiosInstance(originalRequest);
                     } catch (refreshError) {
-                        // Refresh failed - redirect to login
+                        // Refresh failed - redirect to login if we are not already on a public page
+                        // For now, let's just redirect as it was before, but more safely
                         if (typeof window !== 'undefined') {
                             window.location.href = '/auth/login';
                         }
@@ -76,10 +77,9 @@ axiosInstance.interceptors.response.use(
                         return Promise.reject(refreshError);
                     }
                 } else {
-                    // Auth request failed - redirect to login
-                    if (typeof window !== 'undefined') {
-                        window.location.href = '/auth/login';
-                    }
+                    // Auth request failed (like /auth/me) - just reject it without redirecting.
+                    // This allows pages to handle unauthenticated state (e.g. show landing page).
+                    return Promise.reject(error);
                 }
             } else if (status === 403) {
                 // 403 is handled by the calling code (e.g. login blocked dialog, route guards)

@@ -1,5 +1,6 @@
 "use client";
 
+import { logout } from "@/app/api/auth/auth_api";
 import {
   Home,
   PenTool,
@@ -78,9 +79,32 @@ export default function DashboardSidebar({
   const pathname = usePathname();
   const router = useRouter();
 
-  const handleLogout = () => {
-    router.push("/auth/login");
-  };
+const handleLogout = async () => {
+  try {
+
+     // Call backend logout API
+   await logout();
+    // Clear localStorage
+    localStorage.clear();
+
+    // Clear sessionStorage
+    sessionStorage.clear();
+
+    // Clear all cookies
+    document.cookie.split(";").forEach((cookie) => {
+      const eqPos = cookie.indexOf("=");
+      const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
+
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=${window.location.hostname}`;
+    });
+
+    // Redirect to home/login page
+    router.push("/");
+  } catch (error) {
+    console.error("Logout error:", error);
+  }
+};
 
   const handleNavigation = (path: string) => {
     router.push(path);

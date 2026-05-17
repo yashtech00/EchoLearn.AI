@@ -158,6 +158,5 @@ export default function InterestsForm({ formData, setFormData, onSubmit, onBack 
 
       
       </div>
-    </div>
   );
 }

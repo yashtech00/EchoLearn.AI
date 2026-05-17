@@ -536,61 +536,95 @@ export const rewriteSubmission = async (req, res) => {
   try {
     const { userId } = req.user;
     const { id } = req.params;
-    const { genre, targetWordCount, body, metadata } = req.body;
+    const { genre, body } = req.body;
 
-    if (!body) {
+    if (!body?.trim()) {
       return res.status(400).json({ message: "Body is required" });
     }
 
-    const previousSubmission = await prisma.submission.findFirst({
+    const existing = await prisma.submission.findFirst({
       where: { id, userId },
+      include: {
+        mistakes: {
+          select: {
+            pillar: true,
+            subtype: true,
+            severity: true,
+            surfaceText: true,
+            message: true,
+            suggestion: true,
+            canonicalRuleId: true,
+          },
+        },
+      },
     });
 
-    if (!previousSubmission) {
-      return res.status(404).json({ message: "Original submission not found" });
+    if (!existing) {
+      return res.status(404).json({ message: "Submission not found" });
     }
 
     const wordCount = body.trim().split(/\s+/).length;
+    const previousScore =
+      existing.analysisJson &&
+      typeof existing.analysisJson === "object" &&
+      "score" in existing.analysisJson
+        ? existing.analysisJson.score
+        : null;
 
-    // Create submission with PENDING status
-    const submission = await prisma.submission.create({
-      data: {
-        userId,
-        promptId: previousSubmission.promptId || null,
-        title: previousSubmission.title || null,
-        genre: genre || previousSubmission.genre,
-        body,
-        wordCount,
-        status: "PENDING",
-      },
-    });
+    const previousMistakes = existing.mistakes.map((m) => ({
+      pillar: m.pillar,
+      subtype: m.subtype,
+      severity: m.severity,
+      surfaceText: m.surfaceText,
+      message: m.message,
+      suggestion: m.suggestion,
+      canonicalRuleId: m.canonicalRuleId,
+    }));
 
-    // Get user profile for AI context
+    await prisma.$transaction([
+      prisma.submission.update({
+        where: { id },
+        data: {
+          body: body.trim(),
+          wordCount,
+          genre: genre || existing.genre,
+          status: "PENDING",
+          analysisJson: null,
+          rawAIResponse: null,
+          errorMessage: null,
+          completedAt: null,
+        },
+      }),
+      prisma.mistake.deleteMany({ where: { submissionId: id } }),
+    ]);
+
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      include: {
-        profile: true,
-      },
+      include: { profile: true },
     });
 
-    // Add job to BullMQ queue for async processing
     const { addSubmissionJob } = await import("../config/queue.js");
-    await addSubmissionJob({
-      submissionId: submission.id,
-      userId,
-      content: body,
-      genre,
-      userProfile: user?.profile || null,
-    });
+    await addSubmissionJob(
+      {
+        submissionId: id,
+        userId,
+        content: body.trim(),
+        genre: genre || existing.genre,
+        userProfile: user?.profile || null,
+        isRewrite: true,
+        previousMistakes,
+        previousScore,
+      },
+      { jobId: `rewrite-${id}-${Date.now()}` },
+    );
 
-    // Return immediately with submission ID and status
-    return res.status(201).json({
-      message: "Submission created successfully",
-      submissionId: submission.id,
+    return res.status(200).json({
+      message: "Rewrite submitted for analysis",
+      submissionId: id,
       status: "PENDING",
     });
   } catch (error) {
-    console.error("Error creating submission:", error);
+    console.error("Error submitting rewrite:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

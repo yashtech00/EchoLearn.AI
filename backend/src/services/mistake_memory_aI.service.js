@@ -165,8 +165,14 @@ const generateWithRetry = async ({
 
 export const analyzeMistakeMemory = async (
   content,
-  profile
+  profile,
+  options = {}
 ) => {
+  const {
+    isRewrite = false,
+    previousMistakes = [],
+    previousScore = null,
+  } = options;
   const fallback = {
     summary: {
       mistakeCount: 0,
@@ -183,6 +189,29 @@ export const analyzeMistakeMemory = async (
   };
 
   try {
+    const rewriteContext =
+      isRewrite && previousMistakes.length > 0
+        ? `
+This is a REWRITE of a previous submission (previous score: ${previousScore ?? "unknown"}/100).
+The learner tried to fix these issues from the last draft:
+${previousMistakes
+  .slice(0, 25)
+  .map(
+    (m, i) =>
+      `${i + 1}. [${m.pillar}] "${m.surfaceText || ""}" — ${m.message}${m.suggestion ? ` → Suggestion: ${m.suggestion}` : ""}`
+  )
+  .join("\n")}
+
+In your feedback, acknowledge improvements when prior mistakes were fixed.
+Score the rewrite holistically; reward clear progress but still flag remaining or new issues.
+`
+        : isRewrite
+          ? `
+This is a REWRITE of a previous submission (previous score: ${previousScore ?? "unknown"}/100).
+Compare against typical expectations for improvement and note progress in feedback.
+`
+          : "";
+
     const prompt = `
 You are an expert English writing evaluator.
 
@@ -191,6 +220,7 @@ ${PILLAR_LIST}
 
 User Context:
 ${buildProfileContext(profile)}
+${rewriteContext}
 
 Analyze this writing:
 """

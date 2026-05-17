@@ -30,3 +30,12 @@ export const user_profile_validator = z.object({
   // ❌ remove from frontend ideally
   initialAssessmentDone: z.boolean().optional(),
 });
+
+export const user_profile_update_validator = user_profile_validator.partial();
+
+export const profile_me_update_validator = z
+  .object({
+    name: z.string().min(1).max(100).optional(),
+    displayName: z.string().max(100).nullable().optional(),
+  })
+  .merge(user_profile_update_validator);

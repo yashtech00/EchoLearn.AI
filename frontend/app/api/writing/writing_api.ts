@@ -119,3 +119,15 @@ export const getNewTopic = async () => {
     throw error;
   }
 };
+
+/** Re-analyze an existing submission in place (rewrite flow). */
+export const submitRewrite = async (
+  submissionId: string,
+  data: { body: string; genre?: string },
+) => {
+  const response = await axiosInstance.patch(
+    `/writing/submission/${submissionId}/rewrite`,
+    data,
+  );
+  return response.data;
+};

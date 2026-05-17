@@ -65,14 +65,15 @@ writingSubmissionQueue.on('failed', (job, err) => {
  * @param {Object} jobData.userProfile - User profile (optional)
  * @returns {Promise<Job>} - BullMQ job instance
  */
-export const addSubmissionJob = async (jobData) => {
+export const addSubmissionJob = async (jobData, options = {}) => {
   try {
+    const jobId = options.jobId ?? jobData.submissionId;
     const job = await writingSubmissionQueue.add(
       'analyze-writing',
       jobData,
       {
-        jobId: jobData.submissionId, // Use submissionId as jobId to prevent duplicates
-        priority: 1, // Default priority
+        jobId,
+        priority: options.priority ?? 1,
       }
     );
     console.log(`✅ Job added to queue: ${job.id}`);

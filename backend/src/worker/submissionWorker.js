@@ -20,7 +20,16 @@ import { logUserActivity } from '../services/activity.service.js';
 const worker = new Worker(
   'writing-submissions',
   async (job) => {
-    const { submissionId, userId, content, genre, userProfile } = job.data;
+    const {
+      submissionId,
+      userId,
+      content,
+      genre,
+      userProfile,
+      isRewrite = false,
+      previousMistakes = [],
+      previousScore = null,
+    } = job.data;
 
     console.log(`🔄 Processing submission ${submissionId}`);
 
@@ -33,8 +42,16 @@ const worker = new Worker(
 
       console.log(`✅ Status updated to PROCESSING for ${submissionId}`);
 
+      if (isRewrite) {
+        await prisma.mistake.deleteMany({ where: { submissionId } });
+      }
+
       // Step 2: Call AI service for analysis
-      const AIResponse = await analyzeMistakeMemory(content, userProfile);
+      const AIResponse = await analyzeMistakeMemory(content, userProfile, {
+        isRewrite,
+        previousMistakes,
+        previousScore,
+      });
 
       if (!AIResponse.success) {
         throw new Error(AIResponse.error || 'AI analysis failed');
@@ -102,8 +119,8 @@ const worker = new Worker(
       const mistakeCount = validatedData.summary?.mistakeCount || 0;
       let xpEarned = 0;
 
-      // Base XP for submission
-      xpEarned += 10;
+      // Base XP for submission / rewrite
+      xpEarned += isRewrite ? 8 : 10;
 
       // XP bonus based on score
       if (score >= 80) xpEarned += 20;
@@ -118,7 +135,7 @@ const worker = new Worker(
       // Update user stats with unified activity service
       const activityResult = await logUserActivity(
         userId,
-        'SUBMISSION_ANALYSIS',
+        isRewrite ? 'REWRITE_SUBMISSION' : 'SUBMISSION_ANALYSIS',
         'WRITING',
         submissionId,
         xpEarned

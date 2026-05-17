@@ -10,6 +10,34 @@ const getBaseURL = () => {
 // This avoids long waits on hanging requests. To make slow APIs actually faster: backend caching, faster Gemini model, streaming, lighter DB queries.
 const DEFAULT_TIMEOUT_MS = 15000;
 
+const MUTATING_METHODS = new Set(["post", "put", "patch", "delete"]);
+
+let csrfToken: string | null = null;
+let csrfFetchPromise: Promise<string> | null = null;
+
+async function fetchCsrfToken(): Promise<string> {
+  const response = await axios.get<{ csrfToken: string }>(
+    `${getBaseURL()}csrf-token`,
+    { withCredentials: true },
+  );
+  csrfToken = response.data.csrfToken;
+  return csrfToken;
+}
+
+async function ensureCsrfToken(): Promise<string> {
+  if (csrfToken) return csrfToken;
+  if (!csrfFetchPromise) {
+    csrfFetchPromise = fetchCsrfToken().finally(() => {
+      csrfFetchPromise = null;
+    });
+  }
+  return csrfFetchPromise;
+}
+
+export function clearCsrfToken() {
+  csrfToken = null;
+}
+
 const axiosInstance = axios.create({
     baseURL: getBaseURL(),
     timeout: DEFAULT_TIMEOUT_MS,
@@ -19,21 +47,29 @@ const axiosInstance = axios.create({
     withCredentials: true, // Important: this sends cookies
 });
 
-// Request interceptor to ensure correct baseURL (runtime-injected)
+// Request interceptor: baseURL, CSRF on mutating requests
 axiosInstance.interceptors.request.use(
-    (config) => {
+    async (config) => {
         config.baseURL = getBaseURL();
-        
+
         // Let browser set Content-Type with boundary for FormData (file uploads)
         if (config.data instanceof FormData) {
             delete config.headers['Content-Type'];
         }
 
+        const method = (config.method ?? 'get').toLowerCase();
+        if (MUTATING_METHODS.has(method)) {
+            const token = await ensureCsrfToken();
+            if (config.headers && typeof config.headers.set === 'function') {
+                config.headers.set('X-CSRF-Token', token);
+            } else {
+                config.headers = { ...config.headers, 'X-CSRF-Token': token };
+            }
+        }
+
         return config;
     },
-    (error) => {
-        return Promise.reject(error);
-    }
+    (error) => Promise.reject(error),
 );
 
 // Response interceptor for error handling and token refresh
@@ -59,11 +95,7 @@ axiosInstance.interceptors.response.use(
 
                     try {
                         // Call refresh endpoint (cookies are sent automatically with withCredentials: true)
-                        await axios.post(
-                            getBaseURL() + 'auth/refresh',
-                            {},
-                            { withCredentials: true }
-                        );
+                        await axiosInstance.post('auth/refresh', {});
                         
                         // Retry original request (new cookies will be sent automatically)
                         return axiosInstance(originalRequest);
@@ -82,7 +114,28 @@ axiosInstance.interceptors.response.use(
                     return Promise.reject(error);
                 }
             } else if (status === 403) {
-                // 403 is handled by the calling code (e.g. login blocked dialog, route guards)
+                const isCsrfError =
+                    data?.message === 'Invalid CSRF token' ||
+                    (error as { code?: string }).code === 'EBADCSRFTOKEN';
+
+                if (isCsrfError && !originalRequest._csrfRetry) {
+                    originalRequest._csrfRetry = true;
+                    clearCsrfToken();
+                    try {
+                        const token = await fetchCsrfToken();
+                        if (originalRequest.headers?.set) {
+                            originalRequest.headers.set('X-CSRF-Token', token);
+                        } else {
+                            originalRequest.headers = {
+                                ...originalRequest.headers,
+                                'X-CSRF-Token': token,
+                            };
+                        }
+                        return axiosInstance(originalRequest);
+                    } catch {
+                        return Promise.reject(error);
+                    }
+                }
             } else if (status === 500) {
                 // Server error (data may be null if response body is empty or non-JSON)
                 console.error('Server error:', data?.message ?? data ?? error.message ?? status);

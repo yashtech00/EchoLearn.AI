@@ -229,31 +229,54 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Activity - Terra Styled */}
-      <div className="bg-card rounded-[12px] shadow-terra p-5 sm:p-8 border border-primary/5">
-        <h2 className="text-xl sm:text-2xl font-serif text-foreground mb-4 sm:mb-6">Recent Activity</h2>
-        <div className="space-y-3 sm:space-y-4">
-          {(stats?.recentActivities && stats.recentActivities.length > 0) ? (
-            stats.recentActivities.map((activity: any) => (
-              <div key={activity.id} className="flex items-center gap-3 sm:gap-5 p-3 sm:p-5 bg-primary/5 rounded-[12px] border border-primary/10 hover:bg-primary/10 transition-colors">
-                <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-[12px] bg-primary flex items-center justify-center shadow-sm flex-shrink-0">
-                  {activity.source === 'WRITING' ? <BookOpen className="w-5 h-5 sm:w-7 sm:h-7 text-white" /> : <Brain className="w-5 h-5 sm:w-7 sm:h-7 text-white" />}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm sm:text-lg font-serif text-foreground truncate">{activity.activityType.replace(/_/g, ' ')}</p>
-                  <p className="text-xs sm:text-base text-muted-foreground">{activity.source} • +{activity.xpEarned} XP</p>
-                </div>
-                <span className="text-xs sm:text-sm font-medium text-muted-foreground/60 flex-shrink-0">
-                  {new Date(activity.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-                </span>
-              </div>
-            ))
-          ) : (
-            <div className="text-center py-8 sm:py-10 text-sm sm:text-base text-muted-foreground">
-              No recent activities. Start practicing to see your progress!
+<div className="bg-card rounded-[12px] shadow-terra p-5 sm:p-8 border border-primary/5">
+  <h2 className="text-xl sm:text-2xl font-serif text-foreground mb-4 sm:mb-6">
+    Recent Activities
+  </h2>
+
+  <div className="space-y-3 sm:space-y-4">
+    {(stats?.recentActivities && stats.recentActivities.length > 0) ? (
+      [...stats.recentActivities]
+        .sort((a, b) => b.xpEarned - a.xpEarned)
+        .slice(0, 3)
+        .map((activity: any) => (
+          <div
+            key={activity.id}
+            className="flex items-center gap-3 sm:gap-5 p-3 sm:p-5 bg-primary/5 rounded-[12px] border border-primary/10 hover:bg-primary/10 transition-colors"
+          >
+            <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-[12px] bg-primary flex items-center justify-center shadow-sm flex-shrink-0">
+              {activity.source === "WRITING" ? (
+                <BookOpen className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
+              ) : (
+                <Brain className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
+              )}
             </div>
-          )}
-        </div>
+
+            <div className="flex-1 min-w-0">
+              <p className="text-sm sm:text-lg font-serif text-foreground truncate">
+                {activity.activityType.replace(/_/g, " ")}
+              </p>
+
+              <p className="text-xs sm:text-base text-muted-foreground">
+                {activity.source} • +{activity.xpEarned} XP
+              </p>
+            </div>
+
+            <span className="text-xs sm:text-sm font-medium text-muted-foreground/60 flex-shrink-0">
+              {new Date(activity.createdAt).toLocaleDateString(undefined, {
+                month: "short",
+                day: "numeric",
+              })}
+            </span>
+          </div>
+        ))
+    ) : (
+      <div className="text-center py-8 sm:py-10 text-sm sm:text-base text-muted-foreground">
+        No recent activities. Start practicing to see your progress!
       </div>
+    )}
+  </div>
+</div>
     </div>
   );
 }

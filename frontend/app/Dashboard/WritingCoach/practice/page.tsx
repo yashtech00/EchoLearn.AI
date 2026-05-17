@@ -344,18 +344,7 @@ export default function WritingCoachPage() {
               className="max-w-3xl w-full max-h-[92dvh] overflow-y-auto bg-[#faf6f0] rounded-t-2xl sm:rounded-[12px] border border-[#4a7c59]/10 p-5 sm:p-8 lg:p-10 relative"
               style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
             >
-              <button
-                onClick={() => {
-                  setResult(null);
-                  setError(null);
-                  setAnalysisStatus("idle");
-                }}
-                className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 rounded-full bg-[#4a7c59]/5 flex items-center justify-center text-[#705c30]/70 hover:text-[#4a7c59] transition-colors touch-manipulation"
-                aria-label="Dismiss"
-              >
-                <X className="w-5 h-5 sm:hidden" />
-                <Maximize2 className="w-5 h-5 hidden sm:block" />
-              </button>
+              
 
               {analysisStatus === "analyzing" ? (
                 <div className="py-8 sm:py-12 text-center space-y-4 sm:space-y-6">

@@ -17,9 +17,12 @@ function ReportContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const refreshKey = searchParams.get("refresh");
+
   useEffect(() => {
     loadData();
-  }, [submissionId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [submissionId, refreshKey]);
 
   const loadData = async () => {
     try {
@@ -42,6 +45,11 @@ function ReportContent() {
         const data = await getSubmissionStatus(targetId);
         
         if (data.status === "PENDING" || data.status === "PROCESSING") {
+          setSubmission({
+            ...data,
+            id: data.submissionId || data.id,
+          });
+
           const pollInterval = setInterval(async () => {
             try {
               const statusData = await getSubmissionStatus(targetId!);

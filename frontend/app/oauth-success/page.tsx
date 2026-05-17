@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { tokenManager } from "@/lib/tokenManager";
 
-export default function OAuthSuccessPage() {
+function OAuthSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -29,5 +29,17 @@ export default function OAuthSuccessPage() {
     <div className="min-h-screen flex items-center justify-center">
       <p className="text-sm text-muted-foreground">Signing you in...</p>
     </div>
+  );
+}
+
+export default function OAuthSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">Signing you in...</p>
+      </div>
+    }>
+      <OAuthSuccessContent />
+    </Suspense>
   );
 }

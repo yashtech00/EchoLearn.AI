@@ -15,7 +15,15 @@ import {
 
 import { usePathname, useRouter } from "next/navigation";
 
-const sidebarSections = [
+interface SidebarSection {
+  id: string;
+  title: string;
+  icon: any;
+  path?: string;
+  items?: { label: string; path: string }[];
+}
+
+const sidebarSections: SidebarSection[] = [
   {
     id: "dashboard",
     title: "Dashboard",
@@ -58,7 +66,7 @@ export default function DashboardSidebar() {
       if (section.path === "/Dashboard") {
         return pathname === "/Dashboard";
       }
-      return pathname.startsWith(section.path);
+      return section.path ? pathname.startsWith(section.path) : false;
     })?.id || "dashboard";
 
   return (

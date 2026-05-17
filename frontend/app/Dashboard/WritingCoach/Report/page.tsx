@@ -1,64 +1,85 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getSubmissionStatus } from "@/app/api/writing/writing_api";
-import { ArrowLeft, Sparkles, AlertCircle, RefreshCw, CheckCircle2, FileText, ChevronRight, BarChart } from "lucide-react";
+import { getSubmissionStatus, getSubmissions } from "@/app/api/writing/writing_api";
+import { ArrowLeft, Sparkles, AlertCircle, RefreshCw, CheckCircle2, FileText, ChevronRight, BarChart, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function ReportPage() {
+function ReportContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const submissionId = searchParams.get("submissionId");
 
+  const [submissions, setSubmissions] = useState<any[]>([]);
   const [submission, setSubmission] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (submissionId) {
-      loadSubmission();
-    } else {
-      setLoading(false);
-      setError("No submission ID provided");
-    }
+    loadData();
   }, [submissionId]);
 
-  const loadSubmission = async () => {
+  const loadData = async () => {
     try {
       setLoading(true);
-      const data = await getSubmissionStatus(submissionId!);
-      
-      if (data.status === "PENDING" || data.status === "PROCESSING") {
-        const pollInterval = setInterval(async () => {
-          try {
-            const statusData = await getSubmissionStatus(submissionId!);
-            if (statusData.status === "COMPLETED") {
+      setError(null);
+
+      // Fetch the last 20 submissions
+      const subsData = await getSubmissions(20, 0);
+      const subsList = subsData.submissions || [];
+      setSubmissions(subsList);
+
+      let targetId = submissionId;
+
+      // If no ID is provided, try to take the latest submission
+      if (!targetId && subsList.length > 0) {
+        targetId = subsList[0].id;
+      }
+
+      if (targetId) {
+        const data = await getSubmissionStatus(targetId);
+        
+        if (data.status === "PENDING" || data.status === "PROCESSING") {
+          const pollInterval = setInterval(async () => {
+            try {
+              const statusData = await getSubmissionStatus(targetId!);
+              if (statusData.status === "COMPLETED") {
+                clearInterval(pollInterval);
+                setSubmission({
+                  ...statusData,
+                  id: statusData.submissionId || statusData.id
+                });
+                setLoading(false);
+              } else if (statusData.status === "FAILED") {
+                clearInterval(pollInterval);
+                setError("Analysis failed. Please try again.");
+                setLoading(false);
+              }
+            } catch (pollErr) {
               clearInterval(pollInterval);
-              setSubmission(statusData);
-              setLoading(false);
-            } else if (statusData.status === "FAILED") {
-              clearInterval(pollInterval);
-              setError("Analysis failed. Please try again.");
+              setError("Failed to check analysis status.");
               setLoading(false);
             }
-          } catch (pollErr) {
+          }, 2000);
+
+          setTimeout(() => {
             clearInterval(pollInterval);
-            setError("Failed to check analysis status.");
-            setLoading(false);
-          }
-        }, 2000);
-
-        setTimeout(() => {
-          clearInterval(pollInterval);
-          if (loading) {
-            setError("Analysis is taking longer than expected.");
-            setLoading(false);
-          }
-        }, 120000);
-
+            if (loading) {
+              setError("Analysis is taking longer than expected.");
+              setLoading(false);
+            }
+          }, 120000);
+        } else {
+          setSubmission({
+            ...data,
+            id: data.submissionId || data.id
+          });
+          setLoading(false);
+        }
       } else {
-        setSubmission(data);
+        // No submissions at all
+        setSubmission(null);
         setLoading(false);
       }
     } catch (err) {
@@ -90,16 +111,36 @@ export default function ReportPage() {
   }
 
   if (error || !submission) {
+    const isNoSubmissions = !error && !submission && !loading;
     return (
-      <div className="flex h-[calc(100vh-4.5rem)] flex-col items-center justify-center bg-[#faf6f0] text-[#2e3230]" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
-        <div className="w-16 h-16 bg-[#705c30]/10 text-[#705c30] rounded-full flex items-center justify-center mb-4">
-          <AlertCircle className="w-8 h-8" />
-        </div>
-        <h2 className="text-xl font-bold text-[#2e3230] mb-2" style={{ fontFamily: "'Literata', serif" }}>Oops!</h2>
-        <p className="text-[#2e3230]/70 mb-6">{error || "Report not found"}</p>
-        <Button onClick={() => router.back()} className="bg-[#faf6f0] border border-[#4a7c59]/20 text-[#4a7c59] hover:bg-[#4a7c59]/5 rounded-[12px]">
-          <ArrowLeft className="w-4 h-4 mr-2" /> Go Back
-        </Button>
+      <div className="flex h-[calc(100vh-4.5rem)] flex-col items-center justify-center bg-[#faf6f0] text-[#2e3230] px-4 text-center" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
+        {isNoSubmissions ? (
+          <div className="max-w-md bg-[#faf6f0] border border-[#4a7c59]/20 rounded-2xl p-8 shadow-terra">
+            <div className="w-16 h-16 bg-[#4a7c59]/10 text-[#4a7c59] rounded-full flex items-center justify-center mx-auto mb-6">
+              <FileText className="w-8 h-8" />
+            </div>
+            <h2 className="text-2xl font-bold text-[#2e3230] mb-3" style={{ fontFamily: "'Literata', serif" }}>
+              No Submissions Yet
+            </h2>
+            <p className="text-[#2e3230]/70 mb-6">
+              Write and submit your first paragraph or essay, and our AI Writing Coach will analyze it in real-time.
+            </p>
+            <Button onClick={() => router.push("/Dashboard/WritingCoach/practice")} className="bg-[#4a7c59] hover:bg-[#3d6649] text-[#faf6f0] rounded-[12px] transition-all">
+              Start Writing Now
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div className="w-16 h-16 bg-[#705c30]/10 text-[#705c30] rounded-full flex items-center justify-center mb-4">
+              <AlertCircle className="w-8 h-8" />
+            </div>
+            <h2 className="text-xl font-bold text-[#2e3230] mb-2" style={{ fontFamily: "'Literata', serif" }}>Oops!</h2>
+            <p className="text-[#2e3230]/70 mb-6">{error || "Report not found"}</p>
+            <Button onClick={() => router.back()} className="bg-[#faf6f0] border border-[#4a7c59]/20 text-[#4a7c59] hover:bg-[#4a7c59]/5 rounded-[12px]">
+              <ArrowLeft className="w-4 h-4 mr-2" /> Go Back
+            </Button>
+          </>
+        )}
       </div>
     );
   }
@@ -128,8 +169,8 @@ export default function ReportPage() {
         
         <div className="flex items-center gap-4">
           <Button 
-            onClick={() => router.push(`/Dashboard/WritingCoach/Rewrite?submissionId=${submissionId}`)}
-            className="bg-[#4a7c59] hover:bg-[#3d6649] text-white rounded-[12px] transition-all gap-2"
+            onClick={() => router.push(`/Dashboard/WritingCoach/Rewrite?submissionId=${submission?.id}`)}
+            className="bg-[#4a7c59] hover:bg-[#3d6649] text-[#faf6f0] rounded-[12px] transition-all gap-2"
             style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}
           >
             <RefreshCw className="w-4 h-4" />
@@ -198,6 +239,51 @@ export default function ReportPage() {
                 </p>
               </div>
             </div>
+
+            {/* Past Submissions Section */}
+            <div className="pt-6 border-t border-[#4a7c59]/10">
+              <h3 className="text-lg font-bold text-[#2e3230] mb-4 flex items-center gap-2" style={{ fontFamily: "'Literata', serif" }}>
+                <Calendar className="w-5 h-5 text-[#705c30]" />
+                Past Sessions
+              </h3>
+              {submissions.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {submissions.map((sub: any) => {
+                    const isActive = sub.id === submission?.id;
+                    return (
+                      <div
+                        key={sub.id}
+                        onClick={() => router.push(`/Dashboard/WritingCoach/Report?submissionId=${sub.id}`)}
+                        className={`p-4 rounded-[12px] border transition-all cursor-pointer text-left ${
+                          isActive
+                            ? "bg-[#4a7c59]/10 border-[#4a7c59]/40"
+                            : "bg-[#f4ebd9]/40 border-[#4a7c59]/10 hover:border-[#4a7c59]/30 hover:bg-[#f4ebd9]/60"
+                        }`}
+                        style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}
+                      >
+                        <div className="flex justify-between items-start gap-2 mb-2">
+                          <span className="text-[10px] font-black text-[#4a7c59] bg-[#4a7c59]/10 px-2.5 py-0.5 rounded-lg uppercase tracking-wider">
+                            {sub.genre?.replace(/_/g, " ") || "PRACTICE"}
+                          </span>
+                          <span className="text-[10px] text-[#2e3230]/50 font-medium">
+                            {new Date(sub.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                          </span>
+                        </div>
+                        <h4 className="text-sm font-bold text-[#2e3230] line-clamp-1 mb-1" style={{ fontFamily: "'Literata', serif" }}>
+                          {sub.title || "Practice Session"}
+                        </h4>
+                        <div className="flex justify-between items-center mt-3 text-xs text-[#2e3230]/70 font-medium">
+                          <span>{sub.wordCount} words</span>
+                          <ChevronRight className="w-4 h-4 text-[#4a7c59]" />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-sm text-[#2e3230]/60 italic">No submissions found.</p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -259,5 +345,21 @@ export default function ReportPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ReportPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-[calc(100vh-4.5rem)] flex-col items-center justify-center bg-[#faf6f0] text-[#2e3230]" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
+        <div className="relative w-20 h-20">
+          <div className="absolute inset-0 border-4 border-[#4a7c59]/20 rounded-full" />
+          <div className="absolute inset-0 border-4 border-[#4a7c59] rounded-full border-t-transparent animate-spin" />
+        </div>
+        <p className="mt-6 text-[#2e3230]/70 font-medium animate-pulse">Loading detailed report...</p>
+      </div>
+    }>
+      <ReportContent />
+    </Suspense>
   );
 }

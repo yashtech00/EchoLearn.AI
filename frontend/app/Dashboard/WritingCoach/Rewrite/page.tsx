@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { 
   Type, Timer, Save, ChevronRight, Sparkles, AlertCircle, Maximize2, Settings, ArrowLeft
@@ -9,7 +9,7 @@ import { getSubmissionStatus, createSubmission } from "@/app/api/writing/writing
 import axiosInstance from "@/app/api/axiosInstances";
 import { Button } from "@/components/ui/button";
 
-export default function RewritePage() {
+function RewriteContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const submissionId = searchParams.get("submissionId");
@@ -24,11 +24,11 @@ export default function RewritePage() {
   const [wordCount, setWordCount] = useState(0);
 
   useEffect(() => {
-    if (submissionId) {
+    if (submissionId && submissionId !== "undefined") {
       loadOriginalSubmission();
     } else {
       setLoading(false);
-      setError("No submission ID provided");
+      setError("No valid submission ID provided");
     }
   }, [submissionId]);
 
@@ -171,5 +171,17 @@ export default function RewritePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RewritePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-[calc(100vh-4.5rem)] items-center justify-center bg-[#faf6f0]">
+        <div className="w-16 h-16 border-4 border-[#4a7c59]/20 border-t-[#4a7c59] rounded-full animate-spin" />
+      </div>
+    }>
+      <RewriteContent />
+    </Suspense>
   );
 }

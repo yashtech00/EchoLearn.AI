@@ -42,8 +42,8 @@ export const getSubmissions = async (limit = 10, offset = 0) => {
 export const getMistakes = async (params?: {
   pillar?: string;
   subtype?: string;
-  startDate?: string;
-  endDate?: string;
+  dateFrom?: string;
+  dateTo?: string;
   limit?: number;
   offset?: number;
 }) => {

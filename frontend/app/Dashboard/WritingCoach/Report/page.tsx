@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getSubmissionStatus, getSubmissions } from "@/app/api/writing/writing_api";
 import { ArrowLeft, Sparkles, AlertCircle, RefreshCw, CheckCircle2, FileText, ChevronRight, BarChart, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FormattedAiFeedback } from "@/components/WritingCoach/FormattedAiFeedback";
 
 function ReportContent() {
   const router = useRouter();
@@ -100,7 +101,7 @@ function ReportContent() {
 
   if (loading) {
     return (
-      <div className="flex h-[calc(100vh-6.5rem)] flex-col items-center justify-center bg-[#faf6f0] text-[#2e3230] rounded-2xl" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
+      <div className="flex min-h-[calc(100dvh-7.5rem)] flex-col items-center justify-center bg-[#faf6f0] text-[#2e3230] rounded-xl sm:rounded-2xl px-4 -mx-1 sm:mx-0" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
         <div className="relative w-20 h-20">
           <div className="absolute inset-0 border-4 border-[#4a7c59]/20 rounded-full" />
           <div className="absolute inset-0 border-4 border-[#4a7c59] rounded-full border-t-transparent animate-spin" />
@@ -113,7 +114,7 @@ function ReportContent() {
   if (error || !submission) {
     const isNoSubmissions = !error && !submission && !loading;
     return (
-      <div className="flex h-[calc(100vh-6.5rem)] flex-col items-center justify-center bg-[#faf6f0] text-[#2e3230] px-4 text-center rounded-2xl" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
+      <div className="flex min-h-[calc(100dvh-7.5rem)] flex-col items-center justify-center bg-[#faf6f0] text-[#2e3230] px-4 text-center rounded-xl sm:rounded-2xl -mx-1 sm:mx-0" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
         {isNoSubmissions ? (
           <div className="max-w-md bg-[#faf6f0] border border-[#4a7c59]/20 rounded-2xl p-8 shadow-terra">
             <div className="w-16 h-16 bg-[#4a7c59]/10 text-[#4a7c59] rounded-full flex items-center justify-center mx-auto mb-6">
@@ -151,13 +152,15 @@ function ReportContent() {
   const feedback = analysis?.feedback;
 
   return (
-    <div className="flex h-[calc(100vh-6.5rem)] bg-[#faf6f0] font-sans flex-col overflow-hidden text-[#2e3230] rounded-2xl" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
+    <div className="flex flex-col min-h-[calc(100dvh-7.5rem)] max-h-none lg:max-h-[calc(100dvh-7.5rem)] lg:h-[calc(100dvh-7.5rem)] bg-[#faf6f0] font-sans lg:overflow-hidden text-[#2e3230] rounded-xl sm:rounded-2xl -mx-1 sm:mx-0" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
       {/* Header */}
-      <header className="h-14 sm:h-20 bg-[#faf6f0]/80 backdrop-blur-md border-b border-[#4a7c59]/10 flex items-center justify-between px-3 sm:px-8 shrink-0 z-10">
+      <header className="h-14 sm:h-20 bg-[#faf6f0]/80 backdrop-blur-md border-b border-[#4a7c59]/10 flex items-center justify-between gap-2 px-3 sm:px-8 shrink-0 z-10 sticky top-0">
         <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <button 
-            onClick={() => router.push('/Dashboard/WritingCoach/MistakeMemory')}
-            className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-[12px] hover:bg-[#4a7c59]/10 text-[#2e3230]/70 transition-colors flex-shrink-0"
+            type="button"
+            onClick={() => router.push('/Dashboard/WritingCoach/practice')}
+            className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-[12px] hover:bg-[#4a7c59]/10 text-[#2e3230]/70 transition-colors shrink-0 touch-manipulation"
+            aria-label="Back to practice"
           >
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
@@ -170,7 +173,7 @@ function ReportContent() {
         <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
           <Button 
             onClick={() => router.push(`/Dashboard/WritingCoach/Rewrite?submissionId=${submission?.id}`)}
-            className="bg-[#4a7c59] hover:bg-[#3d6649] text-[#faf6f0] rounded-[12px] transition-all gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 h-8 sm:h-10"
+            className="bg-[#4a7c59] hover:bg-[#3d6649] text-[#faf6f0] rounded-[12px] transition-all gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 h-9 sm:h-10 min-h-[44px] touch-manipulation shrink-0"
             style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}
           >
             <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -181,10 +184,10 @@ function ReportContent() {
       </header>
 
       {/* Content Layout */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row lg:overflow-hidden min-h-0">
         {/* Left Side: Original Text & Stats */}
-        <div className="w-full lg:w-1/2 flex flex-col border-b lg:border-b-0 lg:border-r border-[#4a7c59]/10 bg-[#faf6f0] overflow-y-auto">
-          <div className="p-4 sm:p-8 lg:p-10 space-y-5 sm:space-y-8">
+        <div className="w-full lg:w-1/2 flex flex-col border-b lg:border-b-0 lg:border-r border-[#4a7c59]/10 bg-[#faf6f0] lg:overflow-y-auto min-h-0">
+          <div className="p-3 sm:p-8 lg:p-10 space-y-4 sm:space-y-8">
             {/* Top Stats */}
             <div className="grid grid-cols-3 gap-2 sm:gap-4">
               <div className="bg-[#f4ebd9] rounded-[12px] p-2.5 sm:p-4 border border-[#4a7c59]/10 flex items-center gap-2 sm:gap-4" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
@@ -217,38 +220,38 @@ function ReportContent() {
             </div>
 
             {/* AI Feedback */}
-            <div className="bg-[#4a7c59]/5 rounded-[12px] p-6 border border-[#4a7c59]/10 relative overflow-hidden" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
+            <div className="bg-[#4a7c59]/5 rounded-[12px] p-4 sm:p-6 border border-[#4a7c59]/10 relative overflow-hidden" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
               <div className="absolute -top-4 -right-4 w-24 h-24 bg-[#4a7c59]/10 rounded-full blur-2xl" />
               <h3 className="text-[#4a7c59] font-bold flex items-center gap-2 mb-3 relative z-10" style={{ fontFamily: "'Literata', serif" }}>
                 <Sparkles className="w-5 h-5 text-[#705c30]" />
                 AI Feedback
               </h3>
-              <p className="text-[#2e3230]/80 leading-relaxed font-medium relative z-10">
-                {feedback}
-              </p>
+              <div className="relative z-10">
+                <FormattedAiFeedback content={feedback} />
+              </div>
             </div>
 
             {/* Original Text */}
             <div>
-              <h3 className="text-lg font-bold text-[#2e3230] mb-4 flex items-center gap-2" style={{ fontFamily: "'Literata', serif" }}>
-                <FileText className="w-5 h-5 text-[#705c30]" />
+              <h3 className="text-base sm:text-lg font-bold text-[#2e3230] mb-3 sm:mb-4 flex items-center gap-2" style={{ fontFamily: "'Literata', serif" }}>
+                <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-[#705c30] shrink-0" />
                 Original Submission
               </h3>
-              <div className="bg-[#f4ebd9] rounded-[12px] p-8 border border-[#4a7c59]/10" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
-                <p className="text-[#2e3230] text-lg leading-loose whitespace-pre-wrap" style={{ fontFamily: "'Literata', serif" }}>
+              <div className="bg-[#f4ebd9] rounded-[12px] p-4 sm:p-6 lg:p-8 border border-[#4a7c59]/10" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
+                <p className="text-[#2e3230] text-sm sm:text-base lg:text-lg leading-relaxed sm:leading-loose whitespace-pre-wrap break-words" style={{ fontFamily: "'Literata', serif" }}>
                   {body}
                 </p>
               </div>
             </div>
 
             {/* Past Submissions Section */}
-            <div className="pt-6 border-t border-[#4a7c59]/10">
-              <h3 className="text-lg font-bold text-[#2e3230] mb-4 flex items-center gap-2" style={{ fontFamily: "'Literata', serif" }}>
-                <Calendar className="w-5 h-5 text-[#705c30]" />
+            <div className="pt-4 sm:pt-6 border-t border-[#4a7c59]/10">
+              <h3 className="text-base sm:text-lg font-bold text-[#2e3230] mb-3 sm:mb-4 flex items-center gap-2" style={{ fontFamily: "'Literata', serif" }}>
+                <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-[#705c30] shrink-0" />
                 Past Sessions
               </h3>
               {submissions.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {submissions.map((sub: any) => {
                     const isActive = sub.id === submission?.id;
                     return (
@@ -289,40 +292,38 @@ function ReportContent() {
         </div>
 
         {/* Right Side: Mistakes List */}
-        <div className="w-full lg:w-1/2 bg-[#f4ebd9] overflow-y-auto">
-          <div className="p-4 sm:p-8 lg:p-10">
-            <h2 className="text-lg sm:text-2xl font-bold text-[#2e3230] mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3" style={{ fontFamily: "'Literata', serif" }}>
-              <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-[#705c30]" />
+        <div className="w-full lg:w-1/2 bg-[#f4ebd9] lg:overflow-y-auto min-h-0">
+          <div className="p-3 sm:p-8 lg:p-10">
+            <h2 className="text-base sm:text-2xl font-bold text-[#2e3230] mb-3 sm:mb-6 flex items-center gap-2 sm:gap-3 lg:sticky lg:top-0 lg:bg-[#f4ebd9]/95 lg:backdrop-blur-sm lg:py-2 lg:z-[1]" style={{ fontFamily: "'Literata', serif" }}>
+              <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-[#705c30] shrink-0" />
               Areas for Improvement
             </h2>
             
             {mistakes && mistakes.length > 0 ? (
               <div className="space-y-4">
                 {mistakes.map((mistake: any, idx: number) => (
-                  <div key={idx} className="bg-[#faf6f0] rounded-[12px] p-6 border border-[#4a7c59]/10 hover:border-[#4a7c59]/30 transition-all group" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <span className="text-[10px] font-black bg-[#4a7c59]/10 text-[#4a7c59] px-3 py-1 rounded-lg uppercase tracking-widest border border-[#4a7c59]/20">
-                          {mistake.pillar?.replace(/_/g, " ")}
-                        </span>
-                        <span className={`text-[10px] font-black px-3 py-1 rounded-lg uppercase tracking-widest border ${getSeverityColor(mistake.severity)}`}>
-                          {mistake.severity}
-                        </span>
-                      </div>
+                  <div key={idx} className="bg-[#faf6f0] rounded-[12px] p-4 sm:p-6 border border-[#4a7c59]/10 hover:border-[#4a7c59]/30 transition-all group" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
+                    <div className="flex flex-wrap items-center gap-2 mb-3 sm:mb-4">
+                      <span className="text-[10px] font-black bg-[#4a7c59]/10 text-[#4a7c59] px-2.5 sm:px-3 py-1 rounded-lg uppercase tracking-widest border border-[#4a7c59]/20">
+                        {mistake.pillar?.replace(/_/g, " ")}
+                      </span>
+                      <span className={`text-[10px] font-black px-2.5 sm:px-3 py-1 rounded-lg uppercase tracking-widest border ${getSeverityColor(mistake.severity)}`}>
+                        {mistake.severity}
+                      </span>
                     </div>
                     
-                    <div className="mb-4 bg-[#f4ebd9] rounded-[12px] p-4 border border-[#4a7c59]/10">
-                      <p className="text-[#2e3230] font-medium leading-relaxed">
-                        <span className="text-[#8a5a44] line-through mr-3 opacity-70">
+                    <div className="mb-3 sm:mb-4 bg-[#f4ebd9] rounded-[12px] p-3 sm:p-4 border border-[#4a7c59]/10">
+                      <p className="text-[#2e3230] text-sm sm:text-base font-medium leading-relaxed break-words">
+                        <span className="text-[#8a5a44] line-through mr-2 sm:mr-3 opacity-70 block sm:inline mb-1 sm:mb-0">
                           {mistake.surfaceText}
                         </span>
-                        <span className="text-[#4a7c59] font-bold bg-[#4a7c59]/10 px-2 py-0.5 rounded-[12px]">
+                        <span className="text-[#4a7c59] font-bold bg-[#4a7c59]/10 px-2 py-0.5 rounded-[12px] inline-block">
                           {mistake.suggestion}
                         </span>
                       </p>
                     </div>
                     
-                    <div className="flex items-start gap-3 bg-[#faf6f0] p-4 rounded-[12px] border border-[#4a7c59]/10">
+                    <div className="flex items-start gap-2 sm:gap-3 bg-[#faf6f0] p-3 sm:p-4 rounded-[12px] border border-[#4a7c59]/10">
                       <div className="w-6 h-6 rounded-full bg-[#705c30]/10 flex items-center justify-center shrink-0 mt-0.5">
                         <Sparkles className="w-3 h-3 text-[#705c30]" />
                       </div>
@@ -334,11 +335,11 @@ function ReportContent() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-20 bg-[#faf6f0] rounded-[12px] border border-dashed border-[#4a7c59]/20">
-                <div className="w-20 h-20 bg-[#4a7c59]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle2 className="w-10 h-10 text-[#4a7c59]" />
+              <div className="text-center py-12 sm:py-20 px-4 bg-[#faf6f0] rounded-[12px] border border-dashed border-[#4a7c59]/20">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 bg-[#4a7c59]/10 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                  <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10 text-[#4a7c59]" />
                 </div>
-                <h3 className="text-2xl font-bold text-[#2e3230] mb-2" style={{ fontFamily: "'Literata', serif" }}>Flawless writing!</h3>
+                <h3 className="text-xl sm:text-2xl font-bold text-[#2e3230] mb-2" style={{ fontFamily: "'Literata', serif" }}>Flawless writing!</h3>
                 <p className="text-[#2e3230]/70">We couldn't find any major mistakes in this submission.</p>
               </div>
             )}
@@ -352,7 +353,7 @@ function ReportContent() {
 export default function ReportPage() {
   return (
     <Suspense fallback={
-      <div className="flex h-[calc(100vh-6.5rem)] flex-col items-center justify-center bg-[#faf6f0] text-[#2e3230] rounded-2xl" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
+      <div className="flex min-h-[calc(100dvh-7.5rem)] flex-col items-center justify-center bg-[#faf6f0] text-[#2e3230] rounded-xl sm:rounded-2xl px-4 -mx-1 sm:mx-0" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
         <div className="relative w-20 h-20">
           <div className="absolute inset-0 border-4 border-[#4a7c59]/20 rounded-full" />
           <div className="absolute inset-0 border-4 border-[#4a7c59] rounded-full border-t-transparent animate-spin" />

@@ -20,9 +20,11 @@ import {
   Italic,
   List,
   ChevronRight,
+  ChevronDown,
   Save,
   CheckCircle2,
   Clock,
+  X,
 } from "lucide-react";
 import {
   createSubmission,
@@ -33,6 +35,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
+import { FormattedAiFeedback } from "@/components/WritingCoach/FormattedAiFeedback";
 
 const formatGenre = (g?: string) => {
   if (!g) return "";
@@ -49,7 +52,8 @@ const formatGenre = (g?: string) => {
 };
 
 const SidebarSkeleton = () => (
-  <div className="w-[400px] bg-[#f4ebd9] h-full overflow-hidden border-l border-[#4a7c59]/10 p-6 flex flex-col gap-6 shrink-0 animate-pulse">
+  <div className="w-full lg:w-[380px] xl:w-[400px] order-1 lg:order-2 bg-[#f4ebd9] flex flex-col min-h-0 lg:h-full border-b lg:border-b-0 lg:border-t-0 lg:border-l border-[#4a7c59]/10 shrink-0 animate-pulse overflow-hidden">
+    <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 flex flex-col gap-4 sm:gap-6 scrollbar-thin scrollbar-thumb-[#4a7c59]/30">
     {/* Header */}
     <div className="flex justify-between items-center gap-2 shrink-0">
       <div className="w-28 h-6 bg-[#4a7c59]/10 rounded-[12px]" />
@@ -81,6 +85,7 @@ const SidebarSkeleton = () => (
         <div className="bg-[#faf6f0] rounded-[12px] h-20 border border-[#4a7c59]/10" />
       </div>
     </div>
+    </div>
   </div>
 );
 
@@ -97,6 +102,7 @@ export default function WritingCoachPage() {
     null,
   );
   const [showToolbar, setShowToolbar] = useState(false);
+  const [promptExpanded, setPromptExpanded] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -226,33 +232,34 @@ export default function WritingCoachPage() {
 
   return (
     <div
-      className="flex h-[calc(100vh-6.5rem)] bg-[#faf6f0] overflow-hidden text-[#2e3230] rounded-2xl"
+      className="flex flex-col lg:flex-row min-h-[calc(100dvh-7.5rem)] max-h-none lg:max-h-[calc(100dvh-7.5rem)] lg:h-[calc(100dvh-7.5rem)] bg-[#faf6f0] lg:overflow-hidden text-[#2e3230] rounded-xl sm:rounded-2xl -mx-1 sm:mx-0"
       style={{ fontFamily: "'Nunito Sans', sans-serif" }}
     >
       {/* Main Content - Editor */}
-      <div className="flex-1 flex flex-col h-full bg-[#faf6f0] relative">
+      <div className="flex-1 flex flex-col min-h-[min(420px,55dvh)] lg:min-h-0 lg:h-full bg-[#faf6f0] relative order-2 lg:order-1 min-w-0">
         {/* Editor Header */}
-        <div className="h-16 border-b border-[#4a7c59]/10 flex items-center justify-between px-8 bg-[#faf6f0]/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
-          <div className="flex items-center gap-8">
-            <div className="flex items-center gap-2 font-medium">
-              <Timer className="w-4 h-4 text-[#4a7c59]" />
-              <span className="text-sm tabular-nums text-[#4a7c59]">25:00</span>
+        <div className="h-11 sm:h-16 border-b border-[#4a7c59]/10 flex items-center justify-between gap-2 px-3 sm:px-8 bg-[#faf6f0]/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-8 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 font-medium">
+              <Timer className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#4a7c59]" />
+              <span className="text-xs sm:text-sm tabular-nums text-[#4a7c59]">25:00</span>
             </div>
-            <div className="flex items-center gap-2 font-medium border-l border-[#4a7c59]/20 pl-8">
-              <Type className="w-4 h-4 text-[#705c30]" />
-              <span className="text-sm uppercase tracking-wider text-[10px] font-bold text-[#705c30]">
-                {wordCount} / {topicData?.wordTarget || 150} Words
+            <div className="flex items-center gap-1.5 sm:gap-2 font-medium border-l border-[#4a7c59]/20 pl-2 sm:pl-8 min-w-0">
+              <Type className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#705c30] shrink-0" />
+              <span className="text-[10px] sm:text-sm uppercase tracking-wider font-bold text-[#705c30] truncate">
+                <span className="sm:hidden">{wordCount}/{topicData?.wordTarget || 150}</span>
+                <span className="hidden sm:inline">{wordCount} / {topicData?.wordTarget || 150} Words</span>
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2 text-[#4a7c59] font-bold text-[10px] uppercase tracking-widest">
+          <div className="flex items-center gap-2 sm:gap-6 shrink-0">
+            <div className="hidden md:flex items-center gap-2 text-[#4a7c59] font-bold text-[10px] uppercase tracking-widest">
               <div className="w-1.5 h-1.5 rounded-full bg-[#4a7c59] animate-pulse" />
               Autosaved
             </div>
 
-            <div className="flex items-center gap-4 text-[#705c30]/60 border-l border-[#4a7c59]/20 pl-4 relative">
+            <div className="flex items-center text-[#705c30]/60 md:border-l md:border-[#4a7c59]/20 md:pl-4 relative">
               <Settings
                 className={`w-5 h-5 cursor-pointer transition-colors ${showToolbar ? "text-[#4a7c59] rotate-45" : "hover:text-[#4a7c59]"}`}
                 onClick={() => setShowToolbar(!showToolbar)}
@@ -290,36 +297,41 @@ export default function WritingCoachPage() {
         </div>
 
         {/* Editor Body */}
-        <div className="flex-1 overflow-y-auto p-12 scrollbar-hide flex flex-col">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-8 lg:p-12 scrollbar-hide flex flex-col min-h-0">
           <textarea
             id="editor-textarea"
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Begin your intellectual journey here..."
-            className="w-full min-h-[500px] flex-1 text-2xl text-[#2e3230] placeholder:text-[#a0a5a0] focus:outline-none resize-none bg-transparent"
+            className="w-full min-h-[180px] sm:min-h-[400px] lg:min-h-[500px] flex-1 text-base sm:text-xl lg:text-2xl text-[#2e3230] placeholder:text-[#a0a5a0] focus:outline-none resize-none bg-transparent"
             style={{ fontFamily: "'Literata', serif", lineHeight: "1.8" }}
           />
         </div>
 
         {/* Editor Footer */}
-        <div className="h-24 border-t border-[#4a7c59]/10 flex items-center justify-between px-12 bg-[#faf6f0]/80 backdrop-blur-md shrink-0">
-          <button className="flex items-center gap-2 px-6 py-3 border border-[#4a7c59]/20 rounded-[12px] text-[#4a7c59] font-bold text-sm hover:bg-[#4a7c59]/5 transition-all bg-[#faf6f0]">
-            <Save className="w-4 h-4" />
-            Save Draft
+        <div className="h-14 sm:h-24 border-t border-[#4a7c59]/10 flex items-center justify-between gap-2 px-3 sm:px-8 lg:px-12 bg-[#faf6f0]/80 backdrop-blur-md shrink-0">
+          <button
+            type="button"
+            className="flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-6 py-2 sm:py-3 border border-[#4a7c59]/20 rounded-[12px] text-[#4a7c59] font-bold text-xs sm:text-sm hover:bg-[#4a7c59]/5 transition-all bg-[#faf6f0] min-h-[44px] min-w-[44px] sm:min-w-0"
+            aria-label="Save draft"
+          >
+            <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Save Draft</span>
           </button>
 
           <button
             onClick={handleSubmit}
             disabled={!content.trim() || loading}
-            className="flex items-center gap-3 px-8 py-4 bg-[#4a7c59] hover:bg-[#3d6649] disabled:opacity-50 disabled:cursor-not-allowed rounded-[12px] text-white font-bold text-[15px] transition-all group"
+            className="flex items-center gap-2 sm:gap-3 px-4 sm:px-8 py-2.5 sm:py-4 min-h-[44px] bg-[#4a7c59] hover:bg-[#3d6649] disabled:opacity-50 disabled:cursor-not-allowed rounded-[12px] text-white font-bold text-sm sm:text-[15px] transition-all group touch-manipulation"
             style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
           >
             {loading ? (
-              <Sparkles className="w-5 h-5 animate-spin" />
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
             ) : (
               <>
-                Submit session
-                <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <span className="hidden sm:inline">Submit session</span>
+                <span className="sm:hidden">Submit</span>
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </>
             )}
           </button>
@@ -327,9 +339,9 @@ export default function WritingCoachPage() {
 
         {/* Overlay Results / Error */}
         {(result || error || analysisStatus === "analyzing") && (
-          <div className="absolute inset-0 bg-[#faf6f0]/80 backdrop-blur-md z-20 flex items-center justify-center p-12 overflow-y-auto">
+          <div className="absolute inset-0 bg-[#faf6f0]/80 backdrop-blur-md z-20 flex items-end sm:items-center justify-center p-3 sm:p-8 lg:p-12 overflow-y-auto">
             <div
-              className="max-w-3xl w-full bg-[#faf6f0] rounded-[12px] border border-[#4a7c59]/10 p-10 relative"
+              className="max-w-3xl w-full max-h-[92dvh] overflow-y-auto bg-[#faf6f0] rounded-t-2xl sm:rounded-[12px] border border-[#4a7c59]/10 p-5 sm:p-8 lg:p-10 relative"
               style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
             >
               <button
@@ -338,13 +350,15 @@ export default function WritingCoachPage() {
                   setError(null);
                   setAnalysisStatus("idle");
                 }}
-                className="absolute top-6 right-6 w-10 h-10 rounded-full bg-[#4a7c59]/5 flex items-center justify-center text-[#705c30]/70 hover:text-[#4a7c59] transition-colors"
+                className="absolute top-4 right-4 sm:top-6 sm:right-6 w-10 h-10 rounded-full bg-[#4a7c59]/5 flex items-center justify-center text-[#705c30]/70 hover:text-[#4a7c59] transition-colors touch-manipulation"
+                aria-label="Dismiss"
               >
-                <Maximize2 className="w-5 h-5" />
+                <X className="w-5 h-5 sm:hidden" />
+                <Maximize2 className="w-5 h-5 hidden sm:block" />
               </button>
 
               {analysisStatus === "analyzing" ? (
-                <div className="py-12 text-center space-y-6">
+                <div className="py-8 sm:py-12 text-center space-y-4 sm:space-y-6">
                   <div className="relative w-24 h-24 mx-auto">
                     <div className="absolute inset-0 border-4 border-[#4a7c59]/20 rounded-full" />
                     <div className="absolute inset-0 border-4 border-[#4a7c59] rounded-full border-t-transparent animate-spin" />
@@ -388,10 +402,10 @@ export default function WritingCoachPage() {
                 result && (
                   <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {/* Result Header */}
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div>
                         <h2
-                          className="text-3xl font-bold text-[#2e3230]"
+                          className="text-xl sm:text-3xl font-bold text-[#2e3230]"
                           style={{ fontFamily: "'Literata', serif" }}
                         >
                           Analysis Complete
@@ -419,9 +433,7 @@ export default function WritingCoachPage() {
                           <Sparkles className="w-5 h-5 text-[#705c30]" />
                           AI Feedback
                         </h4>
-                        <p className="text-[#2e3230]/80 leading-relaxed font-medium">
-                          {result.analysis?.feedback}
-                        </p>
+                        <FormattedAiFeedback content={result.analysis?.feedback} />
                       </div>
 
                       {/* Stats Card */}
@@ -552,19 +564,55 @@ export default function WritingCoachPage() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="w-[400px] bg-[#f4ebd9] h-full overflow-hidden border-l border-[#4a7c59]/10 p-6 flex flex-col gap-6 shrink-0"
+            className="w-full lg:w-[380px] xl:w-[400px] order-1 lg:order-2 bg-[#f4ebd9] flex flex-col min-h-0 lg:h-full overflow-hidden border-b lg:border-b-0 lg:border-t-0 lg:border-l border-[#4a7c59]/10 shrink-0"
           >
+            <button
+              type="button"
+              onClick={() => setPromptExpanded((v) => !v)}
+              className="lg:hidden w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left border-b border-[#4a7c59]/10 active:bg-[#ebe2d0] transition-colors"
+              aria-expanded={promptExpanded}
+            >
+              <span className="flex items-center gap-2 min-w-0 flex-1">
+                <BookOpen className="w-4 h-4 text-[#4a7c59] shrink-0" />
+                <span className="text-sm font-bold text-[#2e3230] truncate" style={{ fontFamily: "'Literata', serif" }}>
+                  {topicData?.topic || "Writing prompt"}
+                </span>
+              </span>
+              <ChevronDown className={`w-5 h-5 text-[#4a7c59] shrink-0 transition-transform duration-200 ${promptExpanded ? "rotate-180" : ""}`} />
+            </button>
+
+            <div
+              className={`grid transition-[grid-template-rows] duration-300 ease-in-out lg:flex-1 lg:min-h-0 ${
+                promptExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+              } lg:grid-rows-[1fr]`}
+            >
+            <div className="min-h-0 overflow-hidden lg:flex lg:flex-col lg:flex-1 lg:min-h-0">
+            <div className="p-4 sm:p-6 flex flex-col gap-4 sm:gap-6 max-h-[min(65dvh,32rem)] lg:max-h-none lg:flex-1 lg:min-h-0 overflow-y-auto overscroll-contain scrollbar-thin scrollbar-thumb-[#4a7c59]/30">
+            {/* Title & Description — shown first when expanded on mobile */}
+            <div className="space-y-2 sm:space-y-3 shrink-0 pb-1 border-b border-[#4a7c59]/10 lg:border-b-0 lg:pb-0">
+              <h1
+                className="text-base sm:text-2xl font-bold text-[#2e3230] leading-snug sm:leading-tight tracking-tight"
+                style={{ fontFamily: "'Literata', serif" }}
+              >
+                {topicData?.topic}
+              </h1>
+              <p className="text-[#2e3230]/80 text-sm sm:text-[14px] leading-relaxed font-medium">
+                {topicData?.description || "In this session, explore the intersection of language, logic, and style."}
+              </p>
+            </div>
+
             {/* Genre & Action Header */}
-            <div className="flex items-center justify-between gap-2 shrink-0">
+            <div className="flex items-center justify-between gap-2 shrink-0 flex-wrap">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[12px] bg-[#4a7c59]/10 text-[#4a7c59] text-[10px] font-bold uppercase tracking-wider border border-[#4a7c59]/20">
                 <BookOpen className="w-3 h-3" />
                 {formatGenre(topicData?.genre) || "Creative Writing"}
               </span>
 
               <button
+                type="button"
                 onClick={handleGetTopic}
                 disabled={loadingTopic}
-                className="px-4 py-2 rounded-[12px] bg-[#faf6f0] border border-[#4a7c59]/20 text-[#4a7c59] text-xs font-bold flex items-center gap-2 hover:bg-[#4a7c59]/5 transition-all duration-300 shadow-terra"
+                className="px-3 sm:px-4 py-2 rounded-[12px] bg-[#faf6f0] border border-[#4a7c59]/20 text-[#4a7c59] text-xs font-bold flex items-center gap-1.5 sm:gap-2 hover:bg-[#4a7c59]/5 transition-all duration-300 shadow-terra min-h-[40px] touch-manipulation"
               >
                 {loadingTopic ? (
                   <Sparkles className="w-3.5 h-3.5 animate-spin text-[#705c30]" />
@@ -575,18 +623,6 @@ export default function WritingCoachPage() {
               </button>
             </div>
 
-            {/* Title & Description */}
-            <div className="space-y-3 flex-1 overflow-hidden flex flex-col justify-center">
-              <h1
-                className="text-2xl font-bold text-[#2e3230] leading-tight tracking-tight"
-                style={{ fontFamily: "'Literata', serif" }}
-              >
-                {topicData?.topic}
-              </h1>
-              <p className="text-[#2e3230]/80 text-[14px] leading-relaxed font-medium overflow-y-auto pr-1">
-                {topicData?.description || "In this session, explore the intersection of language, logic, and style."}
-              </p>
-            </div>
 
             {/* Level & Genre Cards */}
             <div className="grid grid-cols-2 gap-4 shrink-0">
@@ -652,6 +688,9 @@ export default function WritingCoachPage() {
                   </div>
                 )}
               </div>
+            </div>
+            </div>
+            </div>
             </div>
           </motion.div>
         )}

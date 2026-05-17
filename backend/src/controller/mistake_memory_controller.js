@@ -378,11 +378,156 @@ export const getTopics = async (req, res) => {
     return res.status(200).json({
       message: "Topic generated successfully",
       topic: topicData.topic,
+      description: topicData.description,
       genre: topicData.genre,
+      targetLevel: topicData.targetLevel,
       wordTarget: topicData.wordTarget,
+      writingTips: topicData.writingTips,
     });
   } catch (error) {
     console.error("Error generating topic:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getCurrentTopic = async (req, res) => {
+  try {
+    const { userId } = req.user;
+
+    // 1. Check if active, unexpired topic exists
+    const activePrompt = await prisma.writingPrompt.findFirst({
+      where: {
+        userId,
+        isActive: true,
+        createdAt: {
+          gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // 24-hour expiration
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    if (activePrompt) {
+      return res.status(200).json({
+        id: activePrompt.id,
+        topic: activePrompt.title,
+        description: activePrompt.description,
+        genre: activePrompt.genre,
+        targetLevel: activePrompt.targetLevel,
+        wordTarget: activePrompt.wordTarget || 150,
+        writingTips: activePrompt.writingTips,
+        createdAt: activePrompt.createdAt,
+      });
+    }
+
+    // 2. No active topic found or it has expired; fetch user context & generate new
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { profile: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Generate topic via AI
+    const AIResponse = await generateTopic(user.profile);
+    if (!AIResponse.success) {
+      return res.status(500).json({ message: "Failed to generate topic", error: AIResponse.error });
+    }
+
+    const topicData = AIResponse.data;
+
+    // Deactivate previous prompts first to ensure strictly one active prompt at a time
+    await prisma.writingPrompt.updateMany({
+      where: { userId, isActive: true },
+      data: { isActive: false },
+    });
+
+    // Create in DB
+    const newPrompt = await prisma.writingPrompt.create({
+      data: {
+        userId,
+        title: topicData.topic,
+        genre: topicData.genre || "GENERAL",
+        description: topicData.description,
+        body: topicData.topic, // fallback
+        targetLevel: topicData.targetLevel,
+        writingTips: topicData.writingTips || [],
+        isActive: true,
+      },
+    });
+
+    return res.status(200).json({
+      id: newPrompt.id,
+      topic: newPrompt.title,
+      description: newPrompt.description,
+      genre: newPrompt.genre,
+      targetLevel: newPrompt.targetLevel,
+      wordTarget: newPrompt.wordTarget || 150,
+      writingTips: newPrompt.writingTips,
+      createdAt: newPrompt.createdAt,
+    });
+  } catch (error) {
+    console.error("Error in getCurrentTopic:", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const createNewTopic = async (req, res) => {
+  try {
+    const { userId } = req.user;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { profile: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Deactivate previous prompts
+    await prisma.writingPrompt.updateMany({
+      where: { userId, isActive: true },
+      data: { isActive: false },
+    });
+
+    // Generate new AI topic
+    const AIResponse = await generateTopic(user.profile);
+    if (!AIResponse.success) {
+      return res.status(500).json({ message: "Failed to generate topic", error: AIResponse.error });
+    }
+
+    const topicData = AIResponse.data;
+
+    // Create in DB
+    const newPrompt = await prisma.writingPrompt.create({
+      data: {
+        userId,
+        title: topicData.topic,
+        genre: topicData.genre || "GENERAL",
+        description: topicData.description,
+        body: topicData.topic,
+        targetLevel: topicData.targetLevel,
+        writingTips: topicData.writingTips || [],
+        isActive: true,
+      },
+    });
+
+    return res.status(200).json({
+      id: newPrompt.id,
+      topic: newPrompt.title,
+      description: newPrompt.description,
+      genre: newPrompt.genre,
+      targetLevel: newPrompt.targetLevel,
+      wordTarget: newPrompt.wordTarget || 150,
+      writingTips: newPrompt.writingTips,
+      createdAt: newPrompt.createdAt,
+    });
+  } catch (error) {
+    console.error("Error in createNewTopic:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

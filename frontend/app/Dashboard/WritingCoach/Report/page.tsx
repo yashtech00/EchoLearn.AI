@@ -100,7 +100,7 @@ function ReportContent() {
 
   if (loading) {
     return (
-      <div className="flex h-[calc(100vh-4.5rem)] flex-col items-center justify-center bg-[#faf6f0] text-[#2e3230]" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
+      <div className="flex h-[calc(100vh-6.5rem)] flex-col items-center justify-center bg-[#faf6f0] text-[#2e3230] rounded-2xl" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
         <div className="relative w-20 h-20">
           <div className="absolute inset-0 border-4 border-[#4a7c59]/20 rounded-full" />
           <div className="absolute inset-0 border-4 border-[#4a7c59] rounded-full border-t-transparent animate-spin" />
@@ -113,7 +113,7 @@ function ReportContent() {
   if (error || !submission) {
     const isNoSubmissions = !error && !submission && !loading;
     return (
-      <div className="flex h-[calc(100vh-4.5rem)] flex-col items-center justify-center bg-[#faf6f0] text-[#2e3230] px-4 text-center" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
+      <div className="flex h-[calc(100vh-6.5rem)] flex-col items-center justify-center bg-[#faf6f0] text-[#2e3230] px-4 text-center rounded-2xl" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
         {isNoSubmissions ? (
           <div className="max-w-md bg-[#faf6f0] border border-[#4a7c59]/20 rounded-2xl p-8 shadow-terra">
             <div className="w-16 h-16 bg-[#4a7c59]/10 text-[#4a7c59] rounded-full flex items-center justify-center mx-auto mb-6">
@@ -151,66 +151,67 @@ function ReportContent() {
   const feedback = analysis?.feedback;
 
   return (
-    <div className="flex h-[calc(100vh-4.5rem)] bg-[#faf6f0] font-sans flex-col overflow-hidden text-[#2e3230]" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
+    <div className="flex h-[calc(100vh-6.5rem)] bg-[#faf6f0] font-sans flex-col overflow-hidden text-[#2e3230] rounded-2xl" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
       {/* Header */}
-      <header className="h-20 bg-[#faf6f0]/80 backdrop-blur-md border-b border-[#4a7c59]/10 flex items-center justify-between px-8 shrink-0 z-10">
-        <div className="flex items-center gap-4">
+      <header className="h-14 sm:h-20 bg-[#faf6f0]/80 backdrop-blur-md border-b border-[#4a7c59]/10 flex items-center justify-between px-3 sm:px-8 shrink-0 z-10">
+        <div className="flex items-center gap-2 sm:gap-4 min-w-0">
           <button 
             onClick={() => router.push('/Dashboard/WritingCoach/MistakeMemory')}
-            className="w-10 h-10 flex items-center justify-center rounded-[12px] hover:bg-[#4a7c59]/10 text-[#2e3230]/70 transition-colors"
+            className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-[12px] hover:bg-[#4a7c59]/10 text-[#2e3230]/70 transition-colors flex-shrink-0"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
-          <div>
-            <h1 className="text-xl font-bold text-[#2e3230] leading-tight" style={{ fontFamily: "'Literata', serif" }}>Detailed Report</h1>
-            <p className="text-sm text-[#4a7c59] font-medium opacity-80">Session Analysis</p>
+          <div className="min-w-0">
+            <h1 className="text-base sm:text-xl font-bold text-[#2e3230] leading-tight truncate" style={{ fontFamily: "'Literata', serif" }}>Detailed Report</h1>
+            <p className="text-xs sm:text-sm text-[#4a7c59] font-medium opacity-80">Session Analysis</p>
           </div>
         </div>
         
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
           <Button 
             onClick={() => router.push(`/Dashboard/WritingCoach/Rewrite?submissionId=${submission?.id}`)}
-            className="bg-[#4a7c59] hover:bg-[#3d6649] text-[#faf6f0] rounded-[12px] transition-all gap-2"
+            className="bg-[#4a7c59] hover:bg-[#3d6649] text-[#faf6f0] rounded-[12px] transition-all gap-1.5 sm:gap-2 text-xs sm:text-sm px-3 sm:px-4 h-8 sm:h-10"
             style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}
           >
-            <RefreshCw className="w-4 h-4" />
-            Rewrite & Improve
+            <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Rewrite & Improve</span>
+            <span className="sm:hidden">Rewrite</span>
           </Button>
         </div>
       </header>
 
       {/* Content Layout */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* Left Side: Original Text & Stats */}
-        <div className="w-1/2 flex flex-col border-r border-[#4a7c59]/10 bg-[#faf6f0] overflow-y-auto">
-          <div className="p-10 space-y-8">
+        <div className="w-full lg:w-1/2 flex flex-col border-b lg:border-b-0 lg:border-r border-[#4a7c59]/10 bg-[#faf6f0] overflow-y-auto">
+          <div className="p-4 sm:p-8 lg:p-10 space-y-5 sm:space-y-8">
             {/* Top Stats */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="bg-[#f4ebd9] rounded-[12px] p-4 border border-[#4a7c59]/10 flex items-center gap-4" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
-                <div className="w-12 h-12 rounded-[12px] bg-[#705c30]/10 flex items-center justify-center shrink-0">
-                  <BarChart className="w-6 h-6 text-[#705c30]" />
+            <div className="grid grid-cols-3 gap-2 sm:gap-4">
+              <div className="bg-[#f4ebd9] rounded-[12px] p-2.5 sm:p-4 border border-[#4a7c59]/10 flex items-center gap-2 sm:gap-4" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
+                <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-[12px] bg-[#705c30]/10 flex items-center justify-center shrink-0">
+                  <BarChart className="w-4 h-4 sm:w-6 sm:h-6 text-[#705c30]" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-[#705c30] uppercase tracking-wider mb-0.5">Score</p>
-                  <p className="text-2xl font-black text-[#2e3230]">{score}</p>
+                  <p className="text-[10px] sm:text-xs font-bold text-[#705c30] uppercase tracking-wider mb-0.5">Score</p>
+                  <p className="text-lg sm:text-2xl font-black text-[#2e3230]">{score}</p>
                 </div>
               </div>
-              <div className="bg-[#f4ebd9] rounded-[12px] p-4 border border-[#4a7c59]/10 flex items-center gap-4" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
-                <div className="w-12 h-12 rounded-[12px] bg-[#4a7c59]/10 flex items-center justify-center shrink-0">
-                  <FileText className="w-6 h-6 text-[#4a7c59]" />
+              <div className="bg-[#f4ebd9] rounded-[12px] p-2.5 sm:p-4 border border-[#4a7c59]/10 flex items-center gap-2 sm:gap-4" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
+                <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-[12px] bg-[#4a7c59]/10 flex items-center justify-center shrink-0">
+                  <FileText className="w-4 h-4 sm:w-6 sm:h-6 text-[#4a7c59]" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-[#4a7c59] uppercase tracking-wider mb-0.5">Words</p>
-                  <p className="text-2xl font-black text-[#2e3230]">{wordCount}</p>
+                  <p className="text-[10px] sm:text-xs font-bold text-[#4a7c59] uppercase tracking-wider mb-0.5">Words</p>
+                  <p className="text-lg sm:text-2xl font-black text-[#2e3230]">{wordCount}</p>
                 </div>
               </div>
-              <div className="bg-[#f4ebd9] rounded-[12px] p-4 border border-[#4a7c59]/10 flex items-center gap-4" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
-                <div className="w-12 h-12 rounded-[12px] bg-[#8a5a44]/10 flex items-center justify-center shrink-0">
-                  <AlertCircle className="w-6 h-6 text-[#8a5a44]" />
+              <div className="bg-[#f4ebd9] rounded-[12px] p-2.5 sm:p-4 border border-[#4a7c59]/10 flex items-center gap-2 sm:gap-4" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
+                <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-[12px] bg-[#8a5a44]/10 flex items-center justify-center shrink-0">
+                  <AlertCircle className="w-4 h-4 sm:w-6 sm:h-6 text-[#8a5a44]" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-[#8a5a44] uppercase tracking-wider mb-0.5">Mistakes</p>
-                  <p className="text-2xl font-black text-[#2e3230]">{mistakes?.length || 0}</p>
+                  <p className="text-[10px] sm:text-xs font-bold text-[#8a5a44] uppercase tracking-wider mb-0.5">Mistakes</p>
+                  <p className="text-lg sm:text-2xl font-black text-[#2e3230]">{mistakes?.length || 0}</p>
                 </div>
               </div>
             </div>
@@ -288,10 +289,10 @@ function ReportContent() {
         </div>
 
         {/* Right Side: Mistakes List */}
-        <div className="w-1/2 bg-[#f4ebd9] overflow-y-auto">
-          <div className="p-10">
-            <h2 className="text-2xl font-bold text-[#2e3230] mb-6 flex items-center gap-3" style={{ fontFamily: "'Literata', serif" }}>
-              <AlertCircle className="w-6 h-6 text-[#705c30]" />
+        <div className="w-full lg:w-1/2 bg-[#f4ebd9] overflow-y-auto">
+          <div className="p-4 sm:p-8 lg:p-10">
+            <h2 className="text-lg sm:text-2xl font-bold text-[#2e3230] mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3" style={{ fontFamily: "'Literata', serif" }}>
+              <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-[#705c30]" />
               Areas for Improvement
             </h2>
             
@@ -351,7 +352,7 @@ function ReportContent() {
 export default function ReportPage() {
   return (
     <Suspense fallback={
-      <div className="flex h-[calc(100vh-4.5rem)] flex-col items-center justify-center bg-[#faf6f0] text-[#2e3230]" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
+      <div className="flex h-[calc(100vh-6.5rem)] flex-col items-center justify-center bg-[#faf6f0] text-[#2e3230] rounded-2xl" style={{ fontFamily: "'Nunito Sans', sans-serif" }}>
         <div className="relative w-20 h-20">
           <div className="absolute inset-0 border-4 border-[#4a7c59]/20 rounded-full" />
           <div className="absolute inset-0 border-4 border-[#4a7c59] rounded-full border-t-transparent animate-spin" />

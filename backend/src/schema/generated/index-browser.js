@@ -172,11 +172,14 @@ exports.Prisma.UserProfileScalarFieldEnum = {
 
 exports.Prisma.WritingPromptScalarFieldEnum = {
   id: 'id',
+  userId: 'userId',
   title: 'title',
   genre: 'genre',
+  description: 'description',
   body: 'body',
   topicTags: 'topicTags',
   targetLevel: 'targetLevel',
+  writingTips: 'writingTips',
   isActive: 'isActive',
   createdAt: 'createdAt'
 };

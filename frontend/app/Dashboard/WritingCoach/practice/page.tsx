@@ -26,24 +26,67 @@ import {
 } from "lucide-react";
 import {
   createSubmission,
-  getTopic,
+  getCurrentTopic,
+  getNewTopic,
   getSubmissionStatus,
 } from "@/app/api/writing/writing_api";
 import { Button } from "@/components/ui/button";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { motion, AnimatePresence } from "framer-motion";
+
+const formatGenre = (g?: string) => {
+  if (!g) return "";
+  const mappings: Record<string, string> = {
+    GENERAL: "General",
+    WORK_EMAIL: "Work Email",
+    SHORT_ESSAY: "Short Essay",
+    DIARY: "Diary",
+    ACADEMIC_PARAGRAPH: "Academic Paragraph",
+  };
+  return (
+    mappings[g] || g.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
+  );
+};
+
+const SidebarSkeleton = () => (
+  <div className="w-[400px] bg-[#f4ebd9] h-full overflow-hidden border-l border-[#4a7c59]/10 p-6 flex flex-col gap-6 shrink-0 animate-pulse">
+    {/* Header */}
+    <div className="flex justify-between items-center gap-2 shrink-0">
+      <div className="w-28 h-6 bg-[#4a7c59]/10 rounded-[12px]" />
+      <div className="w-24 h-8 bg-[#faf6f0] rounded-[12px] border border-[#4a7c59]/10 animate-pulse" />
+    </div>
+
+    {/* Title & Description */}
+    <div className="space-y-3 flex-1 overflow-hidden flex flex-col justify-center">
+      <div className="h-7 w-3/4 bg-[#2e3230]/10 rounded-md" />
+      <div className="h-7 w-1/2 bg-[#2e3230]/10 rounded-md" />
+      <div className="space-y-2 mt-4">
+        <div className="h-4 w-full bg-[#2e3230]/10 rounded-md" />
+        <div className="h-4 w-5/6 bg-[#2e3230]/10 rounded-md" />
+        <div className="h-4 w-2/3 bg-[#2e3230]/10 rounded-md" />
+      </div>
+    </div>
+
+    {/* Level & Genre Cards */}
+    <div className="grid grid-cols-2 gap-4 shrink-0">
+      <div className="bg-[#faf6f0] rounded-[12px] p-4 h-16 border border-[#4a7c59]/10" />
+      <div className="bg-[#faf6f0] rounded-[12px] p-4 h-16 border border-[#4a7c59]/10" />
+    </div>
+
+    {/* Tips */}
+    <div className="space-y-3 shrink-0">
+      <div className="h-6 w-1/3 bg-[#2e3230]/10 rounded-md" />
+      <div className="space-y-3">
+        <div className="bg-[#faf6f0] rounded-[12px] h-20 border border-[#4a7c59]/10" />
+        <div className="bg-[#faf6f0] rounded-[12px] h-20 border border-[#4a7c59]/10" />
+      </div>
+    </div>
+  </div>
+);
 
 export default function WritingCoachPage() {
   const [content, setContent] = useState("");
-  const [topic, setTopic] = useState(
-    "The Ethical Implications of Post-Quantum Cryptography",
-  );
-  const [description, setDescription] = useState(
-    "In this session, explore the intersection of advanced mathematics and global privacy. Focus on maintaining a professional yet accessible tone.",
-  );
-  const [genre, setGenre] = useState("Critical Analysis");
-  const [targetLevel, setTargetLevel] = useState("C2 Proficiency");
-  const [wordTarget, setWordTarget] = useState(150);
   const [loading, setLoading] = useState(false);
-  const [loadingTopic, setLoadingTopic] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   const [analysisStatus, setAnalysisStatus] = useState<
@@ -55,42 +98,32 @@ export default function WritingCoachPage() {
   );
   const [showToolbar, setShowToolbar] = useState(false);
   const router = useRouter();
+  const queryClient = useQueryClient();
+
+  // Fetch the active unexpired topic, persisted via React Query cache
+  const { data: topicData, isLoading: isQueryLoading } = useQuery({
+    queryKey: ["writing-topic"],
+    queryFn: getCurrentTopic,
+    staleTime: Infinity,
+  });
+
+  // Mutation to generate a new AI topic, smoothly resetting the cache
+  const newTopicMutation = useMutation({
+    mutationFn: getNewTopic,
+    onSuccess: (newData) => {
+      queryClient.setQueryData(["writing-topic"], newData);
+    },
+  });
+
+  const loadingTopic = newTopicMutation.isPending;
 
   useEffect(() => {
     const words = content.trim() ? content.trim().split(/\s+/).length : 0;
     setWordCount(words);
   }, [content]);
 
-  const handleGetTopic = async () => {
-    setLoadingTopic(true);
-    try {
-      const response = await getTopic();
-      setTopic(response.topic);
-      setGenre(response.genre || "GENERAL");
-      if (response.wordTarget) setWordTarget(response.wordTarget);
-
-      // Personalized description based on genre
-      const descMap: Record<string, string> = {
-        GENERAL:
-          "Write a balanced response to this prompt. Focus on variety in sentence structure.",
-        WORK_EMAIL:
-          "Maintain a professional, concise, and respectful tone appropriate for a workplace setting.",
-        SHORT_ESSAY:
-          "Develop a structured argument with a clear introduction, body, and conclusion.",
-        DIARY:
-          "Express your personal thoughts and feelings in a casual yet reflective narrative style.",
-        ACADEMIC_PARAGRAPH:
-          "Focus on academic precision, formal register, and cohesive logical flow.",
-      };
-      setDescription(
-        descMap[response.genre] ||
-          "Explore the nuances of this topic. Focus on clarity and precise vocabulary.",
-      );
-    } catch (error) {
-      console.error("Error generating topic:", error);
-    } finally {
-      setLoadingTopic(false);
-    }
+  const handleGetTopic = () => {
+    newTopicMutation.mutate();
   };
 
   const handleSubmit = async () => {
@@ -107,8 +140,9 @@ export default function WritingCoachPage() {
     try {
       const response = await createSubmission({
         body: content,
-        genre,
-        title: topic || undefined,
+        genre: topicData?.genre || "GENERAL",
+        title: topicData?.topic || undefined,
+        promptId: topicData?.id || undefined,
       });
 
       const submissionId = response.submissionId;
@@ -124,6 +158,7 @@ export default function WritingCoachPage() {
             setResult({ analysis });
             setAnalysisStatus("completed");
             setLoading(false);
+            router.push(`/Dashboard/WritingCoach/Report?submissionId=${submissionId}`);
           } else if (status === "FAILED") {
             clearInterval(pollInterval);
             setError(errorMessage || "Analysis failed. Please try again.");
@@ -206,7 +241,7 @@ export default function WritingCoachPage() {
             <div className="flex items-center gap-2 font-medium border-l border-[#4a7c59]/20 pl-8">
               <Type className="w-4 h-4 text-[#705c30]" />
               <span className="text-sm uppercase tracking-wider text-[10px] font-bold text-[#705c30]">
-                {wordCount} / {wordTarget} Words
+                {wordCount} / {topicData?.wordTarget || 150} Words
               </span>
             </div>
           </div>
@@ -499,133 +534,128 @@ export default function WritingCoachPage() {
       </div>
 
       {/* Sidebar - Writing Context */}
-      <div className="w-[400px] bg-[#f4ebd9] h-full overflow-y-auto border-l border-[#4a7c59]/10 p-8 flex flex-col gap-8 scrollbar-hide shrink-0">
-        {/* Genre Badge */}
-        <div className="flex justify-between items-center gap-2">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[12px] bg-[#4a7c59]/10 text-[#4a7c59] text-[10px] font-bold uppercase tracking-wider border border-[#4a7c59]/20">
-            <BookOpen className="w-3 h-3" />
-            Creative Writing
-          </span>
+      <AnimatePresence mode="wait">
+        {isQueryLoading ? (
+          <motion.div
+            key="skeleton"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <SidebarSkeleton />
+          </motion.div>
+        ) : (
+          <motion.div
+            key={topicData?.id || "topic"}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="w-[400px] bg-[#f4ebd9] h-full overflow-hidden border-l border-[#4a7c59]/10 p-6 flex flex-col gap-6 shrink-0"
+          >
+            {/* Genre & Action Header */}
+            <div className="flex items-center justify-between gap-2 shrink-0">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[12px] bg-[#4a7c59]/10 text-[#4a7c59] text-[10px] font-bold uppercase tracking-wider border border-[#4a7c59]/20">
+                <BookOpen className="w-3 h-3" />
+                {formatGenre(topicData?.genre) || "Creative Writing"}
+              </span>
 
-          <button
-            onClick={handleGetTopic}
-            disabled={loadingTopic}
-            className="w-full py-4 rounded-[12px] bg-[#faf6f0] border border-[#4a7c59]/20 text-[#4a7c59] text-sm font-bold flex items-center justify-center gap-2 hover:bg-[#4a7c59]/5 transition-all duration-300 mt-4"
-          >
-            {loadingTopic ? (
-              <Sparkles className="w-4 h-4 animate-spin text-[#705c30]" />
-            ) : (
-              <Lightbulb className="w-4 h-4 text-[#705c30]" />
-            )}
-            New Writing Prompt
-          </button>
-        </div>
+              <button
+                onClick={handleGetTopic}
+                disabled={loadingTopic}
+                className="px-4 py-2 rounded-[12px] bg-[#faf6f0] border border-[#4a7c59]/20 text-[#4a7c59] text-xs font-bold flex items-center gap-2 hover:bg-[#4a7c59]/5 transition-all duration-300 shadow-terra"
+              >
+                {loadingTopic ? (
+                  <Sparkles className="w-3.5 h-3.5 animate-spin text-[#705c30]" />
+                ) : (
+                  <Lightbulb className="w-3.5 h-3.5 text-[#705c30]" />
+                )}
+                New Prompt
+              </button>
+            </div>
 
-        {/* Title & Description */}
-        <div className="space-y-4">
-          <h1
-            className="text-3xl font-bold text-[#2e3230] leading-tight tracking-tight"
-            style={{ fontFamily: "'Literata', serif" }}
-          >
-            {topic}
-          </h1>
-          <p className="text-[#2e3230]/80 text-[15px] leading-relaxed font-medium">
-            {description}
-          </p>
-        </div>
-
-        {/* Level & Genre Cards */}
-        <div className="grid grid-cols-2 gap-4">
-          <div
-            className="bg-[#faf6f0] rounded-[12px] p-4 border border-[#4a7c59]/10"
-            style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
-          >
-            <p className="text-[10px] font-bold text-[#705c30] uppercase tracking-widest mb-1">
-              Target Level
-            </p>
-            <p className="text-[#4a7c59] font-bold text-[14px]">
-              {targetLevel}
-            </p>
-          </div>
-          <div
-            className="bg-[#faf6f0] rounded-[12px] p-4 border border-[#4a7c59]/10"
-            style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
-          >
-            <p className="text-[10px] font-bold text-[#705c30] uppercase tracking-widest mb-1">
-              Genre
-            </p>
-            <p className="text-[#4a7c59] font-bold text-[14px]">{genre}</p>
-          </div>
-        </div>
-
-        {/* Writing Tips */}
-        <div className="space-y-4">
-          <h3
-            className="text-xl font-bold text-[#2e3230]"
-            style={{ fontFamily: "'Literata', serif" }}
-          >
-            Writing Tips
-          </h3>
-          <div className="space-y-3">
-            <div
-              className="bg-[#faf6f0] rounded-[12px] p-5 border-l-4 border-[#4a7c59] border-y border-r border-[#4a7c59]/10"
-              style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
-            >
-              <h4 className="font-bold text-[#2e3230] text-sm mb-1">
-                Use Tentative Language
-              </h4>
-              <p className="text-[#2e3230]/70 text-xs leading-relaxed">
-                When discussing future tech, use "it could be argued" or
-                "potential ramifications" to maintain objectivity.
+            {/* Title & Description */}
+            <div className="space-y-3 flex-1 overflow-hidden flex flex-col justify-center">
+              <h1
+                className="text-2xl font-bold text-[#2e3230] leading-tight tracking-tight"
+                style={{ fontFamily: "'Literata', serif" }}
+              >
+                {topicData?.topic}
+              </h1>
+              <p className="text-[#2e3230]/80 text-[14px] leading-relaxed font-medium overflow-y-auto pr-1">
+                {topicData?.description || "In this session, explore the intersection of language, logic, and style."}
               </p>
             </div>
-            <div
-              className="bg-[#faf6f0] rounded-[12px] p-5 border-l-4 border-[#4a7c59] border-y border-r border-[#4a7c59]/10"
-              style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
-            >
-              <h4 className="font-bold text-[#2e3230] text-sm mb-1">
-                Active Voice Priority
-              </h4>
-              <p className="text-[#2e3230]/70 text-xs leading-relaxed">
-                Avoid passive structures to make your technical arguments more
-                direct and impactful.
-              </p>
-            </div>
-          </div>
-        </div>
 
-        {/* Active Focus Areas */}
-        <div className="space-y-4 pb-8">
-          {/* <h3
-            className="text-xl font-bold text-[#2e3230]"
-            style={{ fontFamily: "'Literata', serif" }}
-          >
-            Active Focus Areas
-          </h3>
-          <div
-            className="bg-[#faf6f0] rounded-[12px] p-5 border border-[#4a7c59]/20 relative overflow-hidden group hover:border-[#4a7c59]/40 transition-all duration-300"
-            style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
-          >
-            <div className="flex justify-between items-start mb-3">
-              <div>
-                <h4 className="font-bold text-[#2e3230] text-sm">
-                  Collocation Precision
-                </h4>
-                <p className="text-[#2e3230]/70 text-xs leading-relaxed mt-1">
-                  Your previous sessions showed confusion here.
+            {/* Level & Genre Cards */}
+            <div className="grid grid-cols-2 gap-4 shrink-0">
+              <div
+                className="bg-[#faf6f0] rounded-[12px] p-3 border border-[#4a7c59]/10"
+                style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
+              >
+                <p className="text-[9px] font-bold text-[#705c30] uppercase tracking-widest mb-0.5">
+                  Target Level
+                </p>
+                <p className="text-[#4a7c59] font-bold text-[13px]">
+                  {topicData?.targetLevel || "B2 Upper Intermediate"}
                 </p>
               </div>
-              <span className="text-[9px] font-black text-[#705c30] uppercase tracking-widest opacity-80">
-                Remedying
-              </span>
+              <div
+                className="bg-[#faf6f0] rounded-[12px] p-3 border border-[#4a7c59]/10"
+                style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
+              >
+                <p className="text-[9px] font-bold text-[#705c30] uppercase tracking-widest mb-0.5">
+                  Genre
+                </p>
+                <p className="text-[#4a7c59] font-bold text-[13px]">
+                  {formatGenre(topicData?.genre)}
+                </p>
+              </div>
             </div>
-            <div className="h-1.5 w-full bg-[#4a7c59]/10 rounded-full overflow-hidden">
-              <div className="h-full w-[65%] bg-[#4a7c59] rounded-full" />
-            </div>
-          </div> */}
 
-        </div>
-      </div>
+            {/* Writing Tips */}
+            <div className="space-y-3 shrink-0">
+              <h3
+                className="text-lg font-bold text-[#2e3230]"
+                style={{ fontFamily: "'Literata', serif" }}
+              >
+                Writing Tips
+              </h3>
+              <div className="space-y-3">
+                {topicData?.writingTips && Array.isArray(topicData.writingTips) ? (
+                  topicData.writingTips.map((tip: any, idx: number) => (
+                    <div
+                      key={idx}
+                      className="bg-[#faf6f0] rounded-[12px] p-4 border-l-4 border-[#4a7c59] border-y border-r border-[#4a7c59]/10"
+                      style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
+                    >
+                      <h4 className="font-bold text-[#2e3230] text-sm mb-1">
+                        {tip.title}
+                      </h4>
+                      <p className="text-[#2e3230]/70 text-xs leading-relaxed">
+                        {tip.description}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <div
+                    className="bg-[#faf6f0] rounded-[12px] p-4 border-l-4 border-[#4a7c59] border-y border-r border-[#4a7c59]/10"
+                    style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
+                  >
+                    <h4 className="font-bold text-[#2e3230] text-sm mb-1">
+                      Active Voice Priority
+                    </h4>
+                    <p className="text-[#2e3230]/70 text-xs leading-relaxed">
+                      Avoid passive structures to make your technical arguments more direct and impactful.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

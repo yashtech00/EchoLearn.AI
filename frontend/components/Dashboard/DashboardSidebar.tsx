@@ -53,12 +53,22 @@ const sidebarSections: SidebarSection[] = [
   },
 ];
 
-export default function DashboardSidebar() {
+interface DashboardSidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function DashboardSidebar({ isOpen = false, onClose }: DashboardSidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
 
   const handleLogout = () => {
     router.push("/auth/login");
+  };
+
+  const handleNavigation = (path: string) => {
+    router.push(path);
+    if (onClose) onClose();
   };
 
   const activeSection =
@@ -70,12 +80,21 @@ export default function DashboardSidebar() {
     })?.id || "dashboard";
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-background border-r border-border overflow-y-auto z-50 font-sans">
+    <aside className={`fixed left-0 top-0 h-screen w-64 bg-background border-r border-border overflow-y-auto z-50 font-sans transition-transform duration-300 ease-in-out md:translate-x-0 ${isOpen ? "translate-x-0 animate-in slide-in-from-left duration-300" : "-translate-x-full"}`}>
       {/* LOGO */}
-      <div className="h-16 border-b border-border flex items-center px-6">
+      <div className="h-16 border-b border-border flex items-center justify-between px-6">
         <h1 className="text-2xl font-bold text-primary font-serif">
           EnglishIQ
         </h1>
+        {onClose && (
+          <button 
+            onClick={onClose} 
+            className="md:hidden p-2 rounded-lg hover:bg-primary/5 text-foreground/50 hover:text-primary transition-all"
+            aria-label="Close Sidebar"
+          >
+            <ChevronRight className="w-5 h-5 rotate-180" />
+          </button>
+        )}
       </div>
 
       {/* NAVIGATION */}
@@ -90,7 +109,7 @@ export default function DashboardSidebar() {
             return (
               <button
                 key={section.id}
-                onClick={() => router.push(section.path!)}
+                onClick={() => handleNavigation(section.path!)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-[12px] transition-all duration-200 ${
                   isActive
                     ? "bg-primary/10 text-primary font-bold"
@@ -134,7 +153,7 @@ export default function DashboardSidebar() {
                   return (
                     <button
                       key={item.path}
-                      onClick={() => router.push(item.path!)}
+                      onClick={() => handleNavigation(item.path!)}
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-[12px] text-sm transition-all duration-200 ${
                         isActive
                           ? "bg-primary/10 text-primary font-bold"
@@ -159,7 +178,7 @@ export default function DashboardSidebar() {
       <div className="absolute bottom-0 left-0 right-0 border-t border-border p-4 bg-background">
         <div className="space-y-2">
           <button
-            onClick={() => router.push("/Dashboard/Profile"!)}
+            onClick={() => handleNavigation("/Dashboard/Profile")}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-[12px] hover:bg-primary/5 text-foreground/70 hover:text-primary transition-all"
           >
             <User className="w-5 h-5" />

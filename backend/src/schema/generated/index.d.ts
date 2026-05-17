@@ -1797,6 +1797,7 @@ export namespace Prisma {
     xpEvents: number
     activities: number
     refreshTokens: number
+    writingPrompts: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1804,6 +1805,7 @@ export namespace Prisma {
     xpEvents?: boolean | UserCountOutputTypeCountXpEventsArgs
     activities?: boolean | UserCountOutputTypeCountActivitiesArgs
     refreshTokens?: boolean | UserCountOutputTypeCountRefreshTokensArgs
+    writingPrompts?: boolean | UserCountOutputTypeCountWritingPromptsArgs
   }
 
   // Custom InputTypes
@@ -1843,6 +1845,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountRefreshTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: RefreshTokenWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountWritingPromptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: WritingPromptWhereInput
   }
 
 
@@ -2154,6 +2163,7 @@ export namespace Prisma {
     xpEvents?: boolean | User$xpEventsArgs<ExtArgs>
     activities?: boolean | User$activitiesArgs<ExtArgs>
     refreshTokens?: boolean | User$refreshTokensArgs<ExtArgs>
+    writingPrompts?: boolean | User$writingPromptsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2201,6 +2211,7 @@ export namespace Prisma {
     xpEvents?: boolean | User$xpEventsArgs<ExtArgs>
     activities?: boolean | User$activitiesArgs<ExtArgs>
     refreshTokens?: boolean | User$refreshTokensArgs<ExtArgs>
+    writingPrompts?: boolean | User$writingPromptsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2215,6 +2226,7 @@ export namespace Prisma {
       xpEvents: Prisma.$XpEventPayload<ExtArgs>[]
       activities: Prisma.$UserActivityPayload<ExtArgs>[]
       refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[]
+      writingPrompts: Prisma.$WritingPromptPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -2626,6 +2638,7 @@ export namespace Prisma {
     xpEvents<T extends User$xpEventsArgs<ExtArgs> = {}>(args?: Subset<T, User$xpEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$XpEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     activities<T extends User$activitiesArgs<ExtArgs> = {}>(args?: Subset<T, User$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     refreshTokens<T extends User$refreshTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    writingPrompts<T extends User$writingPromptsArgs<ExtArgs> = {}>(args?: Subset<T, User$writingPromptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WritingPromptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3183,6 +3196,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: RefreshTokenScalarFieldEnum | RefreshTokenScalarFieldEnum[]
+  }
+
+  /**
+   * User.writingPrompts
+   */
+  export type User$writingPromptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WritingPrompt
+     */
+    select?: WritingPromptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WritingPrompt
+     */
+    omit?: WritingPromptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WritingPromptInclude<ExtArgs> | null
+    where?: WritingPromptWhereInput
+    orderBy?: WritingPromptOrderByWithRelationInput | WritingPromptOrderByWithRelationInput[]
+    cursor?: WritingPromptWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: WritingPromptScalarFieldEnum | WritingPromptScalarFieldEnum[]
   }
 
   /**
@@ -5653,65 +5690,56 @@ export namespace Prisma {
 
   export type AggregateWritingPrompt = {
     _count: WritingPromptCountAggregateOutputType | null
-    _avg: WritingPromptAvgAggregateOutputType | null
-    _sum: WritingPromptSumAggregateOutputType | null
     _min: WritingPromptMinAggregateOutputType | null
     _max: WritingPromptMaxAggregateOutputType | null
   }
 
-  export type WritingPromptAvgAggregateOutputType = {
-    targetLevel: number | null
-  }
-
-  export type WritingPromptSumAggregateOutputType = {
-    targetLevel: number | null
-  }
-
   export type WritingPromptMinAggregateOutputType = {
     id: string | null
+    userId: string | null
     title: string | null
     genre: $Enums.SubmissionGenre | null
+    description: string | null
     body: string | null
-    targetLevel: number | null
+    targetLevel: string | null
     isActive: boolean | null
     createdAt: Date | null
   }
 
   export type WritingPromptMaxAggregateOutputType = {
     id: string | null
+    userId: string | null
     title: string | null
     genre: $Enums.SubmissionGenre | null
+    description: string | null
     body: string | null
-    targetLevel: number | null
+    targetLevel: string | null
     isActive: boolean | null
     createdAt: Date | null
   }
 
   export type WritingPromptCountAggregateOutputType = {
     id: number
+    userId: number
     title: number
     genre: number
+    description: number
     body: number
     topicTags: number
     targetLevel: number
+    writingTips: number
     isActive: number
     createdAt: number
     _all: number
   }
 
 
-  export type WritingPromptAvgAggregateInputType = {
-    targetLevel?: true
-  }
-
-  export type WritingPromptSumAggregateInputType = {
-    targetLevel?: true
-  }
-
   export type WritingPromptMinAggregateInputType = {
     id?: true
+    userId?: true
     title?: true
     genre?: true
+    description?: true
     body?: true
     targetLevel?: true
     isActive?: true
@@ -5720,8 +5748,10 @@ export namespace Prisma {
 
   export type WritingPromptMaxAggregateInputType = {
     id?: true
+    userId?: true
     title?: true
     genre?: true
+    description?: true
     body?: true
     targetLevel?: true
     isActive?: true
@@ -5730,11 +5760,14 @@ export namespace Prisma {
 
   export type WritingPromptCountAggregateInputType = {
     id?: true
+    userId?: true
     title?: true
     genre?: true
+    description?: true
     body?: true
     topicTags?: true
     targetLevel?: true
+    writingTips?: true
     isActive?: true
     createdAt?: true
     _all?: true
@@ -5778,18 +5811,6 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Select which fields to average
-    **/
-    _avg?: WritingPromptAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: WritingPromptSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
      * Select which fields to find the minimum value
     **/
     _min?: WritingPromptMinAggregateInputType
@@ -5820,24 +5841,23 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: WritingPromptCountAggregateInputType | true
-    _avg?: WritingPromptAvgAggregateInputType
-    _sum?: WritingPromptSumAggregateInputType
     _min?: WritingPromptMinAggregateInputType
     _max?: WritingPromptMaxAggregateInputType
   }
 
   export type WritingPromptGroupByOutputType = {
     id: string
+    userId: string | null
     title: string
     genre: $Enums.SubmissionGenre
+    description: string | null
     body: string
     topicTags: string[]
-    targetLevel: number | null
+    targetLevel: string | null
+    writingTips: JsonValue | null
     isActive: boolean
     createdAt: Date
     _count: WritingPromptCountAggregateOutputType | null
-    _avg: WritingPromptAvgAggregateOutputType | null
-    _sum: WritingPromptSumAggregateOutputType | null
     _min: WritingPromptMinAggregateOutputType | null
     _max: WritingPromptMaxAggregateOutputType | null
   }
@@ -5858,70 +5878,94 @@ export namespace Prisma {
 
   export type WritingPromptSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    userId?: boolean
     title?: boolean
     genre?: boolean
+    description?: boolean
     body?: boolean
     topicTags?: boolean
     targetLevel?: boolean
+    writingTips?: boolean
     isActive?: boolean
     createdAt?: boolean
+    user?: boolean | WritingPrompt$userArgs<ExtArgs>
     submissions?: boolean | WritingPrompt$submissionsArgs<ExtArgs>
     _count?: boolean | WritingPromptCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["writingPrompt"]>
 
   export type WritingPromptSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    userId?: boolean
     title?: boolean
     genre?: boolean
+    description?: boolean
     body?: boolean
     topicTags?: boolean
     targetLevel?: boolean
+    writingTips?: boolean
     isActive?: boolean
     createdAt?: boolean
+    user?: boolean | WritingPrompt$userArgs<ExtArgs>
   }, ExtArgs["result"]["writingPrompt"]>
 
   export type WritingPromptSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
+    userId?: boolean
     title?: boolean
     genre?: boolean
+    description?: boolean
     body?: boolean
     topicTags?: boolean
     targetLevel?: boolean
+    writingTips?: boolean
     isActive?: boolean
     createdAt?: boolean
+    user?: boolean | WritingPrompt$userArgs<ExtArgs>
   }, ExtArgs["result"]["writingPrompt"]>
 
   export type WritingPromptSelectScalar = {
     id?: boolean
+    userId?: boolean
     title?: boolean
     genre?: boolean
+    description?: boolean
     body?: boolean
     topicTags?: boolean
     targetLevel?: boolean
+    writingTips?: boolean
     isActive?: boolean
     createdAt?: boolean
   }
 
-  export type WritingPromptOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "genre" | "body" | "topicTags" | "targetLevel" | "isActive" | "createdAt", ExtArgs["result"]["writingPrompt"]>
+  export type WritingPromptOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "genre" | "description" | "body" | "topicTags" | "targetLevel" | "writingTips" | "isActive" | "createdAt", ExtArgs["result"]["writingPrompt"]>
   export type WritingPromptInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | WritingPrompt$userArgs<ExtArgs>
     submissions?: boolean | WritingPrompt$submissionsArgs<ExtArgs>
     _count?: boolean | WritingPromptCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type WritingPromptIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
-  export type WritingPromptIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type WritingPromptIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | WritingPrompt$userArgs<ExtArgs>
+  }
+  export type WritingPromptIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | WritingPrompt$userArgs<ExtArgs>
+  }
 
   export type $WritingPromptPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "WritingPrompt"
     objects: {
+      user: Prisma.$UserPayload<ExtArgs> | null
       submissions: Prisma.$SubmissionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
+      userId: string | null
       title: string
       genre: $Enums.SubmissionGenre
+      description: string | null
       body: string
       topicTags: string[]
-      targetLevel: number | null
+      targetLevel: string | null
+      writingTips: Prisma.JsonValue | null
       isActive: boolean
       createdAt: Date
     }, ExtArgs["result"]["writingPrompt"]>
@@ -6318,6 +6362,7 @@ export namespace Prisma {
    */
   export interface Prisma__WritingPromptClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends WritingPrompt$userArgs<ExtArgs> = {}>(args?: Subset<T, WritingPrompt$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     submissions<T extends WritingPrompt$submissionsArgs<ExtArgs> = {}>(args?: Subset<T, WritingPrompt$submissionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubmissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -6349,11 +6394,14 @@ export namespace Prisma {
    */
   interface WritingPromptFieldRefs {
     readonly id: FieldRef<"WritingPrompt", 'String'>
+    readonly userId: FieldRef<"WritingPrompt", 'String'>
     readonly title: FieldRef<"WritingPrompt", 'String'>
     readonly genre: FieldRef<"WritingPrompt", 'SubmissionGenre'>
+    readonly description: FieldRef<"WritingPrompt", 'String'>
     readonly body: FieldRef<"WritingPrompt", 'String'>
     readonly topicTags: FieldRef<"WritingPrompt", 'String[]'>
-    readonly targetLevel: FieldRef<"WritingPrompt", 'Int'>
+    readonly targetLevel: FieldRef<"WritingPrompt", 'String'>
+    readonly writingTips: FieldRef<"WritingPrompt", 'Json'>
     readonly isActive: FieldRef<"WritingPrompt", 'Boolean'>
     readonly createdAt: FieldRef<"WritingPrompt", 'DateTime'>
   }
@@ -6605,6 +6653,10 @@ export namespace Prisma {
      */
     data: WritingPromptCreateManyInput | WritingPromptCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WritingPromptIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -6675,6 +6727,10 @@ export namespace Prisma {
      * Limit how many WritingPrompts to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WritingPromptIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -6741,6 +6797,25 @@ export namespace Prisma {
      * Limit how many WritingPrompts to delete.
      */
     limit?: number
+  }
+
+  /**
+   * WritingPrompt.user
+   */
+  export type WritingPrompt$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
   }
 
   /**
@@ -13895,11 +13970,14 @@ export namespace Prisma {
 
   export const WritingPromptScalarFieldEnum: {
     id: 'id',
+    userId: 'userId',
     title: 'title',
     genre: 'genre',
+    description: 'description',
     body: 'body',
     topicTags: 'topicTags',
     targetLevel: 'targetLevel',
+    writingTips: 'writingTips',
     isActive: 'isActive',
     createdAt: 'createdAt'
   };
@@ -14141,20 +14219,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'SubmissionStatus'
-   */
-  export type EnumSubmissionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubmissionStatus'>
-    
-
-
-  /**
-   * Reference to a field of type 'SubmissionStatus[]'
-   */
-  export type ListEnumSubmissionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubmissionStatus[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -14165,6 +14229,20 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'SubmissionStatus'
+   */
+  export type EnumSubmissionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubmissionStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'SubmissionStatus[]'
+   */
+  export type ListEnumSubmissionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubmissionStatus[]'>
     
 
 
@@ -14246,6 +14324,7 @@ export namespace Prisma {
     xpEvents?: XpEventListRelationFilter
     activities?: UserActivityListRelationFilter
     refreshTokens?: RefreshTokenListRelationFilter
+    writingPrompts?: WritingPromptListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -14264,6 +14343,7 @@ export namespace Prisma {
     xpEvents?: XpEventOrderByRelationAggregateInput
     activities?: UserActivityOrderByRelationAggregateInput
     refreshTokens?: RefreshTokenOrderByRelationAggregateInput
+    writingPrompts?: WritingPromptOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -14285,6 +14365,7 @@ export namespace Prisma {
     xpEvents?: XpEventListRelationFilter
     activities?: UserActivityListRelationFilter
     refreshTokens?: RefreshTokenListRelationFilter
+    writingPrompts?: WritingPromptListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -14539,25 +14620,33 @@ export namespace Prisma {
     OR?: WritingPromptWhereInput[]
     NOT?: WritingPromptWhereInput | WritingPromptWhereInput[]
     id?: StringFilter<"WritingPrompt"> | string
+    userId?: StringNullableFilter<"WritingPrompt"> | string | null
     title?: StringFilter<"WritingPrompt"> | string
     genre?: EnumSubmissionGenreFilter<"WritingPrompt"> | $Enums.SubmissionGenre
+    description?: StringNullableFilter<"WritingPrompt"> | string | null
     body?: StringFilter<"WritingPrompt"> | string
     topicTags?: StringNullableListFilter<"WritingPrompt">
-    targetLevel?: IntNullableFilter<"WritingPrompt"> | number | null
+    targetLevel?: StringNullableFilter<"WritingPrompt"> | string | null
+    writingTips?: JsonNullableFilter<"WritingPrompt">
     isActive?: BoolFilter<"WritingPrompt"> | boolean
     createdAt?: DateTimeFilter<"WritingPrompt"> | Date | string
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     submissions?: SubmissionListRelationFilter
   }
 
   export type WritingPromptOrderByWithRelationInput = {
     id?: SortOrder
+    userId?: SortOrderInput | SortOrder
     title?: SortOrder
     genre?: SortOrder
+    description?: SortOrderInput | SortOrder
     body?: SortOrder
     topicTags?: SortOrder
     targetLevel?: SortOrderInput | SortOrder
+    writingTips?: SortOrderInput | SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
     submissions?: SubmissionOrderByRelationAggregateInput
   }
 
@@ -14566,30 +14655,35 @@ export namespace Prisma {
     AND?: WritingPromptWhereInput | WritingPromptWhereInput[]
     OR?: WritingPromptWhereInput[]
     NOT?: WritingPromptWhereInput | WritingPromptWhereInput[]
+    userId?: StringNullableFilter<"WritingPrompt"> | string | null
     title?: StringFilter<"WritingPrompt"> | string
     genre?: EnumSubmissionGenreFilter<"WritingPrompt"> | $Enums.SubmissionGenre
+    description?: StringNullableFilter<"WritingPrompt"> | string | null
     body?: StringFilter<"WritingPrompt"> | string
     topicTags?: StringNullableListFilter<"WritingPrompt">
-    targetLevel?: IntNullableFilter<"WritingPrompt"> | number | null
+    targetLevel?: StringNullableFilter<"WritingPrompt"> | string | null
+    writingTips?: JsonNullableFilter<"WritingPrompt">
     isActive?: BoolFilter<"WritingPrompt"> | boolean
     createdAt?: DateTimeFilter<"WritingPrompt"> | Date | string
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     submissions?: SubmissionListRelationFilter
   }, "id">
 
   export type WritingPromptOrderByWithAggregationInput = {
     id?: SortOrder
+    userId?: SortOrderInput | SortOrder
     title?: SortOrder
     genre?: SortOrder
+    description?: SortOrderInput | SortOrder
     body?: SortOrder
     topicTags?: SortOrder
     targetLevel?: SortOrderInput | SortOrder
+    writingTips?: SortOrderInput | SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
     _count?: WritingPromptCountOrderByAggregateInput
-    _avg?: WritingPromptAvgOrderByAggregateInput
     _max?: WritingPromptMaxOrderByAggregateInput
     _min?: WritingPromptMinOrderByAggregateInput
-    _sum?: WritingPromptSumOrderByAggregateInput
   }
 
   export type WritingPromptScalarWhereWithAggregatesInput = {
@@ -14597,11 +14691,14 @@ export namespace Prisma {
     OR?: WritingPromptScalarWhereWithAggregatesInput[]
     NOT?: WritingPromptScalarWhereWithAggregatesInput | WritingPromptScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"WritingPrompt"> | string
+    userId?: StringNullableWithAggregatesFilter<"WritingPrompt"> | string | null
     title?: StringWithAggregatesFilter<"WritingPrompt"> | string
     genre?: EnumSubmissionGenreWithAggregatesFilter<"WritingPrompt"> | $Enums.SubmissionGenre
+    description?: StringNullableWithAggregatesFilter<"WritingPrompt"> | string | null
     body?: StringWithAggregatesFilter<"WritingPrompt"> | string
     topicTags?: StringNullableListFilter<"WritingPrompt">
-    targetLevel?: IntNullableWithAggregatesFilter<"WritingPrompt"> | number | null
+    targetLevel?: StringNullableWithAggregatesFilter<"WritingPrompt"> | string | null
+    writingTips?: JsonNullableWithAggregatesFilter<"WritingPrompt">
     isActive?: BoolWithAggregatesFilter<"WritingPrompt"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"WritingPrompt"> | Date | string
   }
@@ -15127,6 +15224,7 @@ export namespace Prisma {
     xpEvents?: XpEventCreateNestedManyWithoutUserInput
     activities?: UserActivityCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
+    writingPrompts?: WritingPromptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -15145,6 +15243,7 @@ export namespace Prisma {
     xpEvents?: XpEventUncheckedCreateNestedManyWithoutUserInput
     activities?: UserActivityUncheckedCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+    writingPrompts?: WritingPromptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -15163,6 +15262,7 @@ export namespace Prisma {
     xpEvents?: XpEventUpdateManyWithoutUserNestedInput
     activities?: UserActivityUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
+    writingPrompts?: WritingPromptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -15181,6 +15281,7 @@ export namespace Prisma {
     xpEvents?: XpEventUncheckedUpdateManyWithoutUserNestedInput
     activities?: UserActivityUncheckedUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+    writingPrompts?: WritingPromptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -15480,21 +15581,27 @@ export namespace Prisma {
     id?: string
     title: string
     genre: $Enums.SubmissionGenre
+    description?: string | null
     body: string
     topicTags?: WritingPromptCreatetopicTagsInput | string[]
-    targetLevel?: number | null
+    targetLevel?: string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: boolean
     createdAt?: Date | string
+    user?: UserCreateNestedOneWithoutWritingPromptsInput
     submissions?: SubmissionCreateNestedManyWithoutPromptInput
   }
 
   export type WritingPromptUncheckedCreateInput = {
     id?: string
+    userId?: string | null
     title: string
     genre: $Enums.SubmissionGenre
+    description?: string | null
     body: string
     topicTags?: WritingPromptCreatetopicTagsInput | string[]
-    targetLevel?: number | null
+    targetLevel?: string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: boolean
     createdAt?: Date | string
     submissions?: SubmissionUncheckedCreateNestedManyWithoutPromptInput
@@ -15504,21 +15611,27 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     body?: StringFieldUpdateOperationsInput | string
     topicTags?: WritingPromptUpdatetopicTagsInput | string[]
-    targetLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneWithoutWritingPromptsNestedInput
     submissions?: SubmissionUpdateManyWithoutPromptNestedInput
   }
 
   export type WritingPromptUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     body?: StringFieldUpdateOperationsInput | string
     topicTags?: WritingPromptUpdatetopicTagsInput | string[]
-    targetLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     submissions?: SubmissionUncheckedUpdateManyWithoutPromptNestedInput
@@ -15526,11 +15639,14 @@ export namespace Prisma {
 
   export type WritingPromptCreateManyInput = {
     id?: string
+    userId?: string | null
     title: string
     genre: $Enums.SubmissionGenre
+    description?: string | null
     body: string
     topicTags?: WritingPromptCreatetopicTagsInput | string[]
-    targetLevel?: number | null
+    targetLevel?: string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: boolean
     createdAt?: Date | string
   }
@@ -15539,20 +15655,25 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     body?: StringFieldUpdateOperationsInput | string
     topicTags?: WritingPromptUpdatetopicTagsInput | string[]
-    targetLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type WritingPromptUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     body?: StringFieldUpdateOperationsInput | string
     topicTags?: WritingPromptUpdatetopicTagsInput | string[]
-    targetLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -16187,6 +16308,12 @@ export namespace Prisma {
     none?: RefreshTokenWhereInput
   }
 
+  export type WritingPromptListRelationFilter = {
+    every?: WritingPromptWhereInput
+    some?: WritingPromptWhereInput
+    none?: WritingPromptWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -16205,6 +16332,10 @@ export namespace Prisma {
   }
 
   export type RefreshTokenOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type WritingPromptOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -16571,62 +16702,6 @@ export namespace Prisma {
     notIn?: $Enums.SubmissionGenre[] | ListEnumSubmissionGenreFieldRefInput<$PrismaModel>
     not?: NestedEnumSubmissionGenreFilter<$PrismaModel> | $Enums.SubmissionGenre
   }
-
-  export type WritingPromptCountOrderByAggregateInput = {
-    id?: SortOrder
-    title?: SortOrder
-    genre?: SortOrder
-    body?: SortOrder
-    topicTags?: SortOrder
-    targetLevel?: SortOrder
-    isActive?: SortOrder
-    createdAt?: SortOrder
-  }
-
-  export type WritingPromptAvgOrderByAggregateInput = {
-    targetLevel?: SortOrder
-  }
-
-  export type WritingPromptMaxOrderByAggregateInput = {
-    id?: SortOrder
-    title?: SortOrder
-    genre?: SortOrder
-    body?: SortOrder
-    targetLevel?: SortOrder
-    isActive?: SortOrder
-    createdAt?: SortOrder
-  }
-
-  export type WritingPromptMinOrderByAggregateInput = {
-    id?: SortOrder
-    title?: SortOrder
-    genre?: SortOrder
-    body?: SortOrder
-    targetLevel?: SortOrder
-    isActive?: SortOrder
-    createdAt?: SortOrder
-  }
-
-  export type WritingPromptSumOrderByAggregateInput = {
-    targetLevel?: SortOrder
-  }
-
-  export type EnumSubmissionGenreWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.SubmissionGenre | EnumSubmissionGenreFieldRefInput<$PrismaModel>
-    in?: $Enums.SubmissionGenre[] | ListEnumSubmissionGenreFieldRefInput<$PrismaModel>
-    notIn?: $Enums.SubmissionGenre[] | ListEnumSubmissionGenreFieldRefInput<$PrismaModel>
-    not?: NestedEnumSubmissionGenreWithAggregatesFilter<$PrismaModel> | $Enums.SubmissionGenre
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumSubmissionGenreFilter<$PrismaModel>
-    _max?: NestedEnumSubmissionGenreFilter<$PrismaModel>
-  }
-
-  export type EnumSubmissionStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.SubmissionStatus | EnumSubmissionStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumSubmissionStatusFilter<$PrismaModel> | $Enums.SubmissionStatus
-  }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -16649,6 +16724,92 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
+  export type WritingPromptCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    title?: SortOrder
+    genre?: SortOrder
+    description?: SortOrder
+    body?: SortOrder
+    topicTags?: SortOrder
+    targetLevel?: SortOrder
+    writingTips?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type WritingPromptMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    title?: SortOrder
+    genre?: SortOrder
+    description?: SortOrder
+    body?: SortOrder
+    targetLevel?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type WritingPromptMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    title?: SortOrder
+    genre?: SortOrder
+    description?: SortOrder
+    body?: SortOrder
+    targetLevel?: SortOrder
+    isActive?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type EnumSubmissionGenreWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SubmissionGenre | EnumSubmissionGenreFieldRefInput<$PrismaModel>
+    in?: $Enums.SubmissionGenre[] | ListEnumSubmissionGenreFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SubmissionGenre[] | ListEnumSubmissionGenreFieldRefInput<$PrismaModel>
+    not?: NestedEnumSubmissionGenreWithAggregatesFilter<$PrismaModel> | $Enums.SubmissionGenre
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSubmissionGenreFilter<$PrismaModel>
+    _max?: NestedEnumSubmissionGenreFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type EnumSubmissionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.SubmissionStatus | EnumSubmissionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSubmissionStatusFilter<$PrismaModel> | $Enums.SubmissionStatus
   }
 
   export type WritingPromptNullableScalarRelationFilter = {
@@ -16741,32 +16902,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumSubmissionStatusFilter<$PrismaModel>
     _max?: NestedEnumSubmissionStatusFilter<$PrismaModel>
-  }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type EnumAnalysisStatusFilter<$PrismaModel = never> = {
@@ -17116,6 +17251,13 @@ export namespace Prisma {
     connect?: RefreshTokenWhereUniqueInput | RefreshTokenWhereUniqueInput[]
   }
 
+  export type WritingPromptCreateNestedManyWithoutUserInput = {
+    create?: XOR<WritingPromptCreateWithoutUserInput, WritingPromptUncheckedCreateWithoutUserInput> | WritingPromptCreateWithoutUserInput[] | WritingPromptUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WritingPromptCreateOrConnectWithoutUserInput | WritingPromptCreateOrConnectWithoutUserInput[]
+    createMany?: WritingPromptCreateManyUserInputEnvelope
+    connect?: WritingPromptWhereUniqueInput | WritingPromptWhereUniqueInput[]
+  }
+
   export type UserProfileUncheckedCreateNestedOneWithoutUserInput = {
     create?: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: UserProfileCreateOrConnectWithoutUserInput
@@ -17154,6 +17296,13 @@ export namespace Prisma {
     connectOrCreate?: RefreshTokenCreateOrConnectWithoutUserInput | RefreshTokenCreateOrConnectWithoutUserInput[]
     createMany?: RefreshTokenCreateManyUserInputEnvelope
     connect?: RefreshTokenWhereUniqueInput | RefreshTokenWhereUniqueInput[]
+  }
+
+  export type WritingPromptUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<WritingPromptCreateWithoutUserInput, WritingPromptUncheckedCreateWithoutUserInput> | WritingPromptCreateWithoutUserInput[] | WritingPromptUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WritingPromptCreateOrConnectWithoutUserInput | WritingPromptCreateOrConnectWithoutUserInput[]
+    createMany?: WritingPromptCreateManyUserInputEnvelope
+    connect?: WritingPromptWhereUniqueInput | WritingPromptWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -17248,6 +17397,20 @@ export namespace Prisma {
     deleteMany?: RefreshTokenScalarWhereInput | RefreshTokenScalarWhereInput[]
   }
 
+  export type WritingPromptUpdateManyWithoutUserNestedInput = {
+    create?: XOR<WritingPromptCreateWithoutUserInput, WritingPromptUncheckedCreateWithoutUserInput> | WritingPromptCreateWithoutUserInput[] | WritingPromptUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WritingPromptCreateOrConnectWithoutUserInput | WritingPromptCreateOrConnectWithoutUserInput[]
+    upsert?: WritingPromptUpsertWithWhereUniqueWithoutUserInput | WritingPromptUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: WritingPromptCreateManyUserInputEnvelope
+    set?: WritingPromptWhereUniqueInput | WritingPromptWhereUniqueInput[]
+    disconnect?: WritingPromptWhereUniqueInput | WritingPromptWhereUniqueInput[]
+    delete?: WritingPromptWhereUniqueInput | WritingPromptWhereUniqueInput[]
+    connect?: WritingPromptWhereUniqueInput | WritingPromptWhereUniqueInput[]
+    update?: WritingPromptUpdateWithWhereUniqueWithoutUserInput | WritingPromptUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: WritingPromptUpdateManyWithWhereWithoutUserInput | WritingPromptUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: WritingPromptScalarWhereInput | WritingPromptScalarWhereInput[]
+  }
+
   export type UserProfileUncheckedUpdateOneWithoutUserNestedInput = {
     create?: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput>
     connectOrCreate?: UserProfileCreateOrConnectWithoutUserInput
@@ -17322,6 +17485,20 @@ export namespace Prisma {
     update?: RefreshTokenUpdateWithWhereUniqueWithoutUserInput | RefreshTokenUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: RefreshTokenUpdateManyWithWhereWithoutUserInput | RefreshTokenUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: RefreshTokenScalarWhereInput | RefreshTokenScalarWhereInput[]
+  }
+
+  export type WritingPromptUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<WritingPromptCreateWithoutUserInput, WritingPromptUncheckedCreateWithoutUserInput> | WritingPromptCreateWithoutUserInput[] | WritingPromptUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: WritingPromptCreateOrConnectWithoutUserInput | WritingPromptCreateOrConnectWithoutUserInput[]
+    upsert?: WritingPromptUpsertWithWhereUniqueWithoutUserInput | WritingPromptUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: WritingPromptCreateManyUserInputEnvelope
+    set?: WritingPromptWhereUniqueInput | WritingPromptWhereUniqueInput[]
+    disconnect?: WritingPromptWhereUniqueInput | WritingPromptWhereUniqueInput[]
+    delete?: WritingPromptWhereUniqueInput | WritingPromptWhereUniqueInput[]
+    connect?: WritingPromptWhereUniqueInput | WritingPromptWhereUniqueInput[]
+    update?: WritingPromptUpdateWithWhereUniqueWithoutUserInput | WritingPromptUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: WritingPromptUpdateManyWithWhereWithoutUserInput | WritingPromptUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: WritingPromptScalarWhereInput | WritingPromptScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutRefreshTokensInput = {
@@ -17411,6 +17588,12 @@ export namespace Prisma {
     set: string[]
   }
 
+  export type UserCreateNestedOneWithoutWritingPromptsInput = {
+    create?: XOR<UserCreateWithoutWritingPromptsInput, UserUncheckedCreateWithoutWritingPromptsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutWritingPromptsInput
+    connect?: UserWhereUniqueInput
+  }
+
   export type SubmissionCreateNestedManyWithoutPromptInput = {
     create?: XOR<SubmissionCreateWithoutPromptInput, SubmissionUncheckedCreateWithoutPromptInput> | SubmissionCreateWithoutPromptInput[] | SubmissionUncheckedCreateWithoutPromptInput[]
     connectOrCreate?: SubmissionCreateOrConnectWithoutPromptInput | SubmissionCreateOrConnectWithoutPromptInput[]
@@ -17432,6 +17615,16 @@ export namespace Prisma {
   export type WritingPromptUpdatetopicTagsInput = {
     set?: string[]
     push?: string | string[]
+  }
+
+  export type UserUpdateOneWithoutWritingPromptsNestedInput = {
+    create?: XOR<UserCreateWithoutWritingPromptsInput, UserUncheckedCreateWithoutWritingPromptsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutWritingPromptsInput
+    upsert?: UserUpsertWithoutWritingPromptsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutWritingPromptsInput, UserUpdateWithoutWritingPromptsInput>, UserUncheckedUpdateWithoutWritingPromptsInput>
   }
 
   export type SubmissionUpdateManyWithoutPromptNestedInput = {
@@ -17977,23 +18170,6 @@ export namespace Prisma {
     _min?: NestedEnumSubmissionGenreFilter<$PrismaModel>
     _max?: NestedEnumSubmissionGenreFilter<$PrismaModel>
   }
-
-  export type NestedEnumSubmissionStatusFilter<$PrismaModel = never> = {
-    equals?: $Enums.SubmissionStatus | EnumSubmissionStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumSubmissionStatusFilter<$PrismaModel> | $Enums.SubmissionStatus
-  }
-
-  export type NestedEnumSubmissionStatusWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.SubmissionStatus | EnumSubmissionStatusFieldRefInput<$PrismaModel>
-    in?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
-    notIn?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
-    not?: NestedEnumSubmissionStatusWithAggregatesFilter<$PrismaModel> | $Enums.SubmissionStatus
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumSubmissionStatusFilter<$PrismaModel>
-    _max?: NestedEnumSubmissionStatusFilter<$PrismaModel>
-  }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -18016,6 +18192,23 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedEnumSubmissionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.SubmissionStatus | EnumSubmissionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSubmissionStatusFilter<$PrismaModel> | $Enums.SubmissionStatus
+  }
+
+  export type NestedEnumSubmissionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SubmissionStatus | EnumSubmissionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SubmissionStatus[] | ListEnumSubmissionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSubmissionStatusWithAggregatesFilter<$PrismaModel> | $Enums.SubmissionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSubmissionStatusFilter<$PrismaModel>
+    _max?: NestedEnumSubmissionStatusFilter<$PrismaModel>
   }
 
   export type NestedEnumAnalysisStatusFilter<$PrismaModel = never> = {
@@ -18295,6 +18488,44 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type WritingPromptCreateWithoutUserInput = {
+    id?: string
+    title: string
+    genre: $Enums.SubmissionGenre
+    description?: string | null
+    body: string
+    topicTags?: WritingPromptCreatetopicTagsInput | string[]
+    targetLevel?: string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: boolean
+    createdAt?: Date | string
+    submissions?: SubmissionCreateNestedManyWithoutPromptInput
+  }
+
+  export type WritingPromptUncheckedCreateWithoutUserInput = {
+    id?: string
+    title: string
+    genre: $Enums.SubmissionGenre
+    description?: string | null
+    body: string
+    topicTags?: WritingPromptCreatetopicTagsInput | string[]
+    targetLevel?: string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: boolean
+    createdAt?: Date | string
+    submissions?: SubmissionUncheckedCreateNestedManyWithoutPromptInput
+  }
+
+  export type WritingPromptCreateOrConnectWithoutUserInput = {
+    where: WritingPromptWhereUniqueInput
+    create: XOR<WritingPromptCreateWithoutUserInput, WritingPromptUncheckedCreateWithoutUserInput>
+  }
+
+  export type WritingPromptCreateManyUserInputEnvelope = {
+    data: WritingPromptCreateManyUserInput | WritingPromptCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserProfileUpsertWithoutUserInput = {
     update: XOR<UserProfileUpdateWithoutUserInput, UserProfileUncheckedUpdateWithoutUserInput>
     create: XOR<UserProfileCreateWithoutUserInput, UserProfileUncheckedCreateWithoutUserInput>
@@ -18509,6 +18740,39 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"RefreshToken"> | Date | string
   }
 
+  export type WritingPromptUpsertWithWhereUniqueWithoutUserInput = {
+    where: WritingPromptWhereUniqueInput
+    update: XOR<WritingPromptUpdateWithoutUserInput, WritingPromptUncheckedUpdateWithoutUserInput>
+    create: XOR<WritingPromptCreateWithoutUserInput, WritingPromptUncheckedCreateWithoutUserInput>
+  }
+
+  export type WritingPromptUpdateWithWhereUniqueWithoutUserInput = {
+    where: WritingPromptWhereUniqueInput
+    data: XOR<WritingPromptUpdateWithoutUserInput, WritingPromptUncheckedUpdateWithoutUserInput>
+  }
+
+  export type WritingPromptUpdateManyWithWhereWithoutUserInput = {
+    where: WritingPromptScalarWhereInput
+    data: XOR<WritingPromptUpdateManyMutationInput, WritingPromptUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type WritingPromptScalarWhereInput = {
+    AND?: WritingPromptScalarWhereInput | WritingPromptScalarWhereInput[]
+    OR?: WritingPromptScalarWhereInput[]
+    NOT?: WritingPromptScalarWhereInput | WritingPromptScalarWhereInput[]
+    id?: StringFilter<"WritingPrompt"> | string
+    userId?: StringNullableFilter<"WritingPrompt"> | string | null
+    title?: StringFilter<"WritingPrompt"> | string
+    genre?: EnumSubmissionGenreFilter<"WritingPrompt"> | $Enums.SubmissionGenre
+    description?: StringNullableFilter<"WritingPrompt"> | string | null
+    body?: StringFilter<"WritingPrompt"> | string
+    topicTags?: StringNullableListFilter<"WritingPrompt">
+    targetLevel?: StringNullableFilter<"WritingPrompt"> | string | null
+    writingTips?: JsonNullableFilter<"WritingPrompt">
+    isActive?: BoolFilter<"WritingPrompt"> | boolean
+    createdAt?: DateTimeFilter<"WritingPrompt"> | Date | string
+  }
+
   export type UserCreateWithoutRefreshTokensInput = {
     id?: string
     name: string
@@ -18524,6 +18788,7 @@ export namespace Prisma {
     stats?: UserStatsCreateNestedOneWithoutUserInput
     xpEvents?: XpEventCreateNestedManyWithoutUserInput
     activities?: UserActivityCreateNestedManyWithoutUserInput
+    writingPrompts?: WritingPromptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutRefreshTokensInput = {
@@ -18541,6 +18806,7 @@ export namespace Prisma {
     stats?: UserStatsUncheckedCreateNestedOneWithoutUserInput
     xpEvents?: XpEventUncheckedCreateNestedManyWithoutUserInput
     activities?: UserActivityUncheckedCreateNestedManyWithoutUserInput
+    writingPrompts?: WritingPromptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutRefreshTokensInput = {
@@ -18574,6 +18840,7 @@ export namespace Prisma {
     stats?: UserStatsUpdateOneWithoutUserNestedInput
     xpEvents?: XpEventUpdateManyWithoutUserNestedInput
     activities?: UserActivityUpdateManyWithoutUserNestedInput
+    writingPrompts?: WritingPromptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutRefreshTokensInput = {
@@ -18591,6 +18858,7 @@ export namespace Prisma {
     stats?: UserStatsUncheckedUpdateOneWithoutUserNestedInput
     xpEvents?: XpEventUncheckedUpdateManyWithoutUserNestedInput
     activities?: UserActivityUncheckedUpdateManyWithoutUserNestedInput
+    writingPrompts?: WritingPromptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutProfileInput = {
@@ -18608,6 +18876,7 @@ export namespace Prisma {
     xpEvents?: XpEventCreateNestedManyWithoutUserInput
     activities?: UserActivityCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
+    writingPrompts?: WritingPromptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutProfileInput = {
@@ -18625,6 +18894,7 @@ export namespace Prisma {
     xpEvents?: XpEventUncheckedCreateNestedManyWithoutUserInput
     activities?: UserActivityUncheckedCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+    writingPrompts?: WritingPromptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutProfileInput = {
@@ -18658,6 +18928,7 @@ export namespace Prisma {
     xpEvents?: XpEventUpdateManyWithoutUserNestedInput
     activities?: UserActivityUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
+    writingPrompts?: WritingPromptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutProfileInput = {
@@ -18675,6 +18946,48 @@ export namespace Prisma {
     xpEvents?: XpEventUncheckedUpdateManyWithoutUserNestedInput
     activities?: UserActivityUncheckedUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+    writingPrompts?: WritingPromptUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutWritingPromptsInput = {
+    id?: string
+    name: string
+    email: string
+    passwordHash?: string | null
+    displayName?: string | null
+    image?: string | null
+    isNewUser?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    profile?: UserProfileCreateNestedOneWithoutUserInput
+    submissions?: SubmissionCreateNestedManyWithoutUserInput
+    stats?: UserStatsCreateNestedOneWithoutUserInput
+    xpEvents?: XpEventCreateNestedManyWithoutUserInput
+    activities?: UserActivityCreateNestedManyWithoutUserInput
+    refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutWritingPromptsInput = {
+    id?: string
+    name: string
+    email: string
+    passwordHash?: string | null
+    displayName?: string | null
+    image?: string | null
+    isNewUser?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    profile?: UserProfileUncheckedCreateNestedOneWithoutUserInput
+    submissions?: SubmissionUncheckedCreateNestedManyWithoutUserInput
+    stats?: UserStatsUncheckedCreateNestedOneWithoutUserInput
+    xpEvents?: XpEventUncheckedCreateNestedManyWithoutUserInput
+    activities?: UserActivityUncheckedCreateNestedManyWithoutUserInput
+    refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutWritingPromptsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutWritingPromptsInput, UserUncheckedCreateWithoutWritingPromptsInput>
   }
 
   export type SubmissionCreateWithoutPromptInput = {
@@ -18723,6 +19036,53 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type UserUpsertWithoutWritingPromptsInput = {
+    update: XOR<UserUpdateWithoutWritingPromptsInput, UserUncheckedUpdateWithoutWritingPromptsInput>
+    create: XOR<UserCreateWithoutWritingPromptsInput, UserUncheckedCreateWithoutWritingPromptsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutWritingPromptsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutWritingPromptsInput, UserUncheckedUpdateWithoutWritingPromptsInput>
+  }
+
+  export type UserUpdateWithoutWritingPromptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    isNewUser?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: UserProfileUpdateOneWithoutUserNestedInput
+    submissions?: SubmissionUpdateManyWithoutUserNestedInput
+    stats?: UserStatsUpdateOneWithoutUserNestedInput
+    xpEvents?: XpEventUpdateManyWithoutUserNestedInput
+    activities?: UserActivityUpdateManyWithoutUserNestedInput
+    refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutWritingPromptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    passwordHash?: NullableStringFieldUpdateOperationsInput | string | null
+    displayName?: NullableStringFieldUpdateOperationsInput | string | null
+    image?: NullableStringFieldUpdateOperationsInput | string | null
+    isNewUser?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    profile?: UserProfileUncheckedUpdateOneWithoutUserNestedInput
+    submissions?: SubmissionUncheckedUpdateManyWithoutUserNestedInput
+    stats?: UserStatsUncheckedUpdateOneWithoutUserNestedInput
+    xpEvents?: XpEventUncheckedUpdateManyWithoutUserNestedInput
+    activities?: UserActivityUncheckedUpdateManyWithoutUserNestedInput
+    refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+  }
+
   export type SubmissionUpsertWithWhereUniqueWithoutPromptInput = {
     where: SubmissionWhereUniqueInput
     update: XOR<SubmissionUpdateWithoutPromptInput, SubmissionUncheckedUpdateWithoutPromptInput>
@@ -18754,6 +19114,7 @@ export namespace Prisma {
     xpEvents?: XpEventCreateNestedManyWithoutUserInput
     activities?: UserActivityCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
+    writingPrompts?: WritingPromptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSubmissionsInput = {
@@ -18771,6 +19132,7 @@ export namespace Prisma {
     xpEvents?: XpEventUncheckedCreateNestedManyWithoutUserInput
     activities?: UserActivityUncheckedCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+    writingPrompts?: WritingPromptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSubmissionsInput = {
@@ -18782,20 +19144,26 @@ export namespace Prisma {
     id?: string
     title: string
     genre: $Enums.SubmissionGenre
+    description?: string | null
     body: string
     topicTags?: WritingPromptCreatetopicTagsInput | string[]
-    targetLevel?: number | null
+    targetLevel?: string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: boolean
     createdAt?: Date | string
+    user?: UserCreateNestedOneWithoutWritingPromptsInput
   }
 
   export type WritingPromptUncheckedCreateWithoutSubmissionsInput = {
     id?: string
+    userId?: string | null
     title: string
     genre: $Enums.SubmissionGenre
+    description?: string | null
     body: string
     topicTags?: WritingPromptCreatetopicTagsInput | string[]
-    targetLevel?: number | null
+    targetLevel?: string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: boolean
     createdAt?: Date | string
   }
@@ -18911,6 +19279,7 @@ export namespace Prisma {
     xpEvents?: XpEventUpdateManyWithoutUserNestedInput
     activities?: UserActivityUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
+    writingPrompts?: WritingPromptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubmissionsInput = {
@@ -18928,6 +19297,7 @@ export namespace Prisma {
     xpEvents?: XpEventUncheckedUpdateManyWithoutUserNestedInput
     activities?: UserActivityUncheckedUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+    writingPrompts?: WritingPromptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type WritingPromptUpsertWithoutSubmissionsInput = {
@@ -18945,20 +19315,26 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     title?: StringFieldUpdateOperationsInput | string
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     body?: StringFieldUpdateOperationsInput | string
     topicTags?: WritingPromptUpdatetopicTagsInput | string[]
-    targetLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneWithoutWritingPromptsNestedInput
   }
 
   export type WritingPromptUncheckedUpdateWithoutSubmissionsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
     title?: StringFieldUpdateOperationsInput | string
     genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
+    description?: NullableStringFieldUpdateOperationsInput | string | null
     body?: StringFieldUpdateOperationsInput | string
     topicTags?: WritingPromptUpdatetopicTagsInput | string[]
-    targetLevel?: NullableIntFieldUpdateOperationsInput | number | null
+    targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -19353,6 +19729,7 @@ export namespace Prisma {
     xpEvents?: XpEventCreateNestedManyWithoutUserInput
     activities?: UserActivityCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
+    writingPrompts?: WritingPromptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutStatsInput = {
@@ -19370,6 +19747,7 @@ export namespace Prisma {
     xpEvents?: XpEventUncheckedCreateNestedManyWithoutUserInput
     activities?: UserActivityUncheckedCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+    writingPrompts?: WritingPromptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutStatsInput = {
@@ -19403,6 +19781,7 @@ export namespace Prisma {
     xpEvents?: XpEventUpdateManyWithoutUserNestedInput
     activities?: UserActivityUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
+    writingPrompts?: WritingPromptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutStatsInput = {
@@ -19420,6 +19799,7 @@ export namespace Prisma {
     xpEvents?: XpEventUncheckedUpdateManyWithoutUserNestedInput
     activities?: UserActivityUncheckedUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+    writingPrompts?: WritingPromptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutXpEventsInput = {
@@ -19437,6 +19817,7 @@ export namespace Prisma {
     stats?: UserStatsCreateNestedOneWithoutUserInput
     activities?: UserActivityCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
+    writingPrompts?: WritingPromptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutXpEventsInput = {
@@ -19454,6 +19835,7 @@ export namespace Prisma {
     stats?: UserStatsUncheckedCreateNestedOneWithoutUserInput
     activities?: UserActivityUncheckedCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+    writingPrompts?: WritingPromptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutXpEventsInput = {
@@ -19487,6 +19869,7 @@ export namespace Prisma {
     stats?: UserStatsUpdateOneWithoutUserNestedInput
     activities?: UserActivityUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
+    writingPrompts?: WritingPromptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutXpEventsInput = {
@@ -19504,6 +19887,7 @@ export namespace Prisma {
     stats?: UserStatsUncheckedUpdateOneWithoutUserNestedInput
     activities?: UserActivityUncheckedUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+    writingPrompts?: WritingPromptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutActivitiesInput = {
@@ -19521,6 +19905,7 @@ export namespace Prisma {
     stats?: UserStatsCreateNestedOneWithoutUserInput
     xpEvents?: XpEventCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenCreateNestedManyWithoutUserInput
+    writingPrompts?: WritingPromptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutActivitiesInput = {
@@ -19538,6 +19923,7 @@ export namespace Prisma {
     stats?: UserStatsUncheckedCreateNestedOneWithoutUserInput
     xpEvents?: XpEventUncheckedCreateNestedManyWithoutUserInput
     refreshTokens?: RefreshTokenUncheckedCreateNestedManyWithoutUserInput
+    writingPrompts?: WritingPromptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutActivitiesInput = {
@@ -19571,6 +19957,7 @@ export namespace Prisma {
     stats?: UserStatsUpdateOneWithoutUserNestedInput
     xpEvents?: XpEventUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUpdateManyWithoutUserNestedInput
+    writingPrompts?: WritingPromptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActivitiesInput = {
@@ -19588,6 +19975,7 @@ export namespace Prisma {
     stats?: UserStatsUncheckedUpdateOneWithoutUserNestedInput
     xpEvents?: XpEventUncheckedUpdateManyWithoutUserNestedInput
     refreshTokens?: RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
+    writingPrompts?: WritingPromptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubmissionCreateManyUserInput = {
@@ -19632,6 +20020,19 @@ export namespace Prisma {
     expiresAt: Date | string
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type WritingPromptCreateManyUserInput = {
+    id?: string
+    title: string
+    genre: $Enums.SubmissionGenre
+    description?: string | null
+    body: string
+    topicTags?: WritingPromptCreatetopicTagsInput | string[]
+    targetLevel?: string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: boolean
+    createdAt?: Date | string
   }
 
   export type SubmissionUpdateWithoutUserInput = {
@@ -19768,6 +20169,47 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WritingPromptUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    topicTags?: WritingPromptUpdatetopicTagsInput | string[]
+    targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    submissions?: SubmissionUpdateManyWithoutPromptNestedInput
+  }
+
+  export type WritingPromptUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    topicTags?: WritingPromptUpdatetopicTagsInput | string[]
+    targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    submissions?: SubmissionUncheckedUpdateManyWithoutPromptNestedInput
+  }
+
+  export type WritingPromptUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    genre?: EnumSubmissionGenreFieldUpdateOperationsInput | $Enums.SubmissionGenre
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    topicTags?: WritingPromptUpdatetopicTagsInput | string[]
+    targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    writingTips?: NullableJsonNullValueInput | InputJsonValue
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SubmissionCreateManyPromptInput = {

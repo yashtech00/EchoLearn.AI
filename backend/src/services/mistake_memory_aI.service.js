@@ -286,12 +286,21 @@ Rules:
 
 export const generateTopic = async (userProfile) => {
   const fallback = {
-    topic:
-      "Describe how technology improves your travel experiences.",
-
+    topic: "Describe how technology improves your travel experiences.",
+    description: "Write a short essay outlining the impact of technology on travel, providing specific examples.",
     genre: "SHORT_ESSAY",
-
+    targetLevel: "B2 Upper Intermediate",
     wordTarget: 150,
+    writingTips: [
+      {
+        title: "Use Specific Examples",
+        description: "Instead of talking generally, name specific apps or technologies you use when traveling."
+      },
+      {
+        title: "Link Paragraphs",
+        description: "Use transition words like 'Furthermore' or 'In addition' to connect your thoughts cleanly."
+      }
+    ]
   };
 
   try {
@@ -304,12 +313,14 @@ ${buildProfileContext(userProfile)}
 Generate ONE personalized writing topic.
 
 Requirements:
-- 10-20 words
+- Topic should be 10-20 words
 - Practical and engaging
 - Match user's English level
 - Relevant to user interests/goals
 - Creative and non-repetitive
 - Encourage opinion/thought expression
+- Provide a clear, actionable description (guidelines for the user)
+- Provide exactly 2 highly relevant and helpful writing tips tailored to this topic
 
 Allowed Genres:
 GENERAL |
@@ -322,8 +333,20 @@ Return ONLY valid JSON:
 
 {
   "topic": string,
+  "description": string,
   "genre": string,
-  "wordTarget": number
+  "targetLevel": string,
+  "wordTarget": number,
+  "writingTips": [
+    {
+      "title": string,
+      "description": string
+    },
+    {
+      "title": string,
+      "description": string
+    }
+  ]
 }
 `;
 

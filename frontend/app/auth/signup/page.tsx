@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function SignupPage() {
   return (
-    <div className="flex flex-col justify-center items-center h-screen bg-[#faf6f0] text-[#2e3230]">
+    <div className="flex flex-col justify-center items-center min-h-screen bg-[#faf6f0] text-[#2e3230] px-4">
       <div className="max-w-md w-full p-8 border border-[#4a7c59]/20 rounded-2xl bg-[#faf6f0] shadow-terra text-center">
         <h2 className="text-2xl font-bold mb-4 font-serif">Create Account</h2>
         <p className="text-sm text-muted-foreground mb-6">

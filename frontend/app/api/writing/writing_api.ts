@@ -99,3 +99,23 @@ export const getTopic = async () => {
     throw error;
   }
 };
+
+export const getCurrentTopic = async () => {
+  try {
+    const response = await axiosInstance.get('/writing/current-topic');
+    return response.data;
+  } catch (error) {
+    console.error("Error getting current topic:", error);
+    throw error;
+  }
+};
+
+export const getNewTopic = async () => {
+  try {
+    const response = await axiosInstance.post('/writing/new-topic');
+    return response.data;
+  } catch (error) {
+    console.error("Error getting new topic:", error);
+    throw error;
+  }
+};

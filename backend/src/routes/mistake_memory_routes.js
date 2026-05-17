@@ -9,7 +9,9 @@ import {
   getWritingPrompts,
   getTopics,
   getSubmissionStatus,
-  rewriteSubmission
+  rewriteSubmission,
+  getCurrentTopic,
+  createNewTopic
 } from "../controller/mistake_memory_controller.js";
 
 const mistakeMemoryRouter = express.Router();
@@ -29,6 +31,8 @@ mistakeMemoryRouter.get("/me/stats", Protect, getUserStats);
 mistakeMemoryRouter.get("/prompts", Protect, getWritingPrompts);
 
 mistakeMemoryRouter.get("/get-topics", Protect, getTopics);
+mistakeMemoryRouter.get("/current-topic", Protect, getCurrentTopic);
+mistakeMemoryRouter.post("/new-topic", Protect, createNewTopic);
 
 mistakeMemoryRouter.patch("/submission/:id/rewrite",Protect,rewriteSubmission)
 

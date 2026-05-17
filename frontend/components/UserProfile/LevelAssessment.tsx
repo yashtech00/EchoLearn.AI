@@ -3,9 +3,23 @@
 import { useState } from "react";
 import { BookOpen, PenTool, Target, Mic, BookMarked, Headphones, Clock, CheckCircle2, ArrowRight, ArrowLeft, Check } from "lucide-react";
 
+interface UserProfileFormData {
+  primaryRole: string;
+  primaryGoal: string;
+  englishReadingSelfScore: number;
+  englishWritingSelfScore: number;
+  weeklyTimeMinutes: number;
+  interestTags: string[];
+  preferredGenres: string[];
+  targetScoreGoal: string;
+  dailyGoalMinutes: number;
+  preferredLearningStyle: string;
+  weakAreas: string[];
+}
+
 interface LevelAssessmentProps {
-  formData: any;
-  setFormData: (data: any) => void;
+  formData: UserProfileFormData;
+  setFormData: (data: UserProfileFormData) => void;
   onNext: () => void;
   onBack: () => void;
 }
@@ -34,8 +48,14 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
   };
 
   const getLevelColor = (level: number) => {
-    const colors = ["bg-red-100 text-red-700", "bg-orange-100 text-orange-700", "bg-yellow-100 text-yellow-700", "bg-blue-100 text-blue-700", "bg-green-100 text-green-700"];
-    return colors[level - 1] || "bg-yellow-100 text-yellow-700";
+    const colors = [
+      "bg-secondary text-muted-foreground",
+      "bg-accent/10 text-accent",
+      "bg-primary/10 text-primary",
+      "bg-primary text-white",
+      "bg-accent text-white",
+    ];
+    return colors[level - 1] || "bg-primary/10 text-primary";
   };
 
   const handleFocusAreaToggle = (areaId: string) => {
@@ -51,14 +71,14 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
+    <div className="min-h-screen bg-background">
       <div className="pt-24 pb-16 px-4 sm:px-6 max-w-5xl mx-auto">
         {/* Hero Section */}
         <div className="text-center mb-10 sm:mb-16 space-y-3 sm:space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight tracking-tight">
-            How's your English today?
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-foreground leading-tight tracking-tight">
+            How&apos;s your English today?
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             Be honest! It helps us find the right starting point for you.
           </p>
         </div>
@@ -67,13 +87,13 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
           {/* Assessment Sliders */}
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-7 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
             {/* Reading Level */}
-            <div className="bg-white p-6 sm:p-9 rounded-3xl shadow-xl border border-gray-200/50 hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="bg-card p-6 sm:p-9 rounded-[12px] shadow-terra border border-primary/10 hover:shadow-terra transition-all duration-300 hover:scale-[1.02]">
               <div className="flex justify-between items-center mb-6 sm:mb-9">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg">
+                  <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-[12px] bg-gradient-to-br from-primary to-primary flex items-center justify-center shadow-terra">
                     <BookOpen className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                   </div>
-                  <h3 className="text-lg sm:text-2xl font-bold text-gray-900">Reading Level</h3>
+                  <h3 className="text-lg sm:text-2xl font-bold text-foreground">Reading Level</h3>
                 </div>
                 <span className={`px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold shadow-sm ${getLevelColor(readingLevel)}`}>
                   {getLevelLabel(readingLevel)}
@@ -89,21 +109,21 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
                   setReadingLevel(level);
                   setFormData({ ...formData, englishReadingSelfScore: level });
                 }}
-                className="w-full h-3 bg-gray-200 rounded-full appearance-none cursor-pointer transition-all duration-300"
+                className="w-full h-3 bg-primary/10 rounded-full appearance-none cursor-pointer transition-all duration-300"
                 style={{
-                  background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(readingLevel - 1) * 25}%, #e5e7eb ${(readingLevel - 1) * 25}%, #e5e7eb 100%)`
+                  background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${(readingLevel - 1) * 25}%, var(--secondary) ${(readingLevel - 1) * 25}%, var(--secondary) 100%)`
                 }}
               />
             </div>
 
             {/* Writing Level */}
-            <div className="bg-white p-6 sm:p-9 rounded-3xl shadow-xl border border-gray-200/50 hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
+            <div className="bg-card p-6 sm:p-9 rounded-[12px] shadow-terra border border-primary/10 hover:shadow-terra transition-all duration-300 hover:scale-[1.02]">
               <div className="flex justify-between items-center mb-6 sm:mb-9">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-lg">
+                  <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-[12px] bg-gradient-to-br from-primary to-primary flex items-center justify-center shadow-terra">
                     <PenTool className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                   </div>
-                  <h3 className="text-lg sm:text-2xl font-bold text-gray-900">Writing Level</h3>
+                  <h3 className="text-lg sm:text-2xl font-bold text-foreground">Writing Level</h3>
                 </div>
                 <span className={`px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold shadow-sm ${getLevelColor(writingLevel)}`}>
                   {getLevelLabel(writingLevel)}
@@ -119,9 +139,9 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
                   setWritingLevel(level);
                   setFormData({ ...formData, englishWritingSelfScore: level });
                 }}
-                className="w-full h-3 bg-gray-200 rounded-full appearance-none cursor-pointer transition-all duration-300"
+                className="w-full h-3 bg-primary/10 rounded-full appearance-none cursor-pointer transition-all duration-300"
                 style={{
-                  background: `linear-gradient(to right, #10b981 0%, #10b981 ${(writingLevel - 1) * 25}%, #e5e7eb ${(writingLevel - 1) * 25}%, #e5e7eb 100%)`
+                  background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${(writingLevel - 1) * 25}%, var(--secondary) ${(writingLevel - 1) * 25}%, var(--secondary) 100%)`
                 }}
               />
             </div>
@@ -130,12 +150,12 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
           {/* Focus Areas Section */}
           <section className="space-y-5 sm:space-y-7 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-[12px] bg-gradient-to-br from-primary to-primary flex items-center justify-center shadow-terra">
                 <Target className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
               </div>
               <div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Focus Areas</h2>
-                <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Select areas you'd like to improve (optional)</p>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Focus Areas</h2>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Select areas you&apos;d like to improve (optional)</p>
               </div>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
@@ -149,19 +169,19 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
                       onChange={() => handleFocusAreaToggle(area.id)}
                       className="peer sr-only"
                     />
-                    <div className="p-4 sm:p-6 rounded-2xl border-2 border-transparent bg-white shadow-lg transition-all duration-300 peer-checked:border-purple-500 peer-checked:bg-gradient-to-br from-purple-50 via-white to-purple-50 peer-checked:shadow-xl peer-checked:ring-2 peer-checked:ring-purple-200 group-hover:scale-[1.02] group-hover:shadow-xl animate-in fade-in slide-in-from-bottom-2">
+                    <div className="p-4 sm:p-6 rounded-[12px] border-2 border-transparent bg-card shadow-terra transition-all duration-300 peer-checked:border-primary peer-checked:bg-gradient-to-br from-secondary to-card peer-checked:shadow-terra peer-checked:ring-2 peer-checked:ring-primary/20 group-hover:scale-[1.02] group-hover:shadow-terra animate-in fade-in slide-in-from-bottom-2">
                       <div className="flex flex-col items-center text-center gap-3">
-                        <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                        <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-[12px] flex items-center justify-center transition-all duration-300 ${
                           formData.weakAreas?.includes(area.id) 
-                            ? 'bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg scale-105' 
-                            : 'bg-gray-100 text-gray-500 group-hover:bg-purple-100 group-hover:text-purple-600 group-hover:scale-105'
+                            ? 'bg-gradient-to-br from-primary to-primary text-white shadow-terra scale-105' 
+                            : 'bg-primary/10 text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary group-hover:scale-105'
                         }`}>
                           <IconComponent className="w-5 h-5 sm:w-7 sm:h-7" />
                         </div>
-                        <span className="text-sm sm:text-base font-bold text-gray-900 truncate">{area.name}</span>
+                        <span className="text-sm sm:text-base font-bold text-foreground truncate">{area.name}</span>
                         {formData.weakAreas?.includes(area.id) && (
-                          <div className="flex items-center gap-1.5 text-purple-600 animate-in zoom-in duration-300">
-                            <CheckCircle2 className="w-4 h-4 fill-purple-600" />
+                          <div className="flex items-center gap-1.5 text-primary animate-in zoom-in duration-300">
+                            <CheckCircle2 className="w-4 h-4 fill-primary" />
                             <span className="text-xs sm:text-sm font-semibold">Selected</span>
                           </div>
                         )}
@@ -176,12 +196,12 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
           {/* Daily Commitment Section */}
           <section className="space-y-5 sm:space-y-7 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-[12px] bg-gradient-to-br from-accent to-accent flex items-center justify-center shadow-terra">
                 <Clock className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
               </div>
               <div>
-                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Daily Commitment</h2>
-                <p className="text-xs sm:text-sm text-gray-600 mt-0.5">Consistency is key to fluency. Choose a realistic daily goal.</p>
+                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">Daily Commitment</h2>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Consistency is key to fluency. Choose a realistic daily goal.</p>
               </div>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-5">
@@ -190,24 +210,24 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
                   key={commitment.minutes}
                   onClick={() => handleDailyCommitment(commitment.minutes)}
                   style={{ animationDelay: `${index * 50}ms` }}
-                  className={`p-5 sm:p-7 rounded-2xl border-2 font-bold transition-all duration-300 transform hover:scale-[1.04] active:scale-[0.96] animate-in fade-in slide-in-from-bottom-2 ${
+                  className={`p-5 sm:p-7 rounded-[12px] border-2 font-bold transition-all duration-300 transform hover:scale-[1.04] active:scale-[0.96] animate-in fade-in slide-in-from-bottom-2 ${
                     formData.dailyGoalMinutes === commitment.minutes
-                      ? 'border-orange-500 bg-gradient-to-br from-orange-50 via-white to-orange-50 text-orange-600 shadow-xl ring-2 ring-orange-200'
-                      : 'border-gray-200 bg-white hover:border-orange-300 hover:shadow-lg'
+                      ? 'border-accent bg-gradient-to-br from-secondary to-card text-accent shadow-terra ring-2 ring-accent/20'
+                      : 'border-primary/10 bg-card hover:border-accent/30 hover:shadow-terra'
                   }`}
                 >
                   <div className="text-center">
-                    <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-2xl mx-auto mb-3 sm:mb-4 flex items-center justify-center transition-all duration-300 ${
+                    <div className={`w-10 h-10 sm:w-14 sm:h-14 rounded-[12px] mx-auto mb-3 sm:mb-4 flex items-center justify-center transition-all duration-300 ${
                       formData.dailyGoalMinutes === commitment.minutes
-                        ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg scale-105'
-                        : 'bg-gray-100 text-gray-500 group-hover:bg-orange-100 group-hover:text-orange-600'
+                        ? 'bg-gradient-to-br from-accent to-accent text-white shadow-terra scale-105'
+                        : 'bg-primary/10 text-muted-foreground group-hover:bg-accent/10 group-hover:text-accent'
                     }`}>
                       <Clock className="w-5 h-5 sm:w-7 sm:h-7" />
                     </div>
                     <div className="text-lg sm:text-xl font-bold">{commitment.label}</div>
                     {formData.dailyGoalMinutes === commitment.minutes && (
-                      <div className="mt-2 flex items-center justify-center gap-1.5 text-orange-600 animate-in zoom-in duration-300">
-                        <CheckCircle2 className="w-4 h-4 fill-orange-600" />
+                      <div className="mt-2 flex items-center justify-center gap-1.5 text-accent animate-in zoom-in duration-300">
+                        <CheckCircle2 className="w-4 h-4 fill-accent" />
                         <span className="text-xs sm:text-sm font-semibold">Selected</span>
                       </div>
                     )}
@@ -221,14 +241,14 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
           <footer className="flex flex-col-reverse md:flex-row items-center justify-between gap-4 pt-10 sm:pt-16 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-400">
             <button
               onClick={onBack}
-              className="group w-full md:w-auto px-10 py-4 sm:py-5 rounded-2xl border-2 border-gray-300 text-gray-700 text-base sm:text-lg font-bold hover:bg-gray-50 hover:border-gray-400 transition-all duration-300 flex items-center justify-center gap-3 hover:shadow-lg active:scale-[0.95]"
+              className="group w-full md:w-auto px-10 py-4 sm:py-5 rounded-[12px] border-2 border-primary/20 text-foreground text-base sm:text-lg font-bold hover:bg-secondary hover:border-primary/30 transition-all duration-300 flex items-center justify-center gap-3 hover:shadow-terra active:scale-[0.95]"
             >
               <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform duration-300" />
               Back
             </button>
             <button
               onClick={onNext}
-              className="group w-full md:w-auto px-10 sm:px-20 py-4 sm:py-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white text-lg sm:text-xl font-bold shadow-2xl hover:shadow-indigo-500/50 hover:scale-[1.03] transition-all duration-300 flex items-center justify-center gap-4 active:scale-[0.95]"
+              className="group w-full md:w-auto px-10 sm:px-20 py-4 sm:py-6 rounded-[12px] bg-primary text-white text-lg sm:text-xl font-bold shadow-terra hover:shadow-terra hover:scale-[1.03] transition-all duration-300 flex items-center justify-center gap-4 active:scale-[0.95]"
             >
               Next: Personalize
               <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform duration-300" />

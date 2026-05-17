@@ -102,7 +102,7 @@ export default function UserProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/20">
+    <div className="min-h-screen bg-background">
       <UserProfileNavbar 
         currentStep={currentStep}
         totalSteps={3}
@@ -112,17 +112,17 @@ export default function UserProfilePage() {
       {renderStep()}
       {loading && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-300">
-          <div className="bg-white p-10 rounded-3xl shadow-2xl max-w-sm w-full mx-4">
+          <div className="bg-card p-8 sm:p-10 rounded-[12px] shadow-terra border border-primary/10 max-w-sm w-full mx-4">
             <div className="flex flex-col items-center gap-6">
               <div className="relative">
-                <div className="animate-spin rounded-full h-16 w-16 border-4 border-indigo-200 border-t-indigo-600"></div>
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary/20 border-t-primary"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <Brain className="w-8 h-8 text-indigo-600 animate-pulse" />
+                  <Brain className="w-8 h-8 text-primary animate-pulse" />
                 </div>
               </div>
               <div className="text-center space-y-2">
-                <p className="text-xl font-bold text-gray-900">Creating your profile...</p>
-                <p className="text-sm text-gray-600">Personalizing your learning journey</p>
+                <p className="text-xl font-bold text-foreground">Creating your profile...</p>
+                <p className="text-sm text-muted-foreground">Personalizing your learning journey</p>
               </div>
             </div>
           </div>

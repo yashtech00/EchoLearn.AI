@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   PenTool,
@@ -51,6 +51,19 @@ const formatGenre = (g?: string) => {
   );
 };
 
+const DEFAULT_WORD_TARGET = 150;
+
+const countWords = (text: string) => {
+  const trimmed = text.trim();
+  return trimmed ? trimmed.split(/\s+/).length : 0;
+};
+
+const limitWords = (text: string, maxWords: number) => {
+  const words = text.match(/\S+/g) || [];
+  if (words.length <= maxWords) return text;
+  return words.slice(0, maxWords).join(" ");
+};
+
 const SidebarSkeleton = () => (
   <div className="w-full lg:w-[380px] xl:w-[400px] order-1 lg:order-2 bg-[#f4ebd9] flex flex-col min-h-0 lg:h-full border-b lg:border-b-0 lg:border-t-0 lg:border-l border-[#4a7c59]/10 shrink-0 animate-pulse overflow-hidden">
     <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 flex flex-col gap-4 sm:gap-6 scrollbar-thin scrollbar-thumb-[#4a7c59]/30">
@@ -97,7 +110,6 @@ export default function WritingCoachPage() {
   const [analysisStatus, setAnalysisStatus] = useState<
     "idle" | "analyzing" | "completed" | "failed" | "timeout"
   >("idle");
-  const [wordCount, setWordCount] = useState(0);
   const [currentSubmissionId, setCurrentSubmissionId] = useState<string | null>(
     null,
   );
@@ -122,19 +134,46 @@ export default function WritingCoachPage() {
   });
 
   const loadingTopic = newTopicMutation.isPending;
+  const wordTarget = topicData?.wordTarget || DEFAULT_WORD_TARGET;
+  const editorContent = limitWords(content, wordTarget);
+  const wordCount = countWords(editorContent);
+  const isAtWordLimit = wordCount >= wordTarget;
 
-  useEffect(() => {
-    const words = content.trim() ? content.trim().split(/\s+/).length : 0;
-    setWordCount(words);
-  }, [content]);
+  const updateContent = (value: string) => {
+    if (isAtWordLimit && value.length > editorContent.length) {
+      return;
+    }
+    setContent(limitWords(value, wordTarget));
+  };
+
+  const handleBeforeInput = (
+    event: React.FormEvent<HTMLTextAreaElement> & {
+      nativeEvent: InputEvent;
+    },
+  ) => {
+    const textarea = event.currentTarget;
+    const hasSelection = textarea.selectionStart !== textarea.selectionEnd;
+
+    if (
+      isAtWordLimit &&
+      !hasSelection &&
+      event.nativeEvent.inputType.startsWith("insert")
+    ) {
+      event.preventDefault();
+    }
+  };
 
   const handleGetTopic = () => {
     newTopicMutation.mutate();
   };
 
   const handleSubmit = async () => {
-    if (!content.trim()) {
+    if (!editorContent.trim()) {
       setError("Please enter some text to analyze");
+      return;
+    }
+    if (wordCount > wordTarget) {
+      setError(`Please keep your writing within ${wordTarget} words.`);
       return;
     }
 
@@ -145,7 +184,7 @@ export default function WritingCoachPage() {
 
     try {
       const response = await createSubmission({
-        body: content,
+        body: editorContent,
         genre: topicData?.genre || "GENERAL",
         title: topicData?.topic || undefined,
         promptId: topicData?.id || undefined,
@@ -202,7 +241,7 @@ export default function WritingCoachPage() {
 
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
-    const selectedText = content.substring(start, end);
+    const selectedText = editorContent.substring(start, end);
 
     if (!selectedText && type === "rewrite") return;
 
@@ -219,8 +258,8 @@ export default function WritingCoachPage() {
     }
 
     const newContent =
-      content.substring(0, start) + newText + content.substring(end);
-    setContent(newContent);
+      editorContent.substring(0, start) + newText + editorContent.substring(end);
+    updateContent(newContent);
 
     setTimeout(() => {
       textarea.focus();
@@ -247,17 +286,17 @@ export default function WritingCoachPage() {
             <div className="flex items-center gap-1.5 sm:gap-2 font-medium border-l border-[#4a7c59]/20 pl-2 sm:pl-8 min-w-0">
               <Type className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#705c30] shrink-0" />
               <span className="text-[10px] sm:text-sm uppercase tracking-wider font-bold text-[#705c30] truncate">
-                <span className="sm:hidden">{wordCount}/{topicData?.wordTarget || 150}</span>
-                <span className="hidden sm:inline">{wordCount} / {topicData?.wordTarget || 150} Words</span>
+                <span className="sm:hidden">{wordCount}/{wordTarget}</span>
+                <span className="hidden sm:inline">{wordCount} / {wordTarget} Words</span>
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-6 shrink-0">
-            <div className="hidden md:flex items-center gap-2 text-[#4a7c59] font-bold text-[10px] uppercase tracking-widest">
+            {/* <div className="hidden md:flex items-center gap-2 text-[#4a7c59] font-bold text-[10px] uppercase tracking-widest">
               <div className="w-1.5 h-1.5 rounded-full bg-[#4a7c59] animate-pulse" />
               Autosaved
-            </div>
+            </div> */}
 
             <div className="flex items-center text-[#705c30]/60 md:border-l md:border-[#4a7c59]/20 md:pl-4 relative">
               <Settings
@@ -300,28 +339,34 @@ export default function WritingCoachPage() {
         <div className="flex-1 overflow-y-auto p-3 sm:p-8 lg:p-12 scrollbar-hide flex flex-col min-h-0">
           <textarea
             id="editor-textarea"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
+            value={editorContent}
+            onBeforeInput={handleBeforeInput}
+            onChange={(e) => updateContent(e.target.value)}
             placeholder="Begin your intellectual journey here..."
             className="w-full min-h-[180px] sm:min-h-[400px] lg:min-h-[500px] flex-1 text-base sm:text-xl lg:text-2xl text-[#2e3230] placeholder:text-[#a0a5a0] focus:outline-none resize-none bg-transparent"
             style={{ fontFamily: "'Literata', serif", lineHeight: "1.8" }}
           />
+          {isAtWordLimit && (
+            <p className="mt-3 text-xs sm:text-sm font-bold text-[#705c30]">
+              Word limit reached. Delete a few words to continue writing.
+            </p>
+          )}
         </div>
 
         {/* Editor Footer */}
         <div className="h-14 sm:h-24 border-t border-[#4a7c59]/10 flex items-center justify-between gap-2 px-3 sm:px-8 lg:px-12 bg-[#faf6f0]/80 backdrop-blur-md shrink-0">
-          <button
+          {/* <button
             type="button"
             className="flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-6 py-2 sm:py-3 border border-[#4a7c59]/20 rounded-[12px] text-[#4a7c59] font-bold text-xs sm:text-sm hover:bg-[#4a7c59]/5 transition-all bg-[#faf6f0] min-h-[44px] min-w-[44px] sm:min-w-0"
             aria-label="Save draft"
           >
             <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
             <span className="hidden sm:inline">Save Draft</span>
-          </button>
+          </button> */}
 
           <button
             onClick={handleSubmit}
-            disabled={!content.trim() || loading}
+            disabled={!editorContent.trim() || loading}
             className="flex items-center gap-2 sm:gap-3 px-4 sm:px-8 py-2.5 sm:py-4 min-h-[44px] bg-[#4a7c59] hover:bg-[#3d6649] disabled:opacity-50 disabled:cursor-not-allowed rounded-[12px] text-white font-bold text-sm sm:text-[15px] transition-all group touch-manipulation"
             style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
           >

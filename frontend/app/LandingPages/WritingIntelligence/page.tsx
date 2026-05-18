@@ -81,7 +81,7 @@ export default function WritingIntelligencePage() {
               From blank page to actionable insight
             </h2>
             <p className="text-white/75 leading-relaxed mb-8">
-              The MVP is centered on writing because it exposes grammar, vocabulary,
+              This is centered on writing because it exposes grammar, vocabulary,
               structure, and clarity in one high-signal activity.
             </p>
             <Link href="/auth/login">

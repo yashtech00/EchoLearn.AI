@@ -123,7 +123,7 @@ export default function PlatformPage() {
               Built around the learner journey
             </h2>
             <p className="text-muted-foreground text-lg leading-relaxed">
-              The MVP keeps the experience intentionally narrow: assess, practice,
+              This keeps the experience intentionally narrow: assess, practice,
               receive feedback, and improve with visible progress.
             </p>
           </div>

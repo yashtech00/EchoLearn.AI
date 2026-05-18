@@ -7,6 +7,11 @@ import { useState } from "react";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const navItems = [
+    { label: "Platform", href: "/LandingPages/Platform" },
+    { label: "Writing Intelligence", href: "/LandingPages/WritingIntelligence" },
+    { label: "Personalized Learning", href: "/LandingPages/PersonalizedLearning" },
+  ];
 
   return (
     <nav className="w-full backdrop-blur-md fixed top-0 z-50 border-b border-primary/5 bg-background/80 transition-all duration-300">
@@ -20,16 +25,12 @@ export const Navbar = () => {
         </Link>
 
         {/* Center Nav Links - Desktop */}
-        <ul className="hidden md:flex gap-10 text-muted-foreground font-sans font-medium">
-          <li className="hover:text-primary cursor-pointer transition-colors">
-            <Link href="/LandingPages/Program">Programs</Link>
-          </li>
-          <li className="hover:text-primary cursor-pointer transition-colors">
-            <Link href="/LandingPages/Blogs">Blog</Link>
-          </li>
-          <li className="hover:text-primary cursor-pointer transition-colors">
-            <Link href="/LandingPages/AboutUs">About Us</Link>
-          </li>
+        <ul className="hidden md:flex gap-8 text-muted-foreground font-sans font-medium">
+          {navItems.map((item) => (
+            <li key={item.href} className="hover:text-primary cursor-pointer transition-colors">
+              <Link href={item.href}>{item.label}</Link>
+            </li>
+          ))}
         </ul>
 
         {/* Auth Buttons - Desktop */}
@@ -41,7 +42,7 @@ export const Navbar = () => {
           </Link>
           <Link href="/auth/login">
             <Button className="bg-primary hover:bg-primary/90 text-white font-sans font-bold px-6 rounded-[12px] shadow-terra transition-all hover:scale-[1.02]">
-              Join Now
+              Get Started
             </Button>
           </Link>
         </div>
@@ -50,7 +51,7 @@ export const Navbar = () => {
         <div className="flex md:hidden items-center gap-3">
           <Link href="/auth/login" className="sm:hidden">
             <Button size="sm" className="bg-primary text-white font-sans font-bold px-3 py-1.5 text-xs rounded-[10px]">
-              Join
+              Start
             </Button>
           </Link>
           <button
@@ -71,15 +72,11 @@ export const Navbar = () => {
         }`}
       >
         <ul className="flex flex-col gap-4 text-foreground font-sans font-semibold text-lg">
-          <li className="hover:text-primary cursor-pointer transition-colors py-2 border-b border-primary/5">
-            <Link href="/LandingPages/Program" onClick={() => setIsOpen(false)}>Programs</Link>
-          </li>
-          <li className="hover:text-primary cursor-pointer transition-colors py-2 border-b border-primary/5">
-            <Link href="/LandingPages/Blogs" onClick={() => setIsOpen(false)}>Blog</Link>
-          </li>
-          <li className="hover:text-primary cursor-pointer transition-colors py-2 border-b border-primary/5">
-            <Link href="/LandingPages/AboutUs" onClick={() => setIsOpen(false)}>About Us</Link>
-          </li>
+          {navItems.map((item) => (
+            <li key={item.href} className="hover:text-primary cursor-pointer transition-colors py-2 border-b border-primary/5">
+              <Link href={item.href} onClick={() => setIsOpen(false)}>{item.label}</Link>
+            </li>
+          ))}
         </ul>
 
         <div className="flex flex-col gap-3 pt-2">
@@ -90,7 +87,7 @@ export const Navbar = () => {
           </Link>
           <Link href="/auth/login" onClick={() => setIsOpen(false)} className="w-full">
             <Button className="w-full bg-primary hover:bg-primary/90 text-white font-sans font-bold py-5 rounded-[12px] shadow-terra">
-              Join Now
+              Get Started
             </Button>
           </Link>
         </div>

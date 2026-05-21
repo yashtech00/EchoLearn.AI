@@ -1,29 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  PenTool,
   Sparkles,
-  BookOpen,
-  TrendingUp,
-  Lightbulb,
-  Award,
-  Flame,
   AlertCircle,
-  Timer,
-  Type,
-  CloudCheck,
-  Settings,
-  Maximize2,
-  Bold,
-  Italic,
-  List,
   ChevronRight,
-  ChevronDown,
-  Save,
-  CheckCircle2,
-  Clock,
   X,
 } from "lucide-react";
 import {
@@ -32,24 +14,14 @@ import {
   getNewTopic,
   getSubmissionStatus,
 } from "@/app/api/writing/writing_api";
+import { getProfileMe } from "@/app/api/user_profile/user_profile";
 import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { FormattedAiFeedback } from "@/components/WritingCoach/FormattedAiFeedback";
-
-const formatGenre = (g?: string) => {
-  if (!g) return "";
-  const mappings: Record<string, string> = {
-    GENERAL: "General",
-    WORK_EMAIL: "Work Email",
-    SHORT_ESSAY: "Short Essay",
-    DIARY: "Diary",
-    ACADEMIC_PARAGRAPH: "Academic Paragraph",
-  };
-  return (
-    mappings[g] || g.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())
-  );
-};
+import MissionPanel from "@/components/WritingCoach/MissionPanel";
+import ExampleStarter from "@/components/WritingCoach/ExampleStarter";
+import ProgressJourney from "@/components/WritingCoach/ProgressJourney";
 
 const DEFAULT_WORD_TARGET = 150;
 
@@ -64,44 +36,6 @@ const limitWords = (text: string, maxWords: number) => {
   return words.slice(0, maxWords).join(" ");
 };
 
-const SidebarSkeleton = () => (
-  <div className="w-full lg:w-[380px] xl:w-[400px] order-1 lg:order-2 bg-[#f4ebd9] flex flex-col min-h-0 lg:h-full border-b lg:border-b-0 lg:border-t-0 lg:border-l border-[#4a7c59]/10 shrink-0 animate-pulse overflow-hidden">
-    <div className="flex-1 min-h-0 overflow-y-auto p-4 sm:p-6 flex flex-col gap-4 sm:gap-6 scrollbar-thin scrollbar-thumb-[#4a7c59]/30">
-    {/* Header */}
-    <div className="flex justify-between items-center gap-2 shrink-0">
-      <div className="w-28 h-6 bg-[#4a7c59]/10 rounded-[12px]" />
-      <div className="w-24 h-8 bg-[#faf6f0] rounded-[12px] border border-[#4a7c59]/10 animate-pulse" />
-    </div>
-
-    {/* Title & Description */}
-    <div className="space-y-3 flex-1 overflow-hidden flex flex-col justify-center">
-      <div className="h-7 w-3/4 bg-[#2e3230]/10 rounded-md" />
-      <div className="h-7 w-1/2 bg-[#2e3230]/10 rounded-md" />
-      <div className="space-y-2 mt-4">
-        <div className="h-4 w-full bg-[#2e3230]/10 rounded-md" />
-        <div className="h-4 w-5/6 bg-[#2e3230]/10 rounded-md" />
-        <div className="h-4 w-2/3 bg-[#2e3230]/10 rounded-md" />
-      </div>
-    </div>
-
-    {/* Level & Genre Cards */}
-    <div className="grid grid-cols-2 gap-4 shrink-0">
-      <div className="bg-[#faf6f0] rounded-[12px] p-4 h-16 border border-[#4a7c59]/10" />
-      <div className="bg-[#faf6f0] rounded-[12px] p-4 h-16 border border-[#4a7c59]/10" />
-    </div>
-
-    {/* Tips */}
-    <div className="space-y-3 shrink-0">
-      <div className="h-6 w-1/3 bg-[#2e3230]/10 rounded-md" />
-      <div className="space-y-3">
-        <div className="bg-[#faf6f0] rounded-[12px] h-20 border border-[#4a7c59]/10" />
-        <div className="bg-[#faf6f0] rounded-[12px] h-20 border border-[#4a7c59]/10" />
-      </div>
-    </div>
-    </div>
-  </div>
-);
-
 export default function WritingCoachPage() {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
@@ -110,26 +44,38 @@ export default function WritingCoachPage() {
   const [analysisStatus, setAnalysisStatus] = useState<
     "idle" | "analyzing" | "completed" | "failed" | "timeout"
   >("idle");
-  const [currentSubmissionId, setCurrentSubmissionId] = useState<string | null>(
-    null,
-  );
-  const [showToolbar, setShowToolbar] = useState(false);
-  const [promptExpanded, setPromptExpanded] = useState(false);
+  const [currentSubmissionId, setCurrentSubmissionId] = useState<string | null>(null);
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  // Fetch the active unexpired topic, persisted via React Query cache
+  const { data: profileData, isLoading: isProfileLoading } = useQuery({
+    queryKey: ["profile-me"],
+    queryFn: getProfileMe,
+    staleTime: 60_000,
+  });
+
+  const hasProfile = Boolean(profileData?.profile);
+
+  useEffect(() => {
+    if (!isProfileLoading && !hasProfile) {
+      router.replace(
+        `/UserProfile?next=${encodeURIComponent("/Dashboard/WritingCoach/practice")}`,
+      );
+    }
+  }, [hasProfile, isProfileLoading, router]);
+
   const { data: topicData, isLoading: isQueryLoading } = useQuery({
     queryKey: ["writing-topic"],
     queryFn: getCurrentTopic,
     staleTime: Infinity,
+    enabled: hasProfile,
   });
 
-  // Mutation to generate a new AI topic, smoothly resetting the cache
   const newTopicMutation = useMutation({
     mutationFn: getNewTopic,
     onSuccess: (newData) => {
       queryClient.setQueryData(["writing-topic"], newData);
+      setContent(""); // Clear editor on new topic
     },
   });
 
@@ -138,6 +84,7 @@ export default function WritingCoachPage() {
   const editorContent = limitWords(content, wordTarget);
   const wordCount = countWords(editorContent);
   const isAtWordLimit = wordCount >= wordTarget;
+  const isEmpty = wordCount === 0;
 
   const updateContent = (value: string) => {
     if (isAtWordLimit && value.length > editorContent.length) {
@@ -167,11 +114,29 @@ export default function WritingCoachPage() {
     newTopicMutation.mutate();
   };
 
+  const handleUseStarter = (starter: string) => {
+    setContent(starter + " ");
+    // Focus textarea
+    setTimeout(() => {
+      const textarea = document.getElementById("editor-textarea") as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.focus();
+        textarea.setSelectionRange(starter.length + 1, starter.length + 1);
+      }
+    }, 100);
+  };
+
   const handleSubmit = async () => {
     if (!editorContent.trim()) {
       setError("Please enter some text to analyze");
       return;
     }
+    
+    if (wordCount < 50) {
+      setError("Write a bit more (at least 50 words) for better feedback.");
+      return;
+    }
+
     if (wordCount > wordTarget) {
       setError(`Please keep your writing within ${wordTarget} words.`);
       return;
@@ -233,499 +198,226 @@ export default function WritingCoachPage() {
     }
   };
 
-  const handleFormat = (type: "bold" | "italic" | "list" | "rewrite") => {
-    const textarea = document.getElementById(
-      "editor-textarea",
-    ) as HTMLTextAreaElement;
-    if (!textarea) return;
-
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = editorContent.substring(start, end);
-
-    if (!selectedText && type === "rewrite") return;
-
-    let newText = "";
-
-    if (type === "bold") {
-      newText = `**${selectedText}**`;
-    } else if (type === "italic") {
-      newText = `*${selectedText}*`;
-    } else if (type === "list") {
-      newText = `\n- ${selectedText}`;
-    } else if (type === "rewrite") {
-      newText = `[Rewrite: ${selectedText}]`;
-    }
-
-    const newContent =
-      editorContent.substring(0, start) + newText + editorContent.substring(end);
-    updateContent(newContent);
-
-    setTimeout(() => {
-      textarea.focus();
-      const offset =
-        type === "list" ? 3 : type === "bold" ? 2 : type === "italic" ? 1 : 10;
-      textarea.setSelectionRange(start + offset, end + offset);
-    }, 0);
-  };
+  if (isProfileLoading || !hasProfile) {
+    return (
+      <div className="min-h-[calc(100dvh-7.5rem)] bg-[#faf6f0] rounded-xl sm:rounded-2xl flex items-center justify-center p-6">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="w-12 h-12 rounded-full border-4 border-[#4a7c59]/20 border-t-[#4a7c59] animate-spin" />
+          <p className="text-sm font-medium text-[#2e3230]/70">
+            Preparing your writing practice...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
-      className="flex flex-col lg:flex-row min-h-[calc(100dvh-7.5rem)] max-h-none lg:max-h-[calc(100dvh-7.5rem)] lg:h-[calc(100dvh-7.5rem)] bg-[#faf6f0] lg:overflow-hidden text-[#2e3230] rounded-xl sm:rounded-2xl -mx-1 sm:mx-0"
+      className="flex flex-col lg:flex-row min-h-[calc(100dvh-7.5rem)] lg:h-[calc(100dvh-7.5rem)] bg-[#faf6f0] overflow-hidden text-[#2e3230] rounded-xl sm:rounded-2xl -mx-1 sm:mx-0"
       style={{ fontFamily: "'Nunito Sans', sans-serif" }}
     >
-      {/* Main Content - Editor */}
-      <div className="flex-1 flex flex-col min-h-[min(420px,55dvh)] lg:min-h-0 lg:h-full bg-[#faf6f0] relative order-2 lg:order-1 min-w-0">
-        {/* Editor Header */}
-        <div className="h-11 sm:h-16 border-b border-[#4a7c59]/10 flex items-center justify-between gap-2 px-3 sm:px-8 bg-[#faf6f0]/80 backdrop-blur-md sticky top-0 z-10 shrink-0">
-          <div className="flex items-center gap-2 sm:gap-8 min-w-0">
-            <div className="flex items-center gap-1.5 sm:gap-2 font-medium">
-              <Timer className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#4a7c59]" />
-              <span className="text-xs sm:text-sm tabular-nums text-[#4a7c59]">25:00</span>
-            </div>
-            <div className="flex items-center gap-1.5 sm:gap-2 font-medium border-l border-[#4a7c59]/20 pl-2 sm:pl-8 min-w-0">
-              <Type className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#705c30] shrink-0" />
-              <span className="text-[10px] sm:text-sm uppercase tracking-wider font-bold text-[#705c30] truncate">
-                <span className="sm:hidden">{wordCount}/{wordTarget}</span>
-                <span className="hidden sm:inline">{wordCount} / {wordTarget} Words</span>
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 sm:gap-6 shrink-0">
-            {/* <div className="hidden md:flex items-center gap-2 text-[#4a7c59] font-bold text-[10px] uppercase tracking-widest">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#4a7c59] animate-pulse" />
-              Autosaved
-            </div> */}
-
-            <div className="flex items-center text-[#705c30]/60 md:border-l md:border-[#4a7c59]/20 md:pl-4 relative">
-              <Settings
-                className={`w-5 h-5 cursor-pointer transition-colors ${showToolbar ? "text-[#4a7c59] rotate-45" : "hover:text-[#4a7c59]"}`}
-                onClick={() => setShowToolbar(!showToolbar)}
-              />
-
-              {/* Formatting Toolbar Tooltip */}
-              {showToolbar && (
-                <div className="absolute top-full right-0 mt-3 flex items-center gap-1 bg-[#faf6f0]/95 backdrop-blur-md border border-[#4a7c59]/10 rounded-[12px] p-1.5 animate-in fade-in zoom-in-95 duration-200 z-50 origin-top-right shadow-xl">
-                  <button
-                    onClick={() => handleFormat("bold")}
-                    className="p-2 hover:bg-[#4a7c59]/10 rounded-[8px] transition-colors text-[#2e3230]/70 hover:text-[#4a7c59]"
-                    title="Bold"
-                  >
-                    <Bold className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleFormat("italic")}
-                    className="p-2 hover:bg-[#4a7c59]/10 rounded-[8px] transition-colors text-[#2e3230]/70 hover:text-[#4a7c59]"
-                    title="Italic"
-                  >
-                    <Italic className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleFormat("list")}
-                    className="p-2 hover:bg-[#4a7c59]/10 rounded-[8px] transition-colors text-[#2e3230]/70 hover:text-[#4a7c59]"
-                    title="List"
-                  >
-                    <List className="w-4 h-4" />
-                  </button>
-                  <div className="w-px h-5 bg-[#4a7c59]/20 mx-1" />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Editor Body */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-8 lg:p-12 scrollbar-hide flex flex-col min-h-0">
-          <textarea
-            id="editor-textarea"
-            value={editorContent}
-            onBeforeInput={handleBeforeInput}
-            onChange={(e) => updateContent(e.target.value)}
-            placeholder="Begin your intellectual journey here..."
-            className="w-full min-h-[180px] sm:min-h-[400px] lg:min-h-[500px] flex-1 text-base sm:text-xl lg:text-2xl text-[#2e3230] placeholder:text-[#a0a5a0] focus:outline-none resize-none bg-transparent"
-            style={{ fontFamily: "'Literata', serif", lineHeight: "1.8" }}
-          />
-          {isAtWordLimit && (
-            <p className="mt-3 text-xs sm:text-sm font-bold text-[#705c30]">
-              Word limit reached. Delete a few words to continue writing.
-            </p>
-          )}
-        </div>
-
-        {/* Editor Footer */}
-        <div className="h-14 sm:h-24 border-t border-[#4a7c59]/10 flex items-center justify-between gap-2 px-3 sm:px-8 lg:px-12 bg-[#faf6f0]/80 backdrop-blur-md shrink-0">
-          {/* <button
-            type="button"
-            className="flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-6 py-2 sm:py-3 border border-[#4a7c59]/20 rounded-[12px] text-[#4a7c59] font-bold text-xs sm:text-sm hover:bg-[#4a7c59]/5 transition-all bg-[#faf6f0] min-h-[44px] min-w-[44px] sm:min-w-0"
-            aria-label="Save draft"
-          >
-            <Save className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            <span className="hidden sm:inline">Save Draft</span>
-          </button> */}
-
-          <button
-            onClick={handleSubmit}
-            disabled={!editorContent.trim() || loading}
-            className="flex items-center gap-2 sm:gap-3 px-4 sm:px-8 py-2.5 sm:py-4 min-h-[44px] bg-[#4a7c59] hover:bg-[#3d6649] disabled:opacity-50 disabled:cursor-not-allowed rounded-[12px] text-white font-bold text-sm sm:text-[15px] transition-all group touch-manipulation"
-            style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
-          >
-            {loading ? (
-              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
-            ) : (
-              <>
-                <span className="hidden sm:inline">Submit session</span>
-                <span className="sm:hidden">Submit</span>
-                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-              </>
-            )}
-          </button>
-        </div>
-
-        {/* Overlay Results / Error */}
-        {(result || error || analysisStatus === "analyzing") && (
-          <div className="absolute inset-0 bg-[#faf6f0]/80 backdrop-blur-md z-20 flex items-end sm:items-center justify-center p-3 sm:p-8 lg:p-12 overflow-y-auto">
-            <div
-              className="max-w-3xl w-full max-h-[92dvh] overflow-y-auto bg-[#faf6f0] rounded-t-2xl sm:rounded-[12px] border border-[#4a7c59]/10 p-5 sm:p-8 lg:p-10 relative"
-              style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
-            >
-              
-
-              {analysisStatus === "analyzing" ? (
-                <div className="py-8 sm:py-12 text-center space-y-4 sm:space-y-6">
-                  <div className="relative w-24 h-24 mx-auto">
-                    <div className="absolute inset-0 border-4 border-[#4a7c59]/20 rounded-full" />
-                    <div className="absolute inset-0 border-4 border-[#4a7c59] rounded-full border-t-transparent animate-spin" />
-                  </div>
-                  <div>
-                    <h3
-                      className="text-2xl font-bold text-[#2e3230]"
-                      style={{ fontFamily: "'Literata', serif" }}
-                    >
-                      Deep AI Analysis
-                    </h3>
-                    <p className="text-[#4a7c59]/80 mt-2 font-medium italic">
-                      "Perfection is attained not when there is nothing more to
-                      add, but when there is nothing left to take away."
-                    </p>
-                  </div>
-                </div>
-              ) : error ? (
-                <div className="text-center py-8 space-y-6">
-                  <div className="w-16 h-16 bg-[#705c30]/10 text-[#705c30] rounded-full flex items-center justify-center mx-auto">
-                    <AlertCircle className="w-8 h-8" />
-                  </div>
-                  <div>
-                    <h3
-                      className="text-xl font-bold text-[#2e3230]"
-                      style={{ fontFamily: "'Literata', serif" }}
-                    >
-                      Something went wrong
-                    </h3>
-                    <p className="text-gray-500 mt-2">{error}</p>
-                  </div>
-                  <Button
-                    onClick={() => setError(null)}
-                    variant="outline"
-                    className="rounded-[12px] px-8 border-[#4a7c59] text-[#4a7c59] bg-[#faf6f0]"
-                  >
-                    Dismiss
-                  </Button>
-                </div>
-              ) : (
-                result && (
-                  <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    {/* Result Header */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div>
-                        <h2
-                          className="text-xl sm:text-3xl font-bold text-[#2e3230]"
-                          style={{ fontFamily: "'Literata', serif" }}
-                        >
-                          Analysis Complete
-                        </h2>
-                        <p className="text-[#2e3230]/70 font-medium">
-                          Session feedback and performance summary
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="text-right">
-                          <p className="text-xs font-black text-[#705c30] uppercase tracking-widest">
-                            Writing Score
-                          </p>
-                          <p className="text-4xl font-black text-[#4a7c59]">
-                            {result.analysis?.score || 75}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Feedback Card */}
-                      <div className="bg-[#4a7c59]/5 rounded-[12px] p-6 border border-[#4a7c59]/10">
-                        <h4 className="flex items-center gap-2 font-bold text-[#4a7c59] mb-4">
-                          <Sparkles className="w-5 h-5 text-[#705c30]" />
-                          AI Feedback
-                        </h4>
-                        <FormattedAiFeedback content={result.analysis?.feedback} />
-                      </div>
-
-                      {/* Stats Card */}
-                      <div
-                        className="bg-[#faf6f0] rounded-[12px] p-6 border border-[#4a7c59]/10"
-                        style={{
-                          boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)",
-                        }}
-                      >
-                        <h4 className="flex items-center gap-2 font-bold text-[#2e3230] mb-4">
-                          <TrendingUp className="w-5 h-5 text-[#4a7c59]" />
-                          Quick Stats
-                        </h4>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="bg-white/50 rounded-[12px] p-4">
-                            <p className="text-2xl font-black text-[#2e3230]">
-                              {result.analysis?.summary?.mistakeCount}
-                            </p>
-                            <p className="text-[10px] font-bold text-[#705c30] uppercase tracking-widest">
-                              Mistakes
-                            </p>
-                          </div>
-                          <div className="bg-white/50 rounded-[12px] p-4">
-                            <p className="text-2xl font-black text-[#2e3230]">
-                              {result.analysis?.summary?.errorDensityPer100Words?.toFixed(
-                                1,
-                              )}
-                            </p>
-                            <p className="text-[10px] font-bold text-[#705c30] uppercase tracking-widest">
-                              Density
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Mistakes List */}
-                    {result.analysis?.mistakes &&
-                      result.analysis.mistakes.length > 0 && (
-                        <div className="space-y-4">
-                          <h4 className="font-bold text-[#2e3230] flex items-center gap-2">
-                            <AlertCircle className="w-5 h-5 text-[#705c30]" />
-                            Identified Opportunities
-                          </h4>
-                          <div className="grid grid-cols-1 gap-3 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin">
-                            {result.analysis.mistakes.map(
-                              (mistake: any, idx: number) => (
-                                <div
-                                  key={idx}
-                                  className="bg-white/50 border border-[#4a7c59]/10 rounded-[12px] p-5 hover:border-[#4a7c59]/30 transition-colors group"
-                                >
-                                  <div className="flex justify-between items-start mb-2">
-                                    <span className="text-[10px] font-black bg-[#4a7c59]/10 text-[#4a7c59] px-2 py-0.5 rounded-md uppercase tracking-widest border border-[#4a7c59]/20">
-                                      {mistake.pillar?.replace(/_/g, " ")}
-                                    </span>
-                                    <span
-                                      className={`text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest ${
-                                        mistake.severity === "HIGH"
-                                          ? "bg-[#705c30]/10 text-[#705c30] border border-[#705c30]/20"
-                                          : mistake.severity === "MEDIUM"
-                                            ? "bg-amber-100/50 text-amber-700 border border-amber-200"
-                                            : "bg-[#4a7c59]/10 text-[#4a7c59] border border-[#4a7c59]/20"
-                                      }`}
-                                    >
-                                      {mistake.severity}
-                                    </span>
-                                  </div>
-                                  <p className="text-sm text-[#2e3230] font-medium mb-1">
-                                    <span className="text-[#705c30] line-through mr-2 opacity-70">
-                                      {mistake.surfaceText}
-                                    </span>
-                                    <span className="text-[#4a7c59] font-bold">
-                                      → {mistake.suggestion}
-                                    </span>
-                                  </p>
-                                  <p className="text-xs text-[#2e3230]/70 italic leading-relaxed transition-colors">
-                                    {mistake.message}
-                                  </p>
-                                </div>
-                              ),
-                            )}
-                          </div>
-                        </div>
-                      )}
-
-                    <div className="pt-4">
-                      <Button
-                        onClick={() => {
-                          if (currentSubmissionId) {
-                            router.push(
-                              `/Dashboard/WritingCoach/Report?submissionId=${currentSubmissionId}`,
-                            );
-                          }
-                        }}
-                        className="w-full py-6 rounded-[12px] bg-[#4a7c59] hover:bg-[#3d6649] text-white font-bold text-lg transition-all"
-                        style={{
-                          boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)",
-                        }}
-                      >
-                        View Detailed Report
-                        <ChevronRight className="w-5 h-5 ml-2" />
-                      </Button>
-                    </div>
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Sidebar - Writing Context */}
       <AnimatePresence mode="wait">
-        {isQueryLoading ? (
+        {isEmpty && !isQueryLoading ? (
+          // EMPTY STATE: Mission-First Layout (Single Page, No Scroll)
           <motion.div
-            key="skeleton"
+            key="empty-state"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.3 }}
+            className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8"
           >
-            <SidebarSkeleton />
-          </motion.div>
-        ) : (
-          <motion.div
-            key={topicData?.id || "topic"}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="w-full lg:w-[380px] xl:w-[400px] order-1 lg:order-2 bg-[#f4ebd9] flex flex-col min-h-0 lg:h-full overflow-hidden border-b lg:border-b-0 lg:border-t-0 lg:border-l border-[#4a7c59]/10 shrink-0"
-          >
-            <button
-              type="button"
-              onClick={() => setPromptExpanded((v) => !v)}
-              className="lg:hidden w-full flex items-center justify-between gap-3 px-4 py-3.5 text-left border-b border-[#4a7c59]/10 active:bg-[#ebe2d0] transition-colors"
-              aria-expanded={promptExpanded}
-            >
-              <span className="flex items-center gap-2 min-w-0 flex-1">
-                <BookOpen className="w-4 h-4 text-[#4a7c59] shrink-0" />
-                <span className="text-sm font-bold text-[#2e3230] truncate" style={{ fontFamily: "'Literata', serif" }}>
-                  {topicData?.topic || "Writing prompt"}
-                </span>
-              </span>
-              <ChevronDown className={`w-5 h-5 text-[#4a7c59] shrink-0 transition-transform duration-200 ${promptExpanded ? "rotate-180" : ""}`} />
-            </button>
-
-            <div
-              className={`grid transition-[grid-template-rows] duration-300 ease-in-out lg:flex-1 lg:min-h-0 ${
-                promptExpanded ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-              } lg:grid-rows-[1fr]`}
-            >
-            <div className="min-h-0 overflow-hidden lg:flex lg:flex-col lg:flex-1 lg:min-h-0">
-            <div className="p-4 sm:p-6 flex flex-col gap-4 sm:gap-6 max-h-[min(65dvh,32rem)] lg:max-h-none lg:flex-1 lg:min-h-0 overflow-y-auto overscroll-contain scrollbar-thin scrollbar-thumb-[#4a7c59]/30">
-            {/* Title & Description — shown first when expanded on mobile */}
-            <div className="space-y-2 sm:space-y-3 shrink-0 pb-1 border-b border-[#4a7c59]/10 lg:border-b-0 lg:pb-0">
-              <h1
-                className="text-base sm:text-2xl font-bold text-[#2e3230] leading-snug sm:leading-tight tracking-tight"
-                style={{ fontFamily: "'Literata', serif" }}
-              >
-                {topicData?.topic}
-              </h1>
-              <p className="text-[#2e3230]/80 text-sm sm:text-[14px] leading-relaxed font-medium">
-                {topicData?.description || "In this session, explore the intersection of language, logic, and style."}
-              </p>
-            </div>
-
-            {/* Genre & Action Header */}
-            <div className="flex items-center justify-between gap-2 shrink-0 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[12px] bg-[#4a7c59]/10 text-[#4a7c59] text-[10px] font-bold uppercase tracking-wider border border-[#4a7c59]/20">
-                <BookOpen className="w-3 h-3" />
-                {formatGenre(topicData?.genre) || "Creative Writing"}
-              </span>
-
-              <button
-                type="button"
-                onClick={handleGetTopic}
-                disabled={loadingTopic}
-                className="px-3 sm:px-4 py-2 rounded-[12px] bg-[#faf6f0] border border-[#4a7c59]/20 text-[#4a7c59] text-xs font-bold flex items-center gap-1.5 sm:gap-2 hover:bg-[#4a7c59]/5 transition-all duration-300 shadow-terra min-h-[40px] touch-manipulation"
-              >
-                {loadingTopic ? (
-                  <Sparkles className="w-3.5 h-3.5 animate-spin text-[#705c30]" />
-                ) : (
-                  <Lightbulb className="w-3.5 h-3.5 text-[#705c30]" />
-                )}
-                New Prompt
-              </button>
-            </div>
-
-
-            {/* Level & Genre Cards */}
-            <div className="grid grid-cols-2 gap-4 shrink-0">
-              <div
-                className="bg-[#faf6f0] rounded-[12px] p-3 border border-[#4a7c59]/10"
-                style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
-              >
-                <p className="text-[9px] font-bold text-[#705c30] uppercase tracking-widest mb-0.5">
-                  Target Level
-                </p>
-                <p className="text-[#4a7c59] font-bold text-[13px]">
-                  {topicData?.targetLevel || "B2 Upper Intermediate"}
-                </p>
+            <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 h-full lg:max-h-[calc(100dvh-10rem)]">
+              {/* Left Column: Mission Panel */}
+              <div className="flex flex-col gap-4 min-h-0">
+                <div className="bg-[#f4ebd9] rounded-2xl p-4 sm:p-6 border border-[#4a7c59]/20 shadow-lg flex-1 overflow-y-auto scrollbar-thin">
+                  {topicData && (
+                    <MissionPanel
+                      topic={topicData.topic}
+                      description={topicData.description}
+                      genre={topicData.genre}
+                      targetLevel={topicData.targetLevel}
+                      writingTips={topicData.writingTips}
+                      onNewTopic={handleGetTopic}
+                      loadingTopic={loadingTopic}
+                    />
+                  )}
+                </div>
               </div>
-              <div
-                className="bg-[#faf6f0] rounded-[12px] p-3 border border-[#4a7c59]/10"
-                style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
-              >
-                <p className="text-[9px] font-bold text-[#705c30] uppercase tracking-widest mb-0.5">
-                  Genre
-                </p>
-                <p className="text-[#4a7c59] font-bold text-[13px]">
-                  {formatGenre(topicData?.genre)}
-                </p>
-              </div>
-            </div>
 
-            {/* Writing Tips */}
-            <div className="space-y-3 shrink-0">
-              <h3
-                className="text-lg font-bold text-[#2e3230]"
-                style={{ fontFamily: "'Literata', serif" }}
-              >
-                Writing Tips
-              </h3>
-              <div className="space-y-3">
-                {topicData?.writingTips && Array.isArray(topicData.writingTips) ? (
-                  topicData.writingTips.map((tip: any, idx: number) => (
-                    <div
-                      key={idx}
-                      className="bg-[#faf6f0] rounded-[12px] p-4 border-l-4 border-[#4a7c59] border-y border-r border-[#4a7c59]/10"
-                      style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
-                    >
-                      <h4 className="font-bold text-[#2e3230] text-sm mb-1">
-                        {tip.title}
-                      </h4>
-                      <p className="text-[#2e3230]/70 text-xs leading-relaxed">
-                        {tip.description}
-                      </p>
-                    </div>
-                  ))
-                ) : (
-                  <div
-                    className="bg-[#faf6f0] rounded-[12px] p-4 border-l-4 border-[#4a7c59] border-y border-r border-[#4a7c59]/10"
-                    style={{ boxShadow: "0 4px 20px rgba(46, 50, 48, 0.06)" }}
-                  >
-                    <h4 className="font-bold text-[#2e3230] text-sm mb-1">
-                      Active Voice Priority
-                    </h4>
-                    <p className="text-[#2e3230]/70 text-xs leading-relaxed">
-                      Avoid passive structures to make your technical arguments more direct and impactful.
-                    </p>
+              {/* Right Column: Editor + Example Starters */}
+              <div className="flex flex-col gap-4 min-h-0">
+                {/* Example Starters - Compact */}
+                {topicData?.exampleStarters && topicData.exampleStarters.length > 0 && (
+                  <div className="bg-white rounded-xl p-4 border border-[#4a7c59]/20 shadow-sm">
+                    <ExampleStarter
+                      examples={topicData.exampleStarters}
+                      onUseStarter={handleUseStarter}
+                    />
                   </div>
                 )}
+
+                {/* Editor */}
+                <div className="bg-white rounded-2xl p-4 sm:p-6 border-2 border-dashed border-[#4a7c59]/30 hover:border-[#4a7c59]/50 transition-all flex-1 flex flex-col min-h-0">
+                  <textarea
+                    id="editor-textarea"
+                    value={editorContent}
+                    onBeforeInput={handleBeforeInput}
+                    onChange={(e) => updateContent(e.target.value)}
+                    placeholder="Click here to start writing..."
+                    className="w-full flex-1 min-h-[220px] sm:min-h-[280px] text-base sm:text-lg text-[#2e3230] placeholder:text-[#a0a5a0] focus:outline-none resize-none bg-transparent"
+                    style={{ fontFamily: "'Literata', serif", lineHeight: "1.8" }}
+                  />
+                  <div className="mt-3 pt-3 border-t border-[#4a7c59]/10 flex items-center justify-between">
+                    <span className="text-xs sm:text-sm text-[#2e3230]/60">
+                      {wordCount} / {wordTarget} words
+                    </span>
+                    <span className="text-xs text-[#2e3230]/40">
+                      Start writing to unlock AI feedback
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
+          </motion.div>
+        ) : (
+          // ACTIVE STATE: Editor-First Layout (Single Page, No Scroll)
+          <motion.div
+            key="active-state"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex-1 flex flex-col lg:flex-row w-full h-full overflow-hidden"
+          >
+            {/* Main Editor */}
+            <div className="flex-1 flex flex-col h-full bg-[#faf6f0] relative min-w-0 overflow-hidden">
+              {/* Editor Header with Progress Journey */}
+              <div className="h-14 sm:h-16 border-b border-[#4a7c59]/10 flex items-center justify-between gap-4 px-4 sm:px-6 bg-[#faf6f0]/80 backdrop-blur-md shrink-0">
+                <ProgressJourney wordCount={wordCount} wordTarget={wordTarget} />
+              </div>
+
+              {/* Editor Body - Fixed Height, No Scroll */}
+              <div className="flex-1 p-4 sm:p-6 lg:p-8 flex flex-col min-h-0 overflow-hidden">
+                <textarea
+                  id="editor-textarea"
+                  value={editorContent}
+                  onBeforeInput={handleBeforeInput}
+                  onChange={(e) => updateContent(e.target.value)}
+                  placeholder="Continue your writing..."
+                  className="w-full flex-1 min-h-[220px] sm:min-h-[320px] text-base sm:text-lg lg:text-xl text-[#2e3230] placeholder:text-[#a0a5a0] focus:outline-none resize-none bg-transparent"
+                  style={{ fontFamily: "'Literata', serif", lineHeight: "1.8" }}
+                  autoFocus
+                />
+                {isAtWordLimit && (
+                  <p className="mt-2 text-xs sm:text-sm font-bold text-[#705c30]">
+                    Word limit reached. Delete a few words to continue writing.
+                  </p>
+                )}
+              </div>
+
+              {/* Editor Footer with Reward CTA */}
+              <div className="h-16 sm:h-20 border-t border-[#4a7c59]/10 flex items-center justify-center gap-4 px-4 sm:px-6 bg-[#faf6f0]/80 backdrop-blur-md shrink-0">
+                <button
+                  onClick={handleSubmit}
+                  disabled={!editorContent.trim() || loading || wordCount < 50}
+                  className="flex items-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-4 bg-gradient-to-r from-[#4a7c59] to-[#3d6649] hover:from-[#3d6649] hover:to-[#2f5038] disabled:opacity-50 disabled:cursor-not-allowed rounded-xl text-white font-bold text-sm sm:text-base transition-all group shadow-lg hover:shadow-xl active:scale-95"
+                >
+                  {loading ? (
+                    <>
+                      <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                      <span>Analyzing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span>Get AI Feedback</span>
+                      <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Overlay Results / Error */}
+              {(result || error || analysisStatus === "analyzing") && (
+                <div className="absolute inset-0 bg-[#faf6f0]/95 backdrop-blur-md z-20 flex items-center justify-center p-4 overflow-hidden">
+                  <div className="max-w-full sm:max-w-2xl w-full max-h-[90%] overflow-y-auto bg-white rounded-2xl border border-[#4a7c59]/20 p-6 sm:p-8 relative shadow-2xl">
+                    <button
+                      onClick={() => {
+                        setError(null);
+                        setResult(null);
+                        setAnalysisStatus("idle");
+                      }}
+                      className="absolute top-4 right-4 p-2 hover:bg-[#4a7c59]/10 rounded-full transition-colors"
+                    >
+                      <X className="w-5 h-5 text-[#2e3230]/60" />
+                    </button>
+
+                    {analysisStatus === "analyzing" ? (
+                      <div className="py-8 text-center space-y-4">
+                        <div className="relative w-20 h-20 mx-auto">
+                          <div className="absolute inset-0 border-4 border-[#4a7c59]/20 rounded-full" />
+                          <div className="absolute inset-0 border-4 border-[#4a7c59] rounded-full border-t-transparent animate-spin" />
+                        </div>
+                        <div>
+                          <h3
+                            className="text-xl font-bold text-[#2e3230]"
+                            style={{ fontFamily: "'Literata', serif" }}
+                          >
+                            Deep AI Analysis
+                          </h3>
+                          <p className="text-[#4a7c59]/80 mt-2 text-sm font-medium italic">
+                            "Perfection is attained not when there is nothing more to add, but when there is nothing left to take away."
+                          </p>
+                        </div>
+                      </div>
+                    ) : error ? (
+                      <div className="text-center py-6 space-y-4">
+                        <div className="w-14 h-14 bg-[#705c30]/10 text-[#705c30] rounded-full flex items-center justify-center mx-auto">
+                          <AlertCircle className="w-7 h-7" />
+                        </div>
+                        <div>
+                          <h3
+                            className="text-lg font-bold text-[#2e3230]"
+                            style={{ fontFamily: "'Literata', serif" }}
+                          >
+                            Something went wrong
+                          </h3>
+                          <p className="text-gray-500 mt-2 text-sm">{error}</p>
+                        </div>
+                        <Button
+                          onClick={() => setError(null)}
+                          variant="outline"
+                          className="rounded-xl px-6 border-[#4a7c59] text-[#4a7c59] bg-white"
+                        >
+                          Dismiss
+                        </Button>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
+              )}
             </div>
-            </div>
-            </div>
+
+            {/* Sidebar Mission Panel - Compact, No Scroll */}
+            {!isEmpty && topicData && (
+              <motion.div
+                initial={{ x: 20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className="w-full lg:w-[340px] xl:w-[380px] bg-[#f4ebd9] border-t lg:border-t-0 lg:border-l border-[#4a7c59]/10 shrink-0 overflow-y-auto scrollbar-thin"
+              >
+                <MissionPanel
+                  topic={topicData.topic}
+                  description={topicData.description}
+                  genre={topicData.genre}
+                  targetLevel={topicData.targetLevel}
+                  writingTips={topicData.writingTips}
+                  onNewTopic={handleGetTopic}
+                  loadingTopic={loadingTopic}
+                />
+              </motion.div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

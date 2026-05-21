@@ -249,7 +249,7 @@ export default function ProfilePage() {
           <div className="flex gap-2 shrink-0">
             {!hasProfile ? (
               <Button
-                onClick={() => router.push("/user-profile")}
+                onClick={() => router.push("/UserProfile")}
                 className="rounded-[12px] bg-primary hover:bg-primary/90 text-white"
               >
                 Complete setup

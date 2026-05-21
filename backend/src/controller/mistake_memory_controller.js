@@ -1,5 +1,12 @@
 import prisma from "../lib/prisma.js";
 import { analyzeMistakeMemory, generateTopic } from "../services/mistake_memory_aI.service.js";
+
+const profileRequiredResponse = (res) =>
+  res.status(428).json({
+    message: "Create your learning profile before starting writing practice.",
+    requiresProfile: true,
+  });
+
 export const createSubmission = async (req, res) => {
   try {
     const { userId } = req.user;
@@ -9,27 +16,38 @@ export const createSubmission = async (req, res) => {
       return res.status(400).json({ message: "Body is required" });
     }
 
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        profile: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.profile) {
+      return profileRequiredResponse(res);
+    }
+
     // Calculate word count
     const wordCount = body.trim().split(/\s+/).length;
 
     // Create submission with PENDING status
     const submission = await prisma.submission.create({
       data: {
-        userId,
-        promptId: promptId || null,
+        user: {
+          connect: { id: userId }
+        },
+        prompt: promptId ? {
+          connect: { id: promptId }
+        } : undefined,
         title: title || null,
         genre,
         body,
         wordCount,
         status: "PENDING",
-      },
-    });
-
-    // Get user profile for AI context
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: {
-        profile: true,
       },
     });
 
@@ -40,7 +58,7 @@ export const createSubmission = async (req, res) => {
       userId,
       content: body,
       genre,
-      userProfile: user?.profile || null,
+      userProfile: user.profile,
     });
 
     // Return immediately with submission ID and status
@@ -294,7 +312,9 @@ export const getUserStats = async (req, res) => {
       // Create default stats
       userStats = await prisma.userStats.create({
         data: {
-          userId,
+          user: {
+            connect: { id: userId }
+          },
           totalXp: 0,
           level: 1,
           currentStreak: 0,
@@ -366,6 +386,10 @@ export const getTopics = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    if (!user.profile) {
+      return profileRequiredResponse(res);
+    }
+
     // Generate topic using AI with user profile context
     const AIResponse = await generateTopic(user.profile);
 
@@ -382,6 +406,7 @@ export const getTopics = async (req, res) => {
       genre: topicData.genre,
       targetLevel: topicData.targetLevel,
       wordTarget: topicData.wordTarget,
+      exampleStarters: topicData.exampleStarters || [],
       writingTips: topicData.writingTips,
     });
   } catch (error) {
@@ -393,6 +418,19 @@ export const getTopics = async (req, res) => {
 export const getCurrentTopic = async (req, res) => {
   try {
     const { userId } = req.user;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: { profile: true },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.profile) {
+      return profileRequiredResponse(res);
+    }
 
     // 1. Check if active, unexpired topic exists
     const activePrompt = await prisma.writingPrompt.findFirst({
@@ -416,19 +454,10 @@ export const getCurrentTopic = async (req, res) => {
         genre: activePrompt.genre,
         targetLevel: activePrompt.targetLevel,
         wordTarget: activePrompt.wordTarget || 150,
+        exampleStarters: activePrompt.exampleStarters || [],
         writingTips: activePrompt.writingTips,
         createdAt: activePrompt.createdAt,
       });
-    }
-
-    // 2. No active topic found or it has expired; fetch user context & generate new
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: { profile: true },
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
     }
 
     // Generate topic via AI
@@ -448,12 +477,15 @@ export const getCurrentTopic = async (req, res) => {
     // Create in DB
     const newPrompt = await prisma.writingPrompt.create({
       data: {
-        userId,
+        user: {
+          connect: { id: userId }
+        },
         title: topicData.topic,
         genre: topicData.genre || "GENERAL",
         description: topicData.description,
         body: topicData.topic, // fallback
         targetLevel: topicData.targetLevel,
+        exampleStarters: topicData.exampleStarters || [],
         writingTips: topicData.writingTips || [],
         isActive: true,
       },
@@ -466,6 +498,7 @@ export const getCurrentTopic = async (req, res) => {
       genre: newPrompt.genre,
       targetLevel: newPrompt.targetLevel,
       wordTarget: newPrompt.wordTarget || 150,
+      exampleStarters: newPrompt.exampleStarters || [],
       writingTips: newPrompt.writingTips,
       createdAt: newPrompt.createdAt,
     });
@@ -488,6 +521,10 @@ export const createNewTopic = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    if (!user.profile) {
+      return profileRequiredResponse(res);
+    }
+
     // Deactivate previous prompts
     await prisma.writingPrompt.updateMany({
       where: { userId, isActive: true },
@@ -505,12 +542,15 @@ export const createNewTopic = async (req, res) => {
     // Create in DB
     const newPrompt = await prisma.writingPrompt.create({
       data: {
-        userId,
+        user: {
+          connect: { id: userId }
+        },
         title: topicData.topic,
         genre: topicData.genre || "GENERAL",
         description: topicData.description,
         body: topicData.topic,
         targetLevel: topicData.targetLevel,
+        exampleStarters: topicData.exampleStarters || [],
         writingTips: topicData.writingTips || [],
         isActive: true,
       },
@@ -523,6 +563,7 @@ export const createNewTopic = async (req, res) => {
       genre: newPrompt.genre,
       targetLevel: newPrompt.targetLevel,
       wordTarget: newPrompt.wordTarget || 150,
+      exampleStarters: newPrompt.exampleStarters || [],
       writingTips: newPrompt.writingTips,
       createdAt: newPrompt.createdAt,
     });

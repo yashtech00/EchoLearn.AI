@@ -154,17 +154,42 @@ const worker = new Worker(
     } catch (error) {
       console.error(`❌ Error processing submission ${submissionId}:`, error);
 
-      // Update submission status to FAILED
-      await prisma.submission.update({
-        where: { id: submissionId },
-        data: {
-          status: 'FAILED',
-          errorMessage: error.message,
-          completedAt: new Date(),
-        },
-      });
+      // Determine error type for better handling
+      const isNetworkError = 
+        error?.message?.includes('fetch failed') ||
+        error?.message?.includes('timeout') ||
+        error?.message?.includes('ECONNRESET') ||
+        error?.message?.includes('ETIMEDOUT');
 
-      throw error; // Re-throw to trigger BullMQ retry
+      const isPrismaError = error?.code?.startsWith('P');
+      
+      const errorMessage = isNetworkError 
+        ? 'Network error: Unable to reach AI service. Please try again.'
+        : isPrismaError
+        ? 'Database error: ' + error.message
+        : error.message;
+
+      // Update submission status to FAILED
+      try {
+        await prisma.submission.update({
+          where: { id: submissionId },
+          data: {
+            status: 'FAILED',
+            errorMessage: errorMessage,
+            completedAt: new Date(),
+          },
+        });
+      } catch (updateError) {
+        console.error(`❌ Failed to update submission status:`, updateError);
+      }
+
+      // Only retry on network errors, not on validation or other errors
+      if (isNetworkError) {
+        throw error; // Re-throw to trigger BullMQ retry
+      } else {
+        // Don't retry on non-network errors
+        console.log(`⚠️  Not retrying due to non-network error`);
+      }
     }
   },
   {

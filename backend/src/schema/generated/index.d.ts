@@ -5727,6 +5727,7 @@ export namespace Prisma {
     body: number
     topicTags: number
     targetLevel: number
+    exampleStarters: number
     writingTips: number
     isActive: number
     createdAt: number
@@ -5767,6 +5768,7 @@ export namespace Prisma {
     body?: true
     topicTags?: true
     targetLevel?: true
+    exampleStarters?: true
     writingTips?: true
     isActive?: true
     createdAt?: true
@@ -5854,6 +5856,7 @@ export namespace Prisma {
     body: string
     topicTags: string[]
     targetLevel: string | null
+    exampleStarters: string[]
     writingTips: JsonValue | null
     isActive: boolean
     createdAt: Date
@@ -5885,6 +5888,7 @@ export namespace Prisma {
     body?: boolean
     topicTags?: boolean
     targetLevel?: boolean
+    exampleStarters?: boolean
     writingTips?: boolean
     isActive?: boolean
     createdAt?: boolean
@@ -5902,6 +5906,7 @@ export namespace Prisma {
     body?: boolean
     topicTags?: boolean
     targetLevel?: boolean
+    exampleStarters?: boolean
     writingTips?: boolean
     isActive?: boolean
     createdAt?: boolean
@@ -5917,6 +5922,7 @@ export namespace Prisma {
     body?: boolean
     topicTags?: boolean
     targetLevel?: boolean
+    exampleStarters?: boolean
     writingTips?: boolean
     isActive?: boolean
     createdAt?: boolean
@@ -5932,12 +5938,13 @@ export namespace Prisma {
     body?: boolean
     topicTags?: boolean
     targetLevel?: boolean
+    exampleStarters?: boolean
     writingTips?: boolean
     isActive?: boolean
     createdAt?: boolean
   }
 
-  export type WritingPromptOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "genre" | "description" | "body" | "topicTags" | "targetLevel" | "writingTips" | "isActive" | "createdAt", ExtArgs["result"]["writingPrompt"]>
+  export type WritingPromptOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "title" | "genre" | "description" | "body" | "topicTags" | "targetLevel" | "exampleStarters" | "writingTips" | "isActive" | "createdAt", ExtArgs["result"]["writingPrompt"]>
   export type WritingPromptInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | WritingPrompt$userArgs<ExtArgs>
     submissions?: boolean | WritingPrompt$submissionsArgs<ExtArgs>
@@ -5965,6 +5972,7 @@ export namespace Prisma {
       body: string
       topicTags: string[]
       targetLevel: string | null
+      exampleStarters: string[]
       writingTips: Prisma.JsonValue | null
       isActive: boolean
       createdAt: Date
@@ -6401,6 +6409,7 @@ export namespace Prisma {
     readonly body: FieldRef<"WritingPrompt", 'String'>
     readonly topicTags: FieldRef<"WritingPrompt", 'String[]'>
     readonly targetLevel: FieldRef<"WritingPrompt", 'String'>
+    readonly exampleStarters: FieldRef<"WritingPrompt", 'String[]'>
     readonly writingTips: FieldRef<"WritingPrompt", 'Json'>
     readonly isActive: FieldRef<"WritingPrompt", 'Boolean'>
     readonly createdAt: FieldRef<"WritingPrompt", 'DateTime'>
@@ -13977,6 +13986,7 @@ export namespace Prisma {
     body: 'body',
     topicTags: 'topicTags',
     targetLevel: 'targetLevel',
+    exampleStarters: 'exampleStarters',
     writingTips: 'writingTips',
     isActive: 'isActive',
     createdAt: 'createdAt'
@@ -14627,6 +14637,7 @@ export namespace Prisma {
     body?: StringFilter<"WritingPrompt"> | string
     topicTags?: StringNullableListFilter<"WritingPrompt">
     targetLevel?: StringNullableFilter<"WritingPrompt"> | string | null
+    exampleStarters?: StringNullableListFilter<"WritingPrompt">
     writingTips?: JsonNullableFilter<"WritingPrompt">
     isActive?: BoolFilter<"WritingPrompt"> | boolean
     createdAt?: DateTimeFilter<"WritingPrompt"> | Date | string
@@ -14643,6 +14654,7 @@ export namespace Prisma {
     body?: SortOrder
     topicTags?: SortOrder
     targetLevel?: SortOrderInput | SortOrder
+    exampleStarters?: SortOrder
     writingTips?: SortOrderInput | SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
@@ -14662,6 +14674,7 @@ export namespace Prisma {
     body?: StringFilter<"WritingPrompt"> | string
     topicTags?: StringNullableListFilter<"WritingPrompt">
     targetLevel?: StringNullableFilter<"WritingPrompt"> | string | null
+    exampleStarters?: StringNullableListFilter<"WritingPrompt">
     writingTips?: JsonNullableFilter<"WritingPrompt">
     isActive?: BoolFilter<"WritingPrompt"> | boolean
     createdAt?: DateTimeFilter<"WritingPrompt"> | Date | string
@@ -14678,6 +14691,7 @@ export namespace Prisma {
     body?: SortOrder
     topicTags?: SortOrder
     targetLevel?: SortOrderInput | SortOrder
+    exampleStarters?: SortOrder
     writingTips?: SortOrderInput | SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
@@ -14698,6 +14712,7 @@ export namespace Prisma {
     body?: StringWithAggregatesFilter<"WritingPrompt"> | string
     topicTags?: StringNullableListFilter<"WritingPrompt">
     targetLevel?: StringNullableWithAggregatesFilter<"WritingPrompt"> | string | null
+    exampleStarters?: StringNullableListFilter<"WritingPrompt">
     writingTips?: JsonNullableWithAggregatesFilter<"WritingPrompt">
     isActive?: BoolWithAggregatesFilter<"WritingPrompt"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"WritingPrompt"> | Date | string
@@ -15585,6 +15600,7 @@ export namespace Prisma {
     body: string
     topicTags?: WritingPromptCreatetopicTagsInput | string[]
     targetLevel?: string | null
+    exampleStarters?: WritingPromptCreateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: boolean
     createdAt?: Date | string
@@ -15601,6 +15617,7 @@ export namespace Prisma {
     body: string
     topicTags?: WritingPromptCreatetopicTagsInput | string[]
     targetLevel?: string | null
+    exampleStarters?: WritingPromptCreateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: boolean
     createdAt?: Date | string
@@ -15615,6 +15632,7 @@ export namespace Prisma {
     body?: StringFieldUpdateOperationsInput | string
     topicTags?: WritingPromptUpdatetopicTagsInput | string[]
     targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    exampleStarters?: WritingPromptUpdateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15631,6 +15649,7 @@ export namespace Prisma {
     body?: StringFieldUpdateOperationsInput | string
     topicTags?: WritingPromptUpdatetopicTagsInput | string[]
     targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    exampleStarters?: WritingPromptUpdateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15646,6 +15665,7 @@ export namespace Prisma {
     body: string
     topicTags?: WritingPromptCreatetopicTagsInput | string[]
     targetLevel?: string | null
+    exampleStarters?: WritingPromptCreateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: boolean
     createdAt?: Date | string
@@ -15659,6 +15679,7 @@ export namespace Prisma {
     body?: StringFieldUpdateOperationsInput | string
     topicTags?: WritingPromptUpdatetopicTagsInput | string[]
     targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    exampleStarters?: WritingPromptUpdateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15673,6 +15694,7 @@ export namespace Prisma {
     body?: StringFieldUpdateOperationsInput | string
     topicTags?: WritingPromptUpdatetopicTagsInput | string[]
     targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    exampleStarters?: WritingPromptUpdateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -16740,6 +16762,7 @@ export namespace Prisma {
     body?: SortOrder
     topicTags?: SortOrder
     targetLevel?: SortOrder
+    exampleStarters?: SortOrder
     writingTips?: SortOrder
     isActive?: SortOrder
     createdAt?: SortOrder
@@ -17588,6 +17611,10 @@ export namespace Prisma {
     set: string[]
   }
 
+  export type WritingPromptCreateexampleStartersInput = {
+    set: string[]
+  }
+
   export type UserCreateNestedOneWithoutWritingPromptsInput = {
     create?: XOR<UserCreateWithoutWritingPromptsInput, UserUncheckedCreateWithoutWritingPromptsInput>
     connectOrCreate?: UserCreateOrConnectWithoutWritingPromptsInput
@@ -17613,6 +17640,11 @@ export namespace Prisma {
   }
 
   export type WritingPromptUpdatetopicTagsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type WritingPromptUpdateexampleStartersInput = {
     set?: string[]
     push?: string | string[]
   }
@@ -18496,6 +18528,7 @@ export namespace Prisma {
     body: string
     topicTags?: WritingPromptCreatetopicTagsInput | string[]
     targetLevel?: string | null
+    exampleStarters?: WritingPromptCreateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: boolean
     createdAt?: Date | string
@@ -18510,6 +18543,7 @@ export namespace Prisma {
     body: string
     topicTags?: WritingPromptCreatetopicTagsInput | string[]
     targetLevel?: string | null
+    exampleStarters?: WritingPromptCreateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: boolean
     createdAt?: Date | string
@@ -18768,6 +18802,7 @@ export namespace Prisma {
     body?: StringFilter<"WritingPrompt"> | string
     topicTags?: StringNullableListFilter<"WritingPrompt">
     targetLevel?: StringNullableFilter<"WritingPrompt"> | string | null
+    exampleStarters?: StringNullableListFilter<"WritingPrompt">
     writingTips?: JsonNullableFilter<"WritingPrompt">
     isActive?: BoolFilter<"WritingPrompt"> | boolean
     createdAt?: DateTimeFilter<"WritingPrompt"> | Date | string
@@ -19148,6 +19183,7 @@ export namespace Prisma {
     body: string
     topicTags?: WritingPromptCreatetopicTagsInput | string[]
     targetLevel?: string | null
+    exampleStarters?: WritingPromptCreateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: boolean
     createdAt?: Date | string
@@ -19163,6 +19199,7 @@ export namespace Prisma {
     body: string
     topicTags?: WritingPromptCreatetopicTagsInput | string[]
     targetLevel?: string | null
+    exampleStarters?: WritingPromptCreateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: boolean
     createdAt?: Date | string
@@ -19319,6 +19356,7 @@ export namespace Prisma {
     body?: StringFieldUpdateOperationsInput | string
     topicTags?: WritingPromptUpdatetopicTagsInput | string[]
     targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    exampleStarters?: WritingPromptUpdateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -19334,6 +19372,7 @@ export namespace Prisma {
     body?: StringFieldUpdateOperationsInput | string
     topicTags?: WritingPromptUpdatetopicTagsInput | string[]
     targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    exampleStarters?: WritingPromptUpdateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20030,6 +20069,7 @@ export namespace Prisma {
     body: string
     topicTags?: WritingPromptCreatetopicTagsInput | string[]
     targetLevel?: string | null
+    exampleStarters?: WritingPromptCreateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: boolean
     createdAt?: Date | string
@@ -20179,6 +20219,7 @@ export namespace Prisma {
     body?: StringFieldUpdateOperationsInput | string
     topicTags?: WritingPromptUpdatetopicTagsInput | string[]
     targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    exampleStarters?: WritingPromptUpdateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20193,6 +20234,7 @@ export namespace Prisma {
     body?: StringFieldUpdateOperationsInput | string
     topicTags?: WritingPromptUpdatetopicTagsInput | string[]
     targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    exampleStarters?: WritingPromptUpdateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20207,6 +20249,7 @@ export namespace Prisma {
     body?: StringFieldUpdateOperationsInput | string
     topicTags?: WritingPromptUpdatetopicTagsInput | string[]
     targetLevel?: NullableStringFieldUpdateOperationsInput | string | null
+    exampleStarters?: WritingPromptUpdateexampleStartersInput | string[]
     writingTips?: NullableJsonNullValueInput | InputJsonValue
     isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

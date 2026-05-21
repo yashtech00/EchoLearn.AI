@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen, PenTool, Target, Mic, BookMarked, Headphones, Clock, CheckCircle2, ArrowRight, ArrowLeft, Check } from "lucide-react";
+import { BookOpen, PenTool, Target, Mic, BookMarked, Headphones, Clock, CheckCircle2, ArrowRight, ArrowLeft, Check, Sparkles, TrendingUp } from "lucide-react";
 
 interface UserProfileFormData {
   primaryRole: string;
@@ -36,10 +36,10 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
   ];
 
   const dailyCommitments = [
-    { minutes: 10, label: "10 mins" },
-    { minutes: 20, label: "20 mins" },
-    { minutes: 30, label: "30 mins" },
-    { minutes: 60, label: "60 mins" },
+    { minutes: 10, label: "10 mins", description: "Quick daily practice" },
+    { minutes: 20, label: "20 mins", description: "Balanced approach" },
+    { minutes: 30, label: "30 mins", description: "Steady progress" },
+    { minutes: 60, label: "60 mins", description: "Intensive learning" },
   ];
 
   const getLevelLabel = (level: number) => {
@@ -49,13 +49,13 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
 
   const getLevelColor = (level: number) => {
     const colors = [
-      "bg-secondary text-muted-foreground",
-      "bg-accent/10 text-accent",
-      "bg-primary/10 text-primary",
-      "bg-primary text-white",
+      "bg-muted text-muted-foreground",
+      "bg-accent/20 text-accent",
+      "bg-primary/20 text-primary",
+      "bg-primary/90 text-white",
       "bg-accent text-white",
     ];
-    return colors[level - 1] || "bg-primary/10 text-primary";
+    return colors[level - 1] || "bg-primary/20 text-primary";
   };
 
   const handleFocusAreaToggle = (areaId: string) => {
@@ -72,78 +72,110 @@ export default function LevelAssessment({ formData, setFormData, onNext, onBack 
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="pt-24 pb-16 px-4 sm:px-6 max-w-5xl mx-auto">
+      <div className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
         {/* Hero Section */}
-        <div className="text-center mb-10 sm:mb-16 space-y-3 sm:space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-foreground leading-tight tracking-tight">
+        <div className="text-center mb-12 sm:mb-20 space-y-4 sm:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full mb-2">
+            <TrendingUp className="w-4 h-4 text-primary" />
+            <span className="text-sm font-bold text-primary">Step 2 of 3</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold text-foreground leading-tight tracking-tight">
             How&apos;s your English today?
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
             Be honest! It helps us find the right starting point for you.
           </p>
         </div>
 
-        <div className="space-y-8 sm:space-y-12">
+        <div className="space-y-12 sm:space-y-16">
           {/* Assessment Sliders */}
-          <section className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-7 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
+          <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
             {/* Reading Level */}
-            <div className="bg-card p-6 sm:p-9 rounded-[12px] shadow-terra border border-primary/10 hover:shadow-terra transition-all duration-300 hover:scale-[1.02]">
-              <div className="flex justify-between items-center mb-6 sm:mb-9">
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-[12px] bg-gradient-to-br from-primary to-primary flex items-center justify-center shadow-terra">
-                    <BookOpen className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
+            <div className="relative bg-card p-8 sm:p-10 rounded-2xl shadow-terra border-2 border-border hover:shadow-2xl transition-all duration-300 hover:scale-[1.01] overflow-hidden group">
+              {/* Decorative gradient */}
+              <div className="absolute -top-20 -right-20 w-48 h-48 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all duration-500" />
+              
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
+                      <BookOpen className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-foreground">Reading Level</h3>
+                      <p className="text-sm text-muted-foreground mt-1">How well do you read?</p>
+                    </div>
                   </div>
-                  <h3 className="text-lg sm:text-2xl font-bold text-foreground">Reading Level</h3>
+                  <span className={`px-4 py-2 rounded-full text-sm font-bold shadow-md transition-all duration-300 ${getLevelColor(readingLevel)}`}>
+                    {getLevelLabel(readingLevel)}
+                  </span>
                 </div>
-                <span className={`px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold shadow-sm ${getLevelColor(readingLevel)}`}>
-                  {getLevelLabel(readingLevel)}
-                </span>
+                <div className="space-y-3">
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    value={readingLevel}
+                    onChange={(e) => {
+                      const level = parseInt(e.target.value);
+                      setReadingLevel(level);
+                      setFormData({ ...formData, englishReadingSelfScore: level });
+                    }}
+                    className="w-full h-3 bg-muted rounded-full appearance-none cursor-pointer transition-all duration-300 slider"
+                    style={{
+                      background: `linear-gradient(to right, var(--terra-primary) 0%, var(--terra-primary) ${(readingLevel - 1) * 25}%, var(--terra-muted) ${(readingLevel - 1) * 25}%, var(--terra-muted) 100%)`
+                    }}
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground font-medium">
+                    <span>Beginner</span>
+                    <span>Fluent</span>
+                  </div>
+                </div>
               </div>
-              <input
-                type="range"
-                min="1"
-                max="5"
-                value={readingLevel}
-                onChange={(e) => {
-                  const level = parseInt(e.target.value);
-                  setReadingLevel(level);
-                  setFormData({ ...formData, englishReadingSelfScore: level });
-                }}
-                className="w-full h-3 bg-primary/10 rounded-full appearance-none cursor-pointer transition-all duration-300"
-                style={{
-                  background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${(readingLevel - 1) * 25}%, var(--secondary) ${(readingLevel - 1) * 25}%, var(--secondary) 100%)`
-                }}
-              />
             </div>
 
             {/* Writing Level */}
-            <div className="bg-card p-6 sm:p-9 rounded-[12px] shadow-terra border border-primary/10 hover:shadow-terra transition-all duration-300 hover:scale-[1.02]">
-              <div className="flex justify-between items-center mb-6 sm:mb-9">
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-[12px] bg-gradient-to-br from-primary to-primary flex items-center justify-center shadow-terra">
-                    <PenTool className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
+            <div className="relative bg-card p-8 sm:p-10 rounded-2xl shadow-terra border-2 border-border hover:shadow-2xl transition-all duration-300 hover:scale-[1.01] overflow-hidden group">
+              {/* Decorative gradient */}
+              <div className="absolute -top-20 -right-20 w-48 h-48 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all duration-500" />
+              
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg">
+                      <PenTool className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl sm:text-2xl font-bold text-foreground">Writing Level</h3>
+                      <p className="text-sm text-muted-foreground mt-1">How well do you write?</p>
+                    </div>
                   </div>
-                  <h3 className="text-lg sm:text-2xl font-bold text-foreground">Writing Level</h3>
+                  <span className={`px-4 py-2 rounded-full text-sm font-bold shadow-md transition-all duration-300 ${getLevelColor(writingLevel)}`}>
+                    {getLevelLabel(writingLevel)}
+                  </span>
                 </div>
-                <span className={`px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold shadow-sm ${getLevelColor(writingLevel)}`}>
-                  {getLevelLabel(writingLevel)}
-                </span>
+                <div className="space-y-3">
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    value={writingLevel}
+                    onChange={(e) => {
+                      const level = parseInt(e.target.value);
+                      setWritingLevel(level);
+                      setFormData({ ...formData, englishWritingSelfScore: level });
+                    }}
+                    className="w-full h-3 bg-muted rounded-full appearance-none cursor-pointer transition-all duration-300 slider"
+                    style={{
+                      background: `linear-gradient(to right, var(--terra-primary) 0%, var(--terra-primary) ${(writingLevel - 1) * 25}%, var(--terra-muted) ${(writingLevel - 1) * 25}%, var(--terra-muted) 100%)`
+                    }}
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground font-medium">
+                    <span>Beginner</span>
+                    <span>Fluent</span>
+                  </div>
+                </div>
               </div>
-              <input
-                type="range"
-                min="1"
-                max="5"
-                value={writingLevel}
-                onChange={(e) => {
-                  const level = parseInt(e.target.value);
-                  setWritingLevel(level);
-                  setFormData({ ...formData, englishWritingSelfScore: level });
-                }}
-                className="w-full h-3 bg-primary/10 rounded-full appearance-none cursor-pointer transition-all duration-300"
-                style={{
-                  background: `linear-gradient(to right, var(--primary) 0%, var(--primary) ${(writingLevel - 1) * 25}%, var(--secondary) ${(writingLevel - 1) * 25}%, var(--secondary) 100%)`
-                }}
-              />
             </div>
           </section>
 

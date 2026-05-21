@@ -8,11 +8,27 @@ import LevelAssessment from "../../components/UserProfile/LevelAssessment";
 import InterestsForm from "../../components/UserProfile/InterestsForm";
 import UserProfileNavbar from "../../components/UserProfile/UserProfileNavbar";
 import { createUserProfile } from "@/app/api/user_profile/user_profile";
+import { useQueryClient } from "@tanstack/react-query";
+
+type ProfileMeCache = {
+  profile?: unknown;
+  user?: {
+    isNewUser?: boolean;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+};
 
 export default function UserProfilePage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [nextPath] = useState(() => {
+    if (typeof window === "undefined") return "/Dashboard";
+    const next = new URLSearchParams(window.location.search).get("next");
+    return next?.startsWith("/") && !next.startsWith("//") ? next : "/Dashboard";
+  });
 
   const [formData, setFormData] = useState({
     primaryRole: "",
@@ -57,7 +73,19 @@ export default function UserProfilePage() {
       });
 
       if (!('error' in response)) {
-        router.push("/Dashboard");
+        queryClient.setQueryData(["profile-me"], (current: ProfileMeCache | undefined) => {
+          const nextUser = current?.user
+            ? { ...current.user, isNewUser: false }
+            : current?.user;
+
+          return {
+            ...current,
+            profile: response.userProfile,
+            user: nextUser,
+          };
+        });
+        queryClient.removeQueries({ queryKey: ["writing-topic"] });
+        router.push(nextPath);
       } else {
         console.error("Profile creation failed:", response.error);
       }

@@ -8,45 +8,72 @@ import {
   Target, 
   Clock, 
   Sparkles,
-  TrendingUp,
   Play,
   Lock,
   Award,
   Flame,
-  Zap
+  Zap,
+  User,
+  ArrowRight,
+  type LucideIcon,
 } from "lucide-react";
 import { useState, useEffect } from "react";
-import { getUserStats, getCurrentTopic } from "@/app/api/writing/writing_api";
-import { useQueryClient } from "@tanstack/react-query";
+import { getUserStats } from "@/app/api/writing/writing_api";
+import { getProfileMe } from "@/app/api/user_profile/user_profile";
+
+type DashboardActivity = {
+  id: string;
+  activityType: string;
+  source: string;
+  xpEarned: number;
+  createdAt: string;
+};
+
+type DashboardStatsResponse = {
+  stats?: {
+    currentStreak?: number;
+    currentStreakDays?: number;
+    level?: number;
+    totalXp?: number;
+  };
+  recentActivities?: DashboardActivity[];
+};
+
+type DashboardGame = {
+  id: number;
+  name: string;
+  description: string;
+  icon: LucideIcon;
+  color: string;
+  bgColor: string;
+  iconColor: string;
+  status: "active" | "coming-soon";
+  path?: string;
+  progress: number;
+};
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [stats, setStats] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const queryClient = useQueryClient();
+  const [stats, setStats] = useState<DashboardStatsResponse | null>(null);
+  const [hasProfile, setHasProfile] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Background prefetch the current writing topic for zero-lag instant transition
-    queryClient.prefetchQuery({
-      queryKey: ["writing-topic"],
-      queryFn: getCurrentTopic,
-      staleTime: Infinity,
-    }).catch(err => console.error("Prefetch error:", err));
-
-    const fetchStats = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const data = await getUserStats();
-        setStats(data);
+        const [statsData, profileData] = await Promise.all([
+          getUserStats(),
+          getProfileMe(),
+        ]);
+        setStats(statsData);
+        setHasProfile(Boolean(profileData?.profile));
       } catch (error) {
-        console.error("Error fetching dashboard stats:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error fetching dashboard data:", error);
       }
     };
-    fetchStats();
-  }, [queryClient]);
+    fetchDashboardData();
+  }, []);
 
-  const games = [
+  const games: DashboardGame[] = [
     {
       id: 1,
       name: "Mistake Memory",
@@ -105,9 +132,13 @@ export default function DashboardPage() {
     },
   ];
 
-  const handleGameClick = (game: any) => {
+  const handleGameClick = (game: DashboardGame) => {
     if (game.status === "active") {
-      router.push(game.path);
+      if (hasProfile === false) {
+        router.push(`/UserProfile?next=${encodeURIComponent(game.path ?? "/Dashboard/WritingCoach/practice")}`);
+        return;
+      }
+      router.push(game.path ?? "/Dashboard/WritingCoach/practice");
     }
   };
 
@@ -115,13 +146,24 @@ export default function DashboardPage() {
     <div className="space-y-8 font-sans">
       {/* Welcome Section - Terra Styled */}
       <div className="bg-primary rounded-[12px] p-6 sm:p-10 text-white relative overflow-hidden shadow-terra">
-        <div className="relative z-10 flex items-center justify-between">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl sm:text-4xl font-serif mb-2 sm:mb-3">Welcome back!</h1>
             <p className="text-white/80 text-sm sm:text-lg max-w-md leading-relaxed">
               Continue your journey to English mastery with calm, focused practice.
             </p>
           </div>
+          {hasProfile === false && (
+            <button
+              type="button"
+              onClick={() => router.push("/UserProfile")}
+              className="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-[12px] bg-white text-primary px-5 py-3 text-sm sm:text-base font-bold shadow-sm transition-all hover:bg-white/90"
+            >
+              <User className="w-4 h-4" />
+              Create learning profile
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          )}
           <div className="hidden md:block opacity-20 flex-shrink-0">
             <Sparkles className="w-24 h-24" />
           </div>
@@ -239,7 +281,7 @@ export default function DashboardPage() {
       [...stats.recentActivities]
         .sort((a, b) => b.xpEarned - a.xpEarned)
         .slice(0, 3)
-        .map((activity: any) => (
+        .map((activity) => (
           <div
             key={activity.id}
             className="flex items-center gap-3 sm:gap-5 p-3 sm:p-5 bg-primary/5 rounded-[12px] border border-primary/10 hover:bg-primary/10 transition-colors"

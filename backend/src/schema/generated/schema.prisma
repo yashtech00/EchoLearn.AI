@@ -137,18 +137,19 @@ model UserProfile {
 }
 
 model WritingPrompt {
-  id          String          @id @default(cuid())
-  userId      String?
-  user        User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  title       String
-  genre       SubmissionGenre
-  description String?
-  body        String
-  topicTags   String[]
-  targetLevel String? // e.g. "C2 Proficiency", "B2 Upper Intermediate"
-  writingTips Json? // Array of writing tips [{title, description}]
-  isActive    Boolean         @default(true)
-  createdAt   DateTime        @default(now())
+  id              String          @id @default(cuid())
+  userId          String?
+  user            User?           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title           String
+  genre           SubmissionGenre
+  description     String?
+  body            String
+  topicTags       String[]
+  targetLevel     String? // e.g. "C2 Proficiency", "B2 Upper Intermediate"
+  exampleStarters String[]        @default([]) // Array of example starter sentences
+  writingTips     Json? // Array of writing tips [{title, description}]
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
 
   submissions Submission[]
 

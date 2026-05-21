@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import type { ReactNode } from "react";
 
 export default function ProtectedRoute({ children }: { children: ReactNode }) {
-    const { user, loading, isNewUser } = useAuth();
+    const { user, loading } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
 
@@ -26,10 +26,8 @@ export default function ProtectedRoute({ children }: { children: ReactNode }) {
 
         if (!loading && !user && !isPublicRoute) {
             router.replace("/auth/login");
-        } else if (!loading && user && isNewUser && pathname !== "/UserProfile") {
-            router.replace("/UserProfile");
         }
-    }, [loading, user, isNewUser, router, pathname]);
+    }, [loading, user, router, pathname]);
 
     if (loading) return <div>Loading...</div>;
 

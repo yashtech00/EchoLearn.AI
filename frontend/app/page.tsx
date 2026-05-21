@@ -13,18 +13,14 @@ import { Sparkles, ArrowRight, PenTool, MessageSquare, Brain } from "lucide-reac
 import Background from "@/components/backgrounds";
 
 export default function Home() {
-  const { user, loading, isNewUser } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (!loading && user) {
-      if (isNewUser) {
-        router.replace("/user-profile");
-      } else {
-        router.replace("/Dashboard");
-      }
+      router.replace("/Dashboard");
     }
-  }, [loading, user, isNewUser, router]);
+  }, [loading, user, router]);
 
   if (loading) {
     return (

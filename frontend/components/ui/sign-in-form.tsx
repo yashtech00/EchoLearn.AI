@@ -48,12 +48,7 @@ export default function SignInForm() {
       }
 
       if (response.user) {
-        // Redirect based on isNewUser
-        if (response.user?.isNewUser) {
-          router.replace("/UserProfile");
-        } else {
-          router.replace("/Dashboard");
-        }
+        router.replace("/Dashboard");
       } else {
         setError(response.message || (isSignUp ? "Registration failed" : "Invalid credentials"));
       }

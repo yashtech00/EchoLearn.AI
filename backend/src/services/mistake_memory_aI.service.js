@@ -99,13 +99,14 @@ ${
 };
 
 /**
- * Retry Wrapper
+ * Retry Wrapper with Timeout
  */
 const generateWithRetry = async ({
   prompt,
   temperature = 0.3,
   maxAttempts = 3,
   retryDelay = 10000,
+  timeout = 60000, // 60 second timeout
 }) => {
   let lastError;
 
@@ -123,7 +124,16 @@ const generateWithRetry = async ({
           `[Gemini] Model=${modelName} Attempt=${attempt}/${maxAttempts}`
         );
 
-        const result = await model.generateContent(prompt);
+        // Create timeout promise
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Request timeout after ' + timeout + 'ms')), timeout);
+        });
+
+        // Race between API call and timeout
+        const result = await Promise.race([
+          model.generateContent(prompt),
+          timeoutPromise
+        ]);
 
         return result.response.text();
       } catch (error) {
@@ -131,24 +141,31 @@ const generateWithRetry = async ({
 
         console.error(
           `[Gemini Error] Model=${modelName} Attempt=${attempt}`,
-          error.message
+          error.message || error
         );
 
+        // Determine if we should retry
         const shouldRetry =
           error?.status === 500 ||
           error?.status === 503 ||
-          error?.message?.includes("high demand");
+          error?.message?.includes("high demand") ||
+          error?.message?.includes("timeout") ||
+          error?.message?.includes("fetch failed") ||
+          error?.message?.includes("ECONNRESET") ||
+          error?.message?.includes("ETIMEDOUT");
 
-        if (!shouldRetry) {
+        if (!shouldRetry && attempt === maxAttempts) {
+          // Last attempt and not retryable - throw
           throw error;
         }
 
         if (attempt < maxAttempts) {
+          const delay = retryDelay * attempt; // Exponential backoff
           console.log(
-            `Retrying in ${retryDelay / 1000} seconds...`
+            `⏳ Retrying in ${delay / 1000} seconds...`
           );
 
-          await sleep(retryDelay);
+          await sleep(delay);
         }
       }
     }
@@ -287,6 +304,15 @@ Rules:
 
       // LOW temperature for consistency
       temperature: 0.1,
+      
+      // Longer timeout for analysis (90 seconds)
+      timeout: 90000,
+      
+      // More retries for critical analysis
+      maxAttempts: 3,
+      
+      // Initial retry delay
+      retryDelay: 5000,
     });
 
     const analysisData = safeJsonParse(text, fallback);
@@ -321,6 +347,11 @@ export const generateTopic = async (userProfile) => {
     genre: "SHORT_ESSAY",
     targetLevel: "B2 Upper Intermediate",
     wordTarget: 150,
+    exampleStarters: [
+      "Technology has transformed how I travel. For example, I use Google Maps to...",
+      "When I travel, my phone is essential. It helps me with navigation and...",
+      "Modern technology makes traveling easier. I remember when I used..."
+    ],
     writingTips: [
       {
         title: "Use Specific Examples",
@@ -351,6 +382,7 @@ Requirements:
 - Encourage opinion/thought expression
 - Provide a clear, actionable description (guidelines for the user)
 - Provide exactly 2 highly relevant and helpful writing tips tailored to this topic
+- Provide exactly 3 example starter sentences to help users begin writing (not full answers, just momentum starters)
 
 Allowed Genres:
 GENERAL |
@@ -367,6 +399,11 @@ Return ONLY valid JSON:
   "genre": string,
   "targetLevel": string,
   "wordTarget": number,
+  "exampleStarters": [
+    string,
+    string,
+    string
+  ],
   "writingTips": [
     {
       "title": string,
@@ -385,6 +422,15 @@ Return ONLY valid JSON:
 
       // HIGH temperature for creativity
       temperature: 0.9,
+      
+      // Standard timeout for topic generation
+      timeout: 30000,
+      
+      // Fewer retries for non-critical operation
+      maxAttempts: 2,
+      
+      // Shorter retry delay
+      retryDelay: 3000,
     });
 
     const topicData = safeJsonParse(text, fallback);

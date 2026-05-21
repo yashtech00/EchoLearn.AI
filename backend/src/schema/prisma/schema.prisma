@@ -147,6 +147,7 @@ model WritingPrompt {
   body        String
   topicTags   String[]
   targetLevel String? // e.g. "C2 Proficiency", "B2 Upper Intermediate"
+  exampleStarters String[] @default([]) // Array of example starter sentences
   writingTips Json?   // Array of writing tips [{title, description}]
   isActive    Boolean         @default(true)
   createdAt   DateTime        @default(now())

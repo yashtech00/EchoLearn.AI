@@ -179,6 +179,7 @@ exports.Prisma.WritingPromptScalarFieldEnum = {
   body: 'body',
   topicTags: 'topicTags',
   targetLevel: 'targetLevel',
+  exampleStarters: 'exampleStarters',
   writingTips: 'writingTips',
   isActive: 'isActive',
   createdAt: 'createdAt'

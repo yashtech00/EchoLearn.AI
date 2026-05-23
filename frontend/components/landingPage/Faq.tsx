@@ -38,8 +38,14 @@ export const FAQSection = () => {
 
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
-  const toggle = (index: number) => {
+  const toggle = (index: number, e: React.MouseEvent) => {
+    e.preventDefault();
+    const scrollPos = window.scrollY;
     setOpenIndex(openIndex === index ? null : index);
+    // Restore scroll position after state update
+    requestAnimationFrame(() => {
+      window.scrollTo(0, scrollPos);
+    });
   };
 
   return (
@@ -69,8 +75,8 @@ export const FAQSection = () => {
               }`}
             >
               <button
-                onClick={() => toggle(index)}
-                className="w-full text-left px-8 py-6 flex justify-between items-center transition-colors"
+                onClick={(e) => toggle(index, e)}
+                className="w-full text-left px-8 py-6 flex justify-between items-center transition-colors focus:outline-none"
               >
                 <span className="text-lg font-serif font-bold text-foreground">{faq.question}</span>
                 <span className="text-primary transition-transform duration-300">

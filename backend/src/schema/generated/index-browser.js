@@ -128,6 +128,7 @@ exports.Prisma.UserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   displayName: 'displayName',
   image: 'image',
+  role: 'role',
   isNewUser: 'isNewUser',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -216,6 +217,20 @@ exports.Prisma.AnalysisRunScalarFieldEnum = {
   completedAt: 'completedAt'
 };
 
+exports.Prisma.AuditLogScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  eventType: 'eventType',
+  route: 'route',
+  method: 'method',
+  statusCode: 'statusCode',
+  ip: 'ip',
+  referrer: 'referrer',
+  userAgent: 'userAgent',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.MistakeScalarFieldEnum = {
   id: 'id',
   submissionId: 'submissionId',
@@ -288,6 +303,11 @@ exports.Prisma.JsonNullValueFilter = {
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
 };
+exports.Role = exports.$Enums.Role = {
+  USER: 'USER',
+  ADMIN: 'ADMIN'
+};
+
 exports.PrimaryRole = exports.$Enums.PrimaryRole = {
   STUDENT: 'STUDENT',
   WORKING_PROFESSIONAL: 'WORKING_PROFESSIONAL',
@@ -326,6 +346,11 @@ exports.AnalysisStatus = exports.$Enums.AnalysisStatus = {
   FAILED: 'FAILED'
 };
 
+exports.AuditEventType = exports.$Enums.AuditEventType = {
+  VIEW: 'VIEW',
+  ACTION: 'ACTION'
+};
+
 exports.PillarCode = exports.$Enums.PillarCode = {
   VERB_SYSTEMS: 'VERB_SYSTEMS',
   AGREEMENT_GRAMMAR: 'AGREEMENT_GRAMMAR',
@@ -354,6 +379,7 @@ exports.Prisma.ModelName = {
   WritingPrompt: 'WritingPrompt',
   Submission: 'Submission',
   AnalysisRun: 'AnalysisRun',
+  AuditLog: 'AuditLog',
   Mistake: 'Mistake',
   UserStats: 'UserStats',
   XpEvent: 'XpEvent',

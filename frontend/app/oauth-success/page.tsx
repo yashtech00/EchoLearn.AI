@@ -1,18 +1,22 @@
 "use client";
 
 import { useEffect, Suspense } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function OAuthSuccessContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const handleAuth = async () => {
-      router.replace("/Dashboard");
+      const isNewUser = searchParams.get("isNewUser") === "true";
+      router.replace(
+        isNewUser ? "/Dashboard/WritingCoach/practice" : "/Dashboard"
+      );
     };
 
     handleAuth();
-  }, [router]);
+  }, [router, searchParams]);
 
   return (
     <div className="min-h-screen flex items-center justify-center">

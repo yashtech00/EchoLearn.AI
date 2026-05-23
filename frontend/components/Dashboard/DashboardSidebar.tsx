@@ -154,12 +154,8 @@ const handleLogout = async () => {
 
   return (
     <aside
-      className={`fixed left-0 top-0 h-screen bg-[#faf6f0] border-r border-[#4a7c59]/10 overflow-y-auto z-50 font-sans transition-all duration-300 ease-in-out ${
-        isCollapsed ? "w-16" : "w-64"
-      } ${
-        isOpen
-          ? "translate-x-0"
-          : "-translate-x-full md:translate-x-0"
+      className={`hidden md:fixed md:left-0 md:top-0 md:h-screen bg-[#faf6f0] border-r border-[#4a7c59]/10 overflow-y-auto z-50 font-sans transition-all duration-300 ease-in-out md:block ${
+        isCollapsed ? "md:w-16" : "md:w-64"
       }`}
     >
       {/* LOGO + TOGGLE */}

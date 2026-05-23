@@ -8,6 +8,7 @@ import {
   ChevronRight,
   X,
 } from "lucide-react";
+import { useAuth } from "@/lib/userAuth";
 import {
   createSubmission,
   getCurrentTopic,
@@ -47,6 +48,7 @@ export default function WritingCoachPage() {
   const [currentSubmissionId, setCurrentSubmissionId] = useState<string | null>(null);
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { isNewUser, loading: authLoading } = useAuth();
 
   const { data: profileData, isLoading: isProfileLoading } = useQuery({
     queryKey: ["profile-me"],
@@ -55,14 +57,6 @@ export default function WritingCoachPage() {
   });
 
   const hasProfile = Boolean(profileData?.profile);
-
-  useEffect(() => {
-    if (!isProfileLoading && !hasProfile) {
-      router.replace(
-        `/UserProfile?next=${encodeURIComponent("/Dashboard/WritingCoach/practice")}`,
-      );
-    }
-  }, [hasProfile, isProfileLoading, router]);
 
   const { data: topicData, isLoading: isQueryLoading } = useQuery({
     queryKey: ["writing-topic"],
@@ -198,13 +192,75 @@ export default function WritingCoachPage() {
     }
   };
 
-  if (isProfileLoading || !hasProfile) {
+  if (isProfileLoading || authLoading) {
     return (
       <div className="min-h-[calc(100dvh-7.5rem)] bg-[#faf6f0] rounded-xl sm:rounded-2xl flex items-center justify-center p-6">
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="w-12 h-12 rounded-full border-4 border-[#4a7c59]/20 border-t-[#4a7c59] animate-spin" />
           <p className="text-sm font-medium text-[#2e3230]/70">
             Preparing your writing practice...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasProfile) {
+    return (
+      <div className="min-h-[calc(100dvh-7.5rem)] bg-[#faf6f0] flex items-center justify-center p-6">
+        <div className="relative max-w-3xl w-full rounded-[32px] border border-slate-200 bg-white p-8 shadow-[0_30px_80px_rgba(15,23,42,0.12)]">
+          <div className="absolute inset-0 rounded-[32px] bg-gradient-to-br from-primary/10 to-emerald-100 opacity-80" />
+          <div className="relative space-y-6">
+            <div className="flex items-center gap-3">
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Sparkles className="h-6 w-6" />
+              </span>
+              <div>
+                <h1 className="text-3xl font-semibold text-foreground">
+                  {isNewUser ? "Welcome! Complete your profile" : "Complete your profile"}
+                </h1>
+                <p className="mt-1 text-sm text-muted-foreground max-w-xl">
+                  It hardly takes 2 minutes. Complete your profile now to unlock faster, more personalized writing practice.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4 text-center">
+              <p className="text-sm text-foreground/80 leading-7">
+                Building your profile helps us choose the right topics, feedback style, and learning path. This is the best way to keep your first practice sessions engaging and useful.
+              </p>
+              {/* <button
+                type="button"
+                onClick={() => router.push("/Dashboard")}
+                className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                Maybe later
+              </button> */}
+            </div>
+
+            <div className=" flex justify-center gap-4 text-center">
+              <button
+                type="button"
+                onClick={() => router.push("/UserProfile?next=/Dashboard/WritingCoach/practice")}
+                className="inline-flex items-center justify-center rounded-2xl bg-primary px-6 py-4 text-sm font-semibold text-white shadow-lg shadow-primary/10 hover:bg-primary/90 transition"
+              >
+                Complete profile now
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show loader when topic is being fetched from API
+  if (isQueryLoading && !topicData) {
+    return (
+      <div className="min-h-[calc(100dvh-7.5rem)] bg-[#faf6f0] rounded-xl sm:rounded-2xl flex items-center justify-center p-6">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <div className="w-12 h-12 rounded-full border-4 border-[#4a7c59]/20 border-t-[#4a7c59] animate-spin" />
+          <p className="text-sm font-medium text-[#2e3230]/70">
+            Loading your writing topic...
           </p>
         </div>
       </div>
@@ -340,9 +396,9 @@ export default function WritingCoachPage() {
 
               {/* Overlay Results / Error */}
               {(result || error || analysisStatus === "analyzing") && (
-                <div className="absolute inset-0 bg-[#faf6f0]/95 backdrop-blur-md z-20 flex items-center justify-center p-4 overflow-hidden">
-                  <div className="max-w-full sm:max-w-2xl w-full max-h-[90%] overflow-y-auto bg-white rounded-2xl border border-[#4a7c59]/20 p-6 sm:p-8 relative shadow-2xl">
-                    <button
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-lg z-50 flex items-center justify-center p-4 overflow-hidden pointer-events-none">
+                  <div className="max-w-full sm:max-w-2xl w-full max-h-[90%] overflow-y-auto bg-white rounded-2xl border border-[#4a7c59]/20 p-6 sm:p-8 relative shadow-2xl pointer-events-auto">
+                    {/* <button
                       onClick={() => {
                         setError(null);
                         setResult(null);
@@ -351,7 +407,7 @@ export default function WritingCoachPage() {
                       className="absolute top-4 right-4 p-2 hover:bg-[#4a7c59]/10 rounded-full transition-colors"
                     >
                       <X className="w-5 h-5 text-[#2e3230]/60" />
-                    </button>
+                    </button> */}
 
                     {analysisStatus === "analyzing" ? (
                       <div className="py-8 text-center space-y-4">

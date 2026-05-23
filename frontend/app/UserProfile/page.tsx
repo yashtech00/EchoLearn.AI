@@ -60,10 +60,6 @@ export default function UserProfilePage() {
     setCurrentStep(step);
   };
 
-  const handleSkip = () => {
-    router.push("/Dashboard");
-  };
-
   const handleSubmit = async () => {
     setLoading(true);
     try {
@@ -135,7 +131,7 @@ export default function UserProfilePage() {
         currentStep={currentStep}
         totalSteps={3}
         onStepClick={handleStepClick}
-        onSkip={handleSkip}
+        
       />
       {renderStep()}
       {loading && (

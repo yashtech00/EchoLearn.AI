@@ -42,7 +42,7 @@ export const register = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 12);
 
         const newUser = await prisma.user.create({
-            data: { name, email, passwordHash: hashedPassword },
+            data: { name, email, passwordHash: hashedPassword, role: "USER" },
         });
 
         // tokens
@@ -83,7 +83,13 @@ export const register = async (req, res) => {
         return res.status(201).json({
             message: "User registered successfully",
             accessToken,
-            user: { id: newUser.id, name: newUser.name, email: newUser.email, isNewUser: newUser.isNewUser },
+            user: {
+                id: newUser.id,
+                name: newUser.name,
+                email: newUser.email,
+                isNewUser: newUser.isNewUser,
+                role: newUser.role,
+            },
         });
 
     } catch (error) {
@@ -154,7 +160,13 @@ export const login = async (req, res) => {
 
         return res.status(200).json({
             accessToken,
-            user: { id: user.id, name: user.name, email: user.email, isNewUser: user.isNewUser },
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                isNewUser: user.isNewUser,
+                role: user.role,
+            },
         });
 
     } catch (e) {
@@ -296,6 +308,7 @@ export const getMe = async (req, res) => {
                 id: true,
                 name: true,
                 email: true,
+                role: true,
                 isNewUser: true,
                 createdAt: true,
             }
@@ -326,6 +339,12 @@ export const googleAuth = (req, res) => {
       const state = crypto.randomBytes(32).toString("hex");
   
       req.session.state = state;
+
+      console.log("Google OAuth init", {
+        sessionId: req.sessionID,
+        generatedState: state,
+        sessionBeforeSend: req.session,
+      });
   
       const authUrl = oauth2Client.generateAuthUrl({
         access_type: "offline",
@@ -337,7 +356,7 @@ export const googleAuth = (req, res) => {
   
       return res.json({ url: authUrl });
     } catch (e) {
-      console.error(e);
+      console.error("Google OAuth init error:", e);
       return res.status(500).json({ message: "Internal server error" });
     }
   };
@@ -345,6 +364,14 @@ export const googleAuth = (req, res) => {
   export const googleAuthCallback = async (req, res) => {
     try {
       const { code, state, error } = req.query;
+
+      console.log("Google OAuth callback", {
+        sessionId: req.sessionID,
+        incomingState: state,
+        sessionState: req.session?.state,
+        cookies: req.headers.cookie,
+        query: req.query,
+      });
   
       // 🔴 handle user cancel
       if (error) {
@@ -355,6 +382,12 @@ export const googleAuth = (req, res) => {
   
       // 🔴 state validation
       if (!state || state !== req.session.state) {
+        console.error("Google OAuth state mismatch", {
+          incomingState: state,
+          sessionState: req.session?.state,
+          sessionExists: !!req.session,
+          cookies: req.headers.cookie,
+        });
         return res.status(400).send("Invalid state");
       }
   
@@ -385,6 +418,7 @@ export const googleAuth = (req, res) => {
             email: data.email,
             name: data.name,
             image: data.picture,
+            role: "USER",
           },
         });
       }

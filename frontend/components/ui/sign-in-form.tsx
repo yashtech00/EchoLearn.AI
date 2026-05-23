@@ -48,7 +48,13 @@ export default function SignInForm() {
       }
 
       if (response.user) {
-        router.replace("/Dashboard");
+        if (response.user.role === "ADMIN") {
+          router.replace("/admin");
+        } else if (response.user?.isNewUser) {
+          router.replace("/Dashboard/WritingCoach/practice");
+        } else {
+          router.replace("/Dashboard");
+        }
       } else {
         setError(response.message || (isSignUp ? "Registration failed" : "Invalid credentials"));
       }

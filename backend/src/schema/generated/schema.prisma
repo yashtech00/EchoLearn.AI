@@ -46,6 +46,11 @@ enum SubmissionStatus {
   FAILED
 }
 
+enum AuditEventType {
+  VIEW
+  ACTION
+}
+
 enum MistakeSeverity {
   LOW
   MEDIUM
@@ -67,6 +72,11 @@ enum PillarCode {
   GENRE_PRAGMATICS
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id           String  @id @default(uuid())
   name         String
@@ -74,6 +84,7 @@ model User {
   passwordHash String?
   displayName  String?
   image        String?
+  role         Role
 
   profile        UserProfile?
   submissions    Submission[]
@@ -82,6 +93,7 @@ model User {
   activities     UserActivity[]
   refreshTokens  RefreshToken[]
   writingPrompts WritingPrompt[]
+  AuditLog       AuditLog[]
 
   isNewUser Boolean @default(true)
 
@@ -207,6 +219,26 @@ model AnalysisRun {
   mistakes Mistake[]
 
   @@index([submissionId])
+}
+
+model AuditLog {
+  id     String  @id @default(cuid())
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  eventType  AuditEventType
+  route      String
+  method     String
+  statusCode Int
+  ip         String?
+  referrer   String?
+  userAgent  String?
+  metadata   Json?
+  createdAt  DateTime       @default(now())
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([createdAt])
 }
 
 model Mistake {

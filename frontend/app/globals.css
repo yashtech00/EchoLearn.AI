@@ -127,4 +127,8 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
+  .safe-area-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+  }
 }

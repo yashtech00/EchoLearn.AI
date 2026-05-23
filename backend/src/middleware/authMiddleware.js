@@ -67,3 +67,26 @@ export const Protect = async (req, res, next) => {
         return res.status(500).json({ message: "Internal server error" });
     }
 }
+
+export const authorizeRole = (role) => {
+    return async (req, res, next) => {
+        try {
+            if (!req.user?.userId) {
+                return res.status(401).json({ message: "Unauthorized" });
+            }
+
+            const user = await prisma.user.findUnique({
+                where: { id: req.user.userId },
+            });
+
+            if (!user || user.role !== role) {
+                return res.status(403).json({ message: "Forbidden" });
+            }
+
+            next();
+        } catch (err) {
+            console.error("Authorization error:", err);
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    };
+}

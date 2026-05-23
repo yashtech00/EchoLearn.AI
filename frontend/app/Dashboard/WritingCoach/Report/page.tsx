@@ -304,7 +304,7 @@ function ReportContent() {
           <div className="p-3 sm:p-8 lg:p-10">
             <h2 className="text-base sm:text-2xl font-bold text-[#2e3230] mb-3 sm:mb-6 flex items-center gap-2 sm:gap-3 lg:sticky lg:top-0 lg:bg-[#f4ebd9]/95 lg:backdrop-blur-sm lg:py-2 lg:z-[1]" style={{ fontFamily: "'Literata', serif" }}>
               <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-[#705c30] shrink-0" />
-              Areas for Improvement
+              What You Can Improve
             </h2>
             
             {mistakes && mistakes.length > 0 ? (

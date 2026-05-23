@@ -1,9 +1,10 @@
 "use client";
 
-import { Search, Flame, Menu, X } from "lucide-react";
+import { Search, Flame, Menu, X, LogOut } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getProfileStats } from "@/app/api/user_profile/user_profile";
+import { logout } from "@/app/api/auth/auth_api";
 
 const navbarConfig: Record<string, { label: string; path: string }[]> = {
   dashboard: [{ label: "Overview", path: "/Dashboard" }],
@@ -49,6 +50,8 @@ interface DashboardNavbarProps {
   sidebarCollapsed?: boolean;
   onToggleSidebar?: () => void;
 }
+
+
 
 export default function DashboardNavbar({
   sidebarCollapsed = false,
@@ -126,6 +129,29 @@ export default function DashboardNavbar({
     [router],
   );
 
+  const handleLogout = async () => {
+  try {
+    await logout();
+
+    localStorage.clear();
+    sessionStorage.clear();
+
+    document.cookie.split(";").forEach((cookie) => {
+      const eqPos = cookie.indexOf("=");
+      const name =
+        eqPos > -1
+          ? cookie.substring(0, eqPos).trim()
+          : cookie.trim();
+
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+    });
+
+    router.push("/");
+  } catch (error) {
+    console.error("Logout error:", error);
+  }
+};
+
   const renderSearchDropdown = () =>
     searchQuery.trim() ? (
       <div className="absolute top-full left-0 right-0 mt-1 max-h-64 overflow-y-auto rounded-[12px] border border-[#4a7c59]/15 bg-[#faf6f0] shadow-lg z-50">
@@ -162,7 +188,7 @@ export default function DashboardNavbar({
             <button
               type="button"
               onClick={onToggleSidebar}
-              className="md:hidden p-2 rounded-[12px] hover:bg-[#4a7c59]/10 text-[#2e3230]/70 hover:text-[#4a7c59] transition-all shrink-0"
+              className="hidden p-2 rounded-[12px] hover:bg-[#4a7c59]/10 text-[#2e3230]/70 hover:text-[#4a7c59] transition-all shrink-0"
               aria-label="Open menu"
             >
               <Menu className="w-5 h-5" />
@@ -261,6 +287,15 @@ export default function DashboardNavbar({
               <span className="hidden sm:inline"> day{streak === 1 ? "" : "s"}</span>
             </span>
           </button>
+          {/* Mobile Logout */}
+<button
+  type="button"
+  onClick={handleLogout}
+  className="md:hidden flex items-center justify-center p-2 rounded-[12px] border border-[#8a5a44]/20 bg-[#8a5a44]/10 text-[#8a5a44] hover:bg-[#8a5a44]/15 transition-all"
+  aria-label="Logout"
+>
+  <LogOut className="w-5 h-5" />
+</button>
         </div>
       </div>
     </header>

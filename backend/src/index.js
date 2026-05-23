@@ -22,6 +22,8 @@ import { closeQueue } from "./config/queue.js";
 import auth_router from "./routes/auth_routes.js";
 import user_profile_router from "./routes/user_profile_routes.js";
 import mistake_memory_router from "./routes/mistake_memory_routes.js";
+import admin_router from "./routes/admin_routes.js";
+import { auditLogger } from "./middleware/auditMiddleware.js";
 
 dotenv.config();
 
@@ -81,6 +83,7 @@ app.use(compression());
  * REQUEST LOGGER
  */
 app.use(morgan("combined"));
+app.use(auditLogger);
 
 /**
  * SANITIZE MONGO NOSQL INJECTION
@@ -196,11 +199,12 @@ app.use(
     name: "sid",
     resave: false,
     saveUninitialized: false,
+    proxy: process.env.NODE_ENV === "production",
 
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
       maxAge: 1000 * 60 * 60 * 24,
     },
   })
@@ -245,6 +249,7 @@ app.use((req, res, next) => {
 app.use("/api/v1/auth", auth_router);
 app.use("/api/v1/profile", user_profile_router);
 app.use("/api/v1/writing", mistake_memory_router);
+app.use("/api/v1/admin", admin_router);
 
 /**
  * 404 HANDLER

@@ -60,11 +60,7 @@ axiosInstance.interceptors.request.use(
         const method = (config.method ?? 'get').toLowerCase();
         if (MUTATING_METHODS.has(method)) {
             const token = await ensureCsrfToken();
-            if (config.headers && typeof config.headers.set === 'function') {
-                config.headers.set('X-CSRF-Token', token);
-            } else {
-                config.headers = { ...config.headers, 'X-CSRF-Token': token };
-            }
+            config.headers.set('X-CSRF-Token', token);
         }
 
         return config;

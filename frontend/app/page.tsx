@@ -47,17 +47,16 @@ export default function Home() {
             <div className="max-w-5xl mx-auto text-center relative z-10">
               <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full bg-primary/5 border border-primary/10 text-primary text-xs sm:text-sm font-bold uppercase tracking-widest mb-6 sm:mb-8 animate-in fade-in slide-in-from-top-4 duration-1000">
                 <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-accent" />
-                Elevate Your English
+ELEVATING COMMUNICATION EXCELLENCE
               </div>
               
               <h1 className="text-4xl sm:text-6xl md:text-8xl font-serif font-bold text-foreground leading-[1.1] mb-6 sm:mb-8 tracking-tight">
                 Master English with <br className="hidden sm:inline" />
-                <span className="text-primary italic">Rooted Warmth.</span>
+                <span className="text-primary italic">Strategic Clarity.</span>
               </h1>
               
               <p className="text-base sm:text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-8 sm:mb-12 leading-relaxed">
-                Experience a calm, AI-powered writing coach that grows with you. 
-                Personalized feedback, organic progress, and focused mastery.
+               Leverage AI-driven insights to build stronger writing habits, improve accuracy, and communicate with greater confidence.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center w-full max-w-md sm:max-w-none mx-auto px-4 sm:px-0">
@@ -66,29 +65,29 @@ export default function Home() {
                   onClick={() => router.push("/auth/login")}
                   className="w-full sm:w-auto px-6 sm:px-10 py-5 sm:py-8 bg-primary hover:bg-primary/90 text-white rounded-[16px] text-lg sm:text-xl font-bold shadow-terra transition-all hover:scale-[1.02] flex items-center justify-center gap-3"
                 >
-                  Begin Your Journey
+                  Begin Your Progress
                   <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
                 </Button>
-                <Button 
+                {/* <Button 
                   variant="outline" 
                   size="lg"
                   onClick={() => router.push("/auth/login")}
                   className="w-full sm:w-auto px-6 sm:px-10 py-5 sm:py-8 border-primary/20 text-primary bg-background hover:bg-primary/5 rounded-[16px] text-lg sm:text-xl font-bold transition-all flex items-center justify-center"
                 >
-                  Explore Features
-                </Button>
-              </div>
+                  Explore Platform Features
+                </Button>*/}
+              </div> 
 
               {/* Social Proof / Trust */}
-              <div className="mt-12 sm:mt-20 pt-8 sm:pt-10 border-t border-primary/5 flex flex-wrap justify-center gap-6 sm:gap-12 grayscale opacity-40">
+              <div className="mt-12 sm:mt-2 pt-8 sm:pt-10 border-t border-primary/5 flex flex-wrap justify-center gap-6 sm:gap-12  text-white">
                 <div className="flex items-center gap-1.5 sm:gap-2 text-sm sm:text-xl font-serif font-bold">
-                  <Brain className="w-5 h-5 sm:w-6 sm:h-6" /> Cognitive AI
+                  <Brain className="w-5 h-5 sm:w-6 sm:h-6" /> Personalized AI Feedback
                 </div>
                 <div className="flex items-center gap-1.5 sm:gap-2 text-sm sm:text-xl font-serif font-bold">
-                  <PenTool className="w-5 h-5 sm:w-6 sm:h-6" /> Writing Coach
+                  <PenTool className="w-5 h-5 sm:w-6 sm:h-6" /> Intelligent Writing Analysis
                 </div>
                 <div className="flex items-center gap-1.5 sm:gap-2 text-sm sm:text-xl font-serif font-bold">
-                  <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6" /> Natural Flow
+                  <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6" /> Adaptive Learning Experience
                 </div>
               </div>
             </div>

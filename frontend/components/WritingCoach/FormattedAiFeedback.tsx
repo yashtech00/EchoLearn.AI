@@ -25,7 +25,7 @@ function renderInline(text: string): ReactNode[] {
 }
 
 function parseListItem(text: string): { title: string | null; body: string } {
-  const match = text.match(/^\*\*([^*]+)\*\*:?\s*(.*)$/s);
+  const match = text.match(/^\*\*([^*]+)\*\*:?\s*([\s\S]*)$/);
   if (match) {
     return { title: match[1].trim(), body: match[2].trim() };
   }

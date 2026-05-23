@@ -1,6 +1,9 @@
 import { createClient } from "redis";
 import IORedis from "ioredis";
 
+import dotenv from "dotenv";
+dotenv.config();
+
 /**
  * Redis URL
  */
@@ -12,6 +15,9 @@ const REDIS_URL = process.env.REDIS_URL;
  */
 const redisClient = createClient({
   url: REDIS_URL,
+  socket: {
+    tls: REDIS_URL.startsWith("rediss://") ? {rejectUnauthorized:false} : undefined,
+  },
 });
 
 redisClient.on("error", (err) => {
@@ -27,6 +33,7 @@ redisClient.on("connect", () => {
  */
 const bullMQConnection = new IORedis(REDIS_URL, {
   maxRetriesPerRequest: null,
+  tls: REDIS_URL.startsWith("rediss://") ? {rejectUnauthorized:false} : undefined,
 });
 
 bullMQConnection.on("connect", () => {

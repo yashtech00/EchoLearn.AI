@@ -4,7 +4,7 @@ import { log } from "node:console";
 dotenv.config();
 
 
-const googleRedirectURL = process.env.FRONTEND_URL + process.env.GOOGLE_REDIRECT_URL;
+const googleRedirectURL = process.env.BACKEND_URL + process.env.GOOGLE_REDIRECT_URL;
 
 console.log("Google OAuth2 Client initialized with redirect URL:", googleRedirectURL);
 

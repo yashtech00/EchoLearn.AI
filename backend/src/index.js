@@ -30,12 +30,19 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 8000;
 const isProduction = process.env.NODE_ENV === "production";
-const allowedOrigins = [
+const parseOrigins = (...values) =>
+  values
+    .filter(Boolean)
+    .flatMap((value) => value.split(","))
+    .map((origin) => origin.trim().replace(/\/+$/, ""))
+    .filter(Boolean);
+
+const allowedOrigins = parseOrigins(
   "http://localhost:3000",
+  "https://echolearn.yashgupta.xyz",
   process.env.FRONTEND_URL,
-]
-  .filter(Boolean)
-  .map((origin) => origin.replace(/\/+$/, ""));
+  process.env.CORS_ORIGINS
+);
 
 /**
  * TRUST PROXY
@@ -67,7 +74,9 @@ app.use(
         return callback(null, true);
       }
 
-      return callback(new Error(`CORS blocked origin: ${origin}`));
+      const error = new Error(`CORS blocked origin: ${origin}`);
+      error.status = 403;
+      return callback(error);
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],

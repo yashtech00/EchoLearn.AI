@@ -17,6 +17,14 @@ const getFrontendBaseUrl = () => {
 };
 
 const frontendUrl = (path) => `${getFrontendBaseUrl()}${path}`;
+const isProduction = process.env.NODE_ENV === "production";
+const authCookieOptions = (maxAge) => ({
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    path: "/",
+    maxAge,
+});
 
 /* ================= REGISTER ================= */
 export const register = async (req, res) => {
@@ -64,21 +72,9 @@ export const register = async (req, res) => {
             },
         });
 
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            path: "/",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie("refreshToken", refreshToken, authCookieOptions(7 * 24 * 60 * 60 * 1000));
 
-        res.cookie("accessToken", accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            path: "/",
-            maxAge: 15 * 60 * 1000, // 15 minutes
-        });
+        res.cookie("accessToken", accessToken, authCookieOptions(15 * 60 * 1000));
 
         return res.status(201).json({
             message: "User registered successfully",
@@ -142,21 +138,9 @@ export const login = async (req, res) => {
             },
         });
 
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            path: "/",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie("refreshToken", refreshToken, authCookieOptions(7 * 24 * 60 * 60 * 1000));
 
-        res.cookie("accessToken", accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            path: "/",
-            maxAge: 15 * 60 * 1000, // 15 minutes
-        });
+        res.cookie("accessToken", accessToken, authCookieOptions(15 * 60 * 1000));
 
         return res.status(200).json({
             accessToken,
@@ -222,21 +206,9 @@ export const refresh = async (req, res) => {
 
         const accessToken = generateAccessToken(user);
 
-        res.cookie("refreshToken", newRefreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            path: "/",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+        res.cookie("refreshToken", newRefreshToken, authCookieOptions(7 * 24 * 60 * 60 * 1000));
 
-        res.cookie("accessToken", accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            path: "/",
-            maxAge: 15 * 60 * 1000, // 15 minutes
-        });
+        res.cookie("accessToken", accessToken, authCookieOptions(15 * 60 * 1000));
 
         return res.json({ accessToken });
 
@@ -441,21 +413,9 @@ export const googleAuth = (req, res) => {
       });
   
       // 🔥 cookie
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      });
+      res.cookie("refreshToken", refreshToken, authCookieOptions(7 * 24 * 60 * 60 * 1000));
 
-      res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        path: "/",
-        maxAge: 15 * 60 * 1000, // 15 minutes
-      });
+      res.cookie("accessToken", accessToken, authCookieOptions(15 * 60 * 1000));
 
       // 🔥 redirect
       return res.redirect(

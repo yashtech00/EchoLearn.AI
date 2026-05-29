@@ -238,7 +238,7 @@ app.use(
  * CSRF PROTECTION
  * Only if using cookie/session auth
  */
-app.use(csrf({ cookie: true }));
+app.use(csrf());
 
 /**
  * CSRF TOKEN ROUTE

@@ -194,7 +194,7 @@ const worker = new Worker(
   },
   {
     connection: getRedisConnection(),
-    concurrency: 5, // Process 5 jobs concurrently
+    concurrency: 3, // Process 1 job concurrently (reduced for shared web+worker process)
   }
 );
 
@@ -211,15 +211,11 @@ worker.on('error', (err) => {
   console.error('Worker error:', err);
 });
 
-// Graceful shutdown
-const shutdown = async () => {
+export const closeWorker = async () => {
   console.log('🛑 Shutting down worker...');
   await worker.close();
   console.log('✅ Worker closed');
 };
-
-process.on('SIGTERM', shutdown);
-process.on('SIGINT', shutdown);
 
 console.log('🚀 Writing submission worker started');
 

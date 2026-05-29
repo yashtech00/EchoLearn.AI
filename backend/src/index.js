@@ -324,11 +324,27 @@ process.on("unhandledRejection", (err) => {
  */
 ConnectionDb()
   .then(async () => {
+    let redisReady = false;
+    let closeEmbeddedWorker = null;
+
     try {
       await connectRedis();
+      redisReady = true;
       console.log("✅ Redis connected");
     } catch (error) {
       console.error("❌ Redis connection failed:", error);
+    }
+
+    if (process.env.ENABLE_WORKER === "true") {
+      if (!redisReady) {
+        console.error(
+          "❌ ENABLE_WORKER=true but Redis is unavailable — worker not started"
+        );
+      } else {
+        const workerModule = await import("./worker/submissionWorker.js");
+        closeEmbeddedWorker = workerModule.closeWorker;
+        console.log("✅ Embedded worker started");
+      }
     }
 
     const server = app.listen(PORT, () => {
@@ -343,6 +359,10 @@ ConnectionDb()
 
       server.close(async () => {
         console.log("✅ HTTP server closed");
+
+        if (closeEmbeddedWorker) {
+          await closeEmbeddedWorker();
+        }
 
         await closeQueue();
         await disconnectRedis();

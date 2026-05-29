@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
+    "start:with-worker": "ENABLE_WORKER=true node src/index.js",
     "dev": "nodemon src/index.js",
+    "dev:with-worker": "ENABLE_WORKER=true nodemon src/index.js",
     "worker": "node src/worker/index.js",
     "worker:dev": "nodemon src/worker/index.js",
     "prisma:generate": "prisma generate --config=src/schema/prisma.config.ts --schema=src/schema/prisma/schema.prisma",

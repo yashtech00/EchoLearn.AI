@@ -17,7 +17,6 @@ const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
     adapter,
-    log: ["query"], // optional: remove in production
   });
 
 if (process.env.NODE_ENV !== "production") {

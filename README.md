@@ -79,33 +79,6 @@ englishIQ/
 └── README.md
 ```
 
-## Security Notes
-
-- Auth tokens are stored in HTTP-only cookies.
-- Mutating frontend requests fetch and send a CSRF token automatically.
-- Backend includes Helmet, CORS allow-listing, rate limiting, slow-down protection, request sanitization, and HTTP parameter pollution protection.
-- `SESSION_SECRET` is required in production.
-- `FRONTEND_URL` and `CORS_ORIGINS` should be set to your production frontend domain.
-
-## Deployment Notes
-
-Frontend can be deployed to Vercel or any Next.js-compatible host.
-
-Backend can be deployed to services such as Railway, Render, Fly.io, or a VPS. Make sure the backend has access to:
-
-- PostgreSQL
-- Redis
-- Gemini API key
-- Google OAuth credentials
-- Production `FRONTEND_URL`
-- Secure `ACCESS_TOKEN_SECRET` and `SESSION_SECRET`
-
-For production Google OAuth, configure the callback URL in Google Cloud Console:
-
-```txt
-https://your-backend-domain.com/api/v1/auth/google/callback
-```
-
 ## License
 
 This project is currently licensed as ISC in the backend package metadata. Update this section if you choose a different repository license.

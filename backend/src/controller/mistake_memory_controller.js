@@ -1,19 +1,27 @@
 import prisma from "../lib/prisma.js";
-import { analyzeMistakeMemory, generateTopic } from "../services/mistake_memory_aI.service.js";
+import {
+  analyzeMistakeMemory,
+  generateTopic,
+} from "../services/mistake_memory_aI.service.js";
 
-const profileRequiredResponse = (res) =>
-  res.status(428).json({
-    message: "Create your learning profile before starting writing practice.",
-    requiresProfile: true,
-  });
+import { STATUS } from "../constants/statusCodes.js";
+import { MESSAGES } from "../constants/messages.js";
+import {
+  successResponse,
+  errorResponse,
+} from "../constants/apiResponses.js";
 
 export const createSubmission = async (req, res) => {
   try {
     const { userId } = req.user;
-    const { promptId, title, genre, body, targetWordCount, metadata } = req.body;
+    const { promptId, title, genre, body } = req.body;
 
-    if (!body) {
-      return res.status(400).json({ message: "Body is required" });
+    if (!body?.trim()) {
+      return errorResponse(
+        res,
+        MESSAGES.BODY_REQUIRED,
+        STATUS.BAD_REQUEST
+      );
     }
 
     const user = await prisma.user.findUnique({
@@ -24,25 +32,34 @@ export const createSubmission = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return errorResponse(
+        res,
+        MESSAGES.USER_NOT_FOUND,
+        STATUS.NOT_FOUND
+      );
     }
 
     if (!user.profile) {
-      return profileRequiredResponse(res);
+      return errorResponse(
+        res,
+        MESSAGES.PROFILE_REQUIRED,
+        STATUS.PRECONDITION_REQUIRED,
+        { requiresProfile: true }
+      );
     }
 
-    // Calculate word count
     const wordCount = body.trim().split(/\s+/).length;
 
-    // Create submission with PENDING status
     const submission = await prisma.submission.create({
       data: {
         user: {
-          connect: { id: userId }
+          connect: { id: userId },
         },
-        prompt: promptId ? {
-          connect: { id: promptId }
-        } : undefined,
+        prompt: promptId
+          ? {
+              connect: { id: promptId },
+            }
+          : undefined,
         title: title || null,
         genre,
         body,
@@ -51,8 +68,8 @@ export const createSubmission = async (req, res) => {
       },
     });
 
-    // Add job to BullMQ queue for async processing
     const { addSubmissionJob } = await import("../config/queue.js");
+
     await addSubmissionJob({
       submissionId: submission.id,
       userId,
@@ -61,15 +78,23 @@ export const createSubmission = async (req, res) => {
       userProfile: user.profile,
     });
 
-    // Return immediately with submission ID and status
-    return res.status(201).json({
-      message: "Submission created successfully",
-      submissionId: submission.id,
-      status: "PENDING",
-    });
+    return successResponse(
+      res,
+      {
+        submissionId: submission.id,
+        status: "PENDING",
+      },
+      MESSAGES.SUBMISSION_CREATED,
+      STATUS.CREATED
+    );
   } catch (error) {
     console.error("Error creating submission:", error);
-    return res.status(500).json({ message: "Internal server error" });
+
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -99,25 +124,37 @@ export const getSubmissionStatus = async (req, res) => {
     });
 
     if (!submission) {
-      return res.status(404).json({ message: "Submission not found" });
+      return errorResponse(
+        res,
+        MESSAGES.SUBMISSION_NOT_FOUND,
+        STATUS.NOT_FOUND
+      );
     }
 
-    return res.status(200).json({
-      submissionId: submission.id,
-      status: submission.status,
-      analysis: submission.analysisJson,
-      errorMessage: submission.errorMessage,
-      completedAt: submission.completedAt,
-      createdAt: submission.createdAt,
-      title: submission.title,
-      genre: submission.genre,
-      body: submission.body,
-      wordCount: submission.wordCount,
-      mistakes: submission.mistakes,
-    });
+    return successResponse(
+      res,
+      {
+        submissionId: submission.id,
+        status: submission.status,
+        analysis: submission.analysisJson,
+        errorMessage: submission.errorMessage,
+        completedAt: submission.completedAt,
+        createdAt: submission.createdAt,
+        title: submission.title,
+        genre: submission.genre,
+        body: submission.body,
+        wordCount: submission.wordCount,
+        mistakes: submission.mistakes,
+      }
+    );
   } catch (error) {
     console.error("Error getting submission status:", error);
-    return res.status(500).json({ message: "Internal server error" });
+
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -136,23 +173,33 @@ export const getSubmissions = async (req, res) => {
         title: true,
         genre: true,
         _count: {
-          select: { mistakes: true }
-        }
+          select: {
+            mistakes: true,
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
       },
-      take: parseInt(limit),
-      skip: parseInt(offset),
+      take: Number(limit),
+      skip: Number(offset),
     });
 
-    return res.status(200).json({
-      message: "Submissions fetched successfully",
-      submissions,
-    });
+    return successResponse(
+      res,
+      {
+        submissions,
+      },
+      MESSAGES.SUBMISSIONS_FETCHED
+    );
   } catch (error) {
     console.error("Error fetching submissions:", error);
-    return res.status(500).json({ message: "Internal server error" });
+
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -163,17 +210,23 @@ export const getMistakes = async (req, res) => {
 
     const where = {
       submission: {
-        userId
-      }
+        userId,
+      },
     };
-    
+
     if (pillar) where.pillar = pillar;
     if (subtype) where.subtype = subtype;
-    
+
     if (dateFrom || dateTo) {
       where.createdAt = {};
-      if (dateFrom) where.createdAt.gte = new Date(dateFrom);
-      if (dateTo) where.createdAt.lte = new Date(dateTo);
+
+      if (dateFrom) {
+        where.createdAt.gte = new Date(dateFrom);
+      }
+
+      if (dateTo) {
+        where.createdAt.lte = new Date(dateTo);
+      }
     }
 
     const mistakes = await prisma.mistake.findMany({
@@ -189,16 +242,24 @@ export const getMistakes = async (req, res) => {
       orderBy: {
         createdAt: "desc",
       },
-      take: parseInt(limit),
+      take: Number(limit),
     });
 
-    return res.status(200).json({
-      message: "Mistakes fetched successfully",
-      mistakes,
-    });
+    return successResponse(
+      res,
+      {
+        mistakes,
+      },
+      MESSAGES.MISTAKES_FETCHED
+    );
   } catch (error) {
     console.error("Error fetching mistakes:", error);
-    return res.status(500).json({ message: "Internal server error" });
+
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -285,18 +346,24 @@ export const getAnalyticsSummary = async (req, res) => {
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
 
-    return res.status(200).json({
-      message: "Analytics summary fetched successfully",
-      window,
-      submissionsCount,
-      totalMistakes,
-      avgErrorDensityPer100Words: avgErrorDensity,
-      pillarMix,
-      topSubtypes,
-    });
+      return successResponse(
+        res,
+        {
+          window,
+          submissionsCount,
+          totalMistakes,
+          avgErrorDensityPer100Words: avgErrorDensity,
+          pillarMix,
+          topSubtypes,
+        },
+        MESSAGES.ANALYTICS_SUMMARY_FETCHED
+      );
   } catch (error) {
-    console.error("Error fetching analytics summary:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -330,20 +397,26 @@ export const getUserStats = async (req, res) => {
       take: 10,
     });
 
-    return res.status(200).json({
-      message: "User stats fetched successfully",
-      stats: {
-        totalXp: userStats.totalXp,
-        level: userStats.level,
-        currentStreakDays: userStats.currentStreak,
-        longestStreakDays: userStats.longestStreak,
-        lastActiveDate: userStats.lastActiveDate,
+    return successResponse(
+      res,
+      {
+        stats: {
+          totalXp: userStats.totalXp,
+          level: userStats.level,
+          currentStreakDays: userStats.currentStreak,
+          longestStreakDays: userStats.longestStreak,
+          lastActiveDate: userStats.lastActiveDate,
+        },
+        recentXpEvents,
       },
-      recentXpEvents,
-    });
+      MESSAGES.USER_STATS_FETCHED
+    );
   } catch (error) {
-    console.error("Error fetching user stats:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -352,29 +425,40 @@ export const getWritingPrompts = async (req, res) => {
     const { genre, limit = 10 } = req.query;
 
     const where = { isActive: true };
-    if (genre) where.genre = genre;
+
+    if (genre) {
+      where.genre = genre;
+    }
 
     const prompts = await prisma.writingPrompt.findMany({
       where,
-      take: parseInt(limit),
-      orderBy: { createdAt: "desc" },
+      take: Number(limit),
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
-    return res.status(200).json({
-      message: "Writing prompts fetched successfully",
-      prompts,
-    });
+    return successResponse(
+      res,
+      {
+        prompts,
+      },
+      MESSAGES.WRITING_PROMPTS_FETCHED
+    );
   } catch (error) {
     console.error("Error fetching writing prompts:", error);
-    return res.status(500).json({ message: "Internal server error" });
+
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
-
 export const getTopics = async (req, res) => {
   try {
     const { userId } = req.user;
 
-    // Get user with profile
     const user = await prisma.user.findUnique({
       where: { id: userId },
       include: {
@@ -383,35 +467,58 @@ export const getTopics = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return errorResponse(
+        res,
+        MESSAGES.USER_NOT_FOUND,
+        STATUS.NOT_FOUND
+      );
     }
 
     if (!user.profile) {
-      return profileRequiredResponse(res);
+      return errorResponse(
+        res,
+        MESSAGES.PROFILE_REQUIRED,
+        STATUS.PRECONDITION_REQUIRED,
+        { requiresProfile: true }
+      );
     }
 
-    // Generate topic using AI with user profile context
     const AIResponse = await generateTopic(user.profile);
 
     if (!AIResponse.success) {
-      return res.status(500).json({ message: "Failed to generate topic", error: AIResponse.error });
+      return errorResponse(
+        res,
+        MESSAGES.TOPIC_GENERATION_FAILED,
+        STATUS.INTERNAL_SERVER_ERROR,
+        {
+          aiError: AIResponse.error,
+        }
+      );
     }
 
     const topicData = AIResponse.data;
 
-    return res.status(200).json({
-      message: "Topic generated successfully",
-      topic: topicData.topic,
-      description: topicData.description,
-      genre: topicData.genre,
-      targetLevel: topicData.targetLevel,
-      wordTarget: topicData.wordTarget,
-      exampleStarters: topicData.exampleStarters || [],
-      writingTips: topicData.writingTips,
-    });
+    return successResponse(
+      res,
+      {
+        topic: topicData.topic,
+        description: topicData.description,
+        genre: topicData.genre,
+        targetLevel: topicData.targetLevel,
+        wordTarget: topicData.wordTarget,
+        exampleStarters: topicData.exampleStarters || [],
+        writingTips: topicData.writingTips || [],
+      },
+      MESSAGES.TOPIC_GENERATED_SUCCESSFULLY
+    );
   } catch (error) {
     console.error("Error generating topic:", error);
-    return res.status(500).json({ message: "Internal server error" });
+
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -421,24 +528,34 @@ export const getCurrentTopic = async (req, res) => {
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      include: { profile: true },
+      include: {
+        profile: true,
+      },
     });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return errorResponse(
+        res,
+        MESSAGES.USER_NOT_FOUND,
+        STATUS.NOT_FOUND
+      );
     }
 
     if (!user.profile) {
-      return profileRequiredResponse(res);
+      return errorResponse(
+        res,
+        MESSAGES.PROFILE_REQUIRED,
+        STATUS.PRECONDITION_REQUIRED,
+        { requiresProfile: true }
+      );
     }
 
-    // 1. Check if active, unexpired topic exists
     const activePrompt = await prisma.writingPrompt.findFirst({
       where: {
         userId,
         isActive: true,
         createdAt: {
-          gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // 24-hour expiration
+          gte: new Date(Date.now() - 24 * 60 * 60 * 1000),
         },
       },
       orderBy: {
@@ -447,103 +564,52 @@ export const getCurrentTopic = async (req, res) => {
     });
 
     if (activePrompt) {
-      return res.status(200).json({
-        id: activePrompt.id,
-        topic: activePrompt.title,
-        description: activePrompt.description,
-        genre: activePrompt.genre,
-        targetLevel: activePrompt.targetLevel,
-        wordTarget: activePrompt.wordTarget || 150,
-        exampleStarters: activePrompt.exampleStarters || [],
-        writingTips: activePrompt.writingTips,
-        createdAt: activePrompt.createdAt,
-      });
+      return successResponse(
+        res,
+        {
+          id: activePrompt.id,
+          topic: activePrompt.title,
+          description: activePrompt.description,
+          genre: activePrompt.genre,
+          targetLevel: activePrompt.targetLevel,
+          wordTarget: activePrompt.wordTarget || 150,
+          exampleStarters: activePrompt.exampleStarters || [],
+          writingTips: activePrompt.writingTips || [],
+          createdAt: activePrompt.createdAt,
+        },
+        MESSAGES.TOPIC_GENERATED_SUCCESSFULLY
+      );
     }
 
-    // Generate topic via AI
     const AIResponse = await generateTopic(user.profile);
+
     if (!AIResponse.success) {
-      return res.status(500).json({ message: "Failed to generate topic", error: AIResponse.error });
+      return errorResponse(
+        res,
+        MESSAGES.TOPIC_GENERATION_FAILED,
+        STATUS.INTERNAL_SERVER_ERROR,
+        {
+          aiError: AIResponse.error,
+        }
+      );
     }
 
     const topicData = AIResponse.data;
 
-    // Deactivate previous prompts first to ensure strictly one active prompt at a time
     await prisma.writingPrompt.updateMany({
-      where: { userId, isActive: true },
-      data: { isActive: false },
-    });
-
-    // Create in DB
-    const newPrompt = await prisma.writingPrompt.create({
-      data: {
-        user: {
-          connect: { id: userId }
-        },
-        title: topicData.topic,
-        genre: topicData.genre || "GENERAL",
-        description: topicData.description,
-        body: topicData.topic, // fallback
-        targetLevel: topicData.targetLevel,
-        exampleStarters: topicData.exampleStarters || [],
-        writingTips: topicData.writingTips || [],
+      where: {
+        userId,
         isActive: true,
+      },
+      data: {
+        isActive: false,
       },
     });
 
-    return res.status(200).json({
-      id: newPrompt.id,
-      topic: newPrompt.title,
-      description: newPrompt.description,
-      genre: newPrompt.genre,
-      targetLevel: newPrompt.targetLevel,
-      wordTarget: newPrompt.wordTarget || 150,
-      exampleStarters: newPrompt.exampleStarters || [],
-      writingTips: newPrompt.writingTips,
-      createdAt: newPrompt.createdAt,
-    });
-  } catch (error) {
-    console.error("Error in getCurrentTopic:", error);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-};
-
-export const createNewTopic = async (req, res) => {
-  try {
-    const { userId } = req.user;
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: { profile: true },
-    });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    if (!user.profile) {
-      return profileRequiredResponse(res);
-    }
-
-    // Deactivate previous prompts
-    await prisma.writingPrompt.updateMany({
-      where: { userId, isActive: true },
-      data: { isActive: false },
-    });
-
-    // Generate new AI topic
-    const AIResponse = await generateTopic(user.profile);
-    if (!AIResponse.success) {
-      return res.status(500).json({ message: "Failed to generate topic", error: AIResponse.error });
-    }
-
-    const topicData = AIResponse.data;
-
-    // Create in DB
     const newPrompt = await prisma.writingPrompt.create({
       data: {
         user: {
-          connect: { id: userId }
+          connect: { id: userId },
         },
         title: topicData.topic,
         genre: topicData.genre || "GENERAL",
@@ -556,20 +622,124 @@ export const createNewTopic = async (req, res) => {
       },
     });
 
-    return res.status(200).json({
-      id: newPrompt.id,
-      topic: newPrompt.title,
-      description: newPrompt.description,
-      genre: newPrompt.genre,
-      targetLevel: newPrompt.targetLevel,
-      wordTarget: newPrompt.wordTarget || 150,
-      exampleStarters: newPrompt.exampleStarters || [],
-      writingTips: newPrompt.writingTips,
-      createdAt: newPrompt.createdAt,
+    return successResponse(
+      res,
+      {
+        id: newPrompt.id,
+        topic: newPrompt.title,
+        description: newPrompt.description,
+        genre: newPrompt.genre,
+        targetLevel: newPrompt.targetLevel,
+        wordTarget: newPrompt.wordTarget || 150,
+        exampleStarters: newPrompt.exampleStarters || [],
+        writingTips: newPrompt.writingTips || [],
+        createdAt: newPrompt.createdAt,
+      },
+      MESSAGES.TOPIC_GENERATED_SUCCESSFULLY
+    );
+  } catch (error) {
+    console.error("Error in getCurrentTopic:", error);
+
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
+  }
+};
+
+export const createNewTopic = async (req, res) => {
+  try {
+    const { userId } = req.user;
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        profile: true,
+      },
     });
+
+    if (!user) {
+      return errorResponse(
+        res,
+        MESSAGES.USER_NOT_FOUND,
+        STATUS.NOT_FOUND
+      );
+    }
+
+    if (!user.profile) {
+      return errorResponse(
+        res,
+        MESSAGES.PROFILE_REQUIRED,
+        STATUS.PRECONDITION_REQUIRED,
+        { requiresProfile: true }
+      );
+    }
+
+    await prisma.writingPrompt.updateMany({
+      where: {
+        userId,
+        isActive: true,
+      },
+      data: {
+        isActive: false,
+      },
+    });
+
+    const AIResponse = await generateTopic(user.profile);
+
+    if (!AIResponse.success) {
+      return errorResponse(
+        res,
+        MESSAGES.TOPIC_GENERATION_FAILED,
+        STATUS.INTERNAL_SERVER_ERROR,
+        {
+          aiError: AIResponse.error,
+        }
+      );
+    }
+
+    const topicData = AIResponse.data;
+
+    const newPrompt = await prisma.writingPrompt.create({
+      data: {
+        user: {
+          connect: { id: userId },
+        },
+        title: topicData.topic,
+        genre: topicData.genre || "GENERAL",
+        description: topicData.description,
+        body: topicData.topic,
+        targetLevel: topicData.targetLevel,
+        exampleStarters: topicData.exampleStarters || [],
+        writingTips: topicData.writingTips || [],
+        isActive: true,
+      },
+    });
+
+    return successResponse(
+      res,
+      {
+        id: newPrompt.id,
+        topic: newPrompt.title,
+        description: newPrompt.description,
+        genre: newPrompt.genre,
+        targetLevel: newPrompt.targetLevel,
+        wordTarget: newPrompt.wordTarget || 150,
+        exampleStarters: newPrompt.exampleStarters || [],
+        writingTips: newPrompt.writingTips || [],
+        createdAt: newPrompt.createdAt,
+      },
+      MESSAGES.TOPIC_GENERATED_SUCCESSFULLY
+    );
   } catch (error) {
     console.error("Error in createNewTopic:", error);
-    return res.status(500).json({ message: "Internal server error" });
+
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -580,11 +750,18 @@ export const rewriteSubmission = async (req, res) => {
     const { genre, body } = req.body;
 
     if (!body?.trim()) {
-      return res.status(400).json({ message: "Body is required" });
+      return errorResponse(
+        res,
+        MESSAGES.BODY_REQUIRED,
+        STATUS.BAD_REQUEST
+      );
     }
 
     const existing = await prisma.submission.findFirst({
-      where: { id, userId },
+      where: {
+        id,
+        userId,
+      },
       include: {
         mistakes: {
           select: {
@@ -601,10 +778,15 @@ export const rewriteSubmission = async (req, res) => {
     });
 
     if (!existing) {
-      return res.status(404).json({ message: "Submission not found" });
+      return errorResponse(
+        res,
+        MESSAGES.SUBMISSION_NOT_FOUND,
+        STATUS.NOT_FOUND
+      );
     }
 
     const wordCount = body.trim().split(/\s+/).length;
+
     const previousScore =
       existing.analysisJson &&
       typeof existing.analysisJson === "object" &&
@@ -636,15 +818,24 @@ export const rewriteSubmission = async (req, res) => {
           completedAt: null,
         },
       }),
-      prisma.mistake.deleteMany({ where: { submissionId: id } }),
+      prisma.mistake.deleteMany({
+        where: {
+          submissionId: id,
+        },
+      }),
     ]);
 
     const user = await prisma.user.findUnique({
-      where: { id: userId },
-      include: { profile: true },
+      where: {
+        id: userId,
+      },
+      include: {
+        profile: true,
+      },
     });
 
     const { addSubmissionJob } = await import("../config/queue.js");
+
     await addSubmissionJob(
       {
         submissionId: id,
@@ -656,16 +847,26 @@ export const rewriteSubmission = async (req, res) => {
         previousMistakes,
         previousScore,
       },
-      { jobId: `rewrite-${id}-${Date.now()}` },
+      {
+        jobId: `rewrite-${id}-${Date.now()}`,
+      }
     );
 
-    return res.status(200).json({
-      message: "Rewrite submitted for analysis",
-      submissionId: id,
-      status: "PENDING",
-    });
+    return successResponse(
+      res,
+      {
+        submissionId: id,
+        status: "PENDING",
+      },
+      MESSAGES.REWRITE_SUBMITTED_FOR_ANALYSIS
+    );
   } catch (error) {
     console.error("Error submitting rewrite:", error);
-    return res.status(500).json({ message: "Internal server error" });
+
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };

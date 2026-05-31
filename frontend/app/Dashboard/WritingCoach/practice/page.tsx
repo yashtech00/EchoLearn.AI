@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Sparkles,
   AlertCircle,
   ChevronRight,
-  X,
 } from "lucide-react";
 import { useAuth } from "@/lib/userAuth";
 import {
@@ -15,11 +14,11 @@ import {
   getNewTopic,
   getSubmissionStatus,
 } from "@/app/api/writing/writing_api";
+import { getApiErrorMessage } from "@/app/api/apiResponse";
 import { getProfileMe } from "@/app/api/user_profile/user_profile";
 import { Button } from "@/components/ui/button";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { FormattedAiFeedback } from "@/components/WritingCoach/FormattedAiFeedback";
 import MissionPanel from "@/components/WritingCoach/MissionPanel";
 import ExampleStarter from "@/components/WritingCoach/ExampleStarter";
 import ProgressJourney from "@/components/WritingCoach/ProgressJourney";
@@ -40,12 +39,11 @@ const limitWords = (text: string, maxWords: number) => {
 export default function WritingCoachPage() {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<{ analysis: unknown } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [analysisStatus, setAnalysisStatus] = useState<
     "idle" | "analyzing" | "completed" | "failed" | "timeout"
   >("idle");
-  const [currentSubmissionId, setCurrentSubmissionId] = useState<string | null>(null);
   const router = useRouter();
   const queryClient = useQueryClient();
   const { isNewUser, loading: authLoading } = useAuth();
@@ -150,7 +148,6 @@ export default function WritingCoachPage() {
       });
 
       const submissionId = response.submissionId;
-      setCurrentSubmissionId(submissionId);
 
       const pollInterval = setInterval(async () => {
         try {
@@ -169,7 +166,7 @@ export default function WritingCoachPage() {
             setAnalysisStatus("failed");
             setLoading(false);
           }
-        } catch (pollError) {
+        } catch {
           clearInterval(pollInterval);
           setError("Failed to check analysis status");
           setLoading(false);
@@ -186,7 +183,7 @@ export default function WritingCoachPage() {
         }
       }, 120000);
     } catch (error) {
-      setError("Failed to submit writing. Please try again.");
+      setError(getApiErrorMessage(error, "Failed to submit writing. Please try again."));
       setLoading(false);
       setAnalysisStatus("failed");
     }
@@ -423,7 +420,7 @@ export default function WritingCoachPage() {
                             Deep AI Analysis
                           </h3>
                           <p className="text-[#4a7c59]/80 mt-2 text-sm font-medium italic">
-                            "Perfection is attained not when there is nothing more to add, but when there is nothing left to take away."
+                            &quot;Perfection is attained not when there is nothing more to add, but when there is nothing left to take away.&quot;
                           </p>
                         </div>
                       </div>

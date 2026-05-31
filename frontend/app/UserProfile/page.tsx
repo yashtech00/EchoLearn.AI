@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Brain } from "lucide-react";
+import { AlertCircle, Brain } from "lucide-react";
 import GoalsForm from "../../components/UserProfile/GoalsForm";
 import LevelAssessment from "../../components/UserProfile/LevelAssessment";
 import InterestsForm from "../../components/UserProfile/InterestsForm";
@@ -24,10 +24,11 @@ export default function UserProfilePage() {
   const queryClient = useQueryClient();
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [nextPath] = useState(() => {
-    if (typeof window === "undefined") return "/Dashboard";
+    if (typeof window === "undefined") return "/Dashboard/WritingCoach/practice";
     const next = new URLSearchParams(window.location.search).get("next");
-    return next?.startsWith("/") && !next.startsWith("//") ? next : "/Dashboard";
+    return next?.startsWith("/") && !next.startsWith("//") ? next : "/Dashboard/WritingCoach/practice";
   });
 
   const [formData, setFormData] = useState({
@@ -62,6 +63,7 @@ export default function UserProfilePage() {
 
   const handleSubmit = async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await createUserProfile({
         ...formData,
@@ -83,9 +85,11 @@ export default function UserProfilePage() {
         queryClient.removeQueries({ queryKey: ["writing-topic"] });
         router.push(nextPath);
       } else {
+        setError(response.error);
         console.error("Profile creation failed:", response.error);
       }
     } catch (err) {
+      setError("Profile creation failed. Please try again.");
       console.error("Error creating profile:", err);
     } finally {
       setLoading(false);
@@ -133,6 +137,12 @@ export default function UserProfilePage() {
         onStepClick={handleStepClick}
         
       />
+      {error && (
+        <div className="mx-auto mt-6 flex w-[min(92vw,56rem)] items-start gap-3 rounded-[8px] border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <p>{error}</p>
+        </div>
+      )}
       {renderStep()}
       {loading && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-in fade-in duration-300">

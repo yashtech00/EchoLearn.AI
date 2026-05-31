@@ -4,6 +4,12 @@ import {
   profile_me_update_validator,
 } from "../validator/user_profile_validator.js";
 
+import { STATUS } from "../constants/statusCodes.js";
+import { MESSAGES } from "../constants/messages.js";
+import {
+  successResponse,
+  errorResponse,
+} from "../constants/apiResponses.js";
 const XP_PER_LEVEL = 50;
 
 const buildLevelProgress = (totalXp = 0, level = 1) => {
@@ -54,7 +60,11 @@ export const createUserProfile = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return errorResponse(
+        res,
+        MESSAGES.USER_NOT_FOUND,
+        STATUS.NOT_FOUND
+      );
     }
 
     const existingProfile = await prisma.userProfile.findUnique({
@@ -62,14 +72,22 @@ export const createUserProfile = async (req, res) => {
     });
 
     if (existingProfile) {
-      return res.status(400).json({ message: "Profile already exists" });
+      return errorResponse(
+        res,
+        MESSAGES.PROFILE_ALREADY_EXISTS,
+        STATUS.BAD_REQUEST
+      );
     }
 
     const parsed = user_profile_validator.safeParse(req.body);
+
     if (!parsed.success) {
-      return res
-        .status(400)
-        .json({ errors: parsed.error.flatten().fieldErrors });
+      return errorResponse(
+        res,
+        MESSAGES.INVALID_PROFILE_DATA,
+        STATUS.BAD_REQUEST,
+        { errors: parsed.error.flatten().fieldErrors }
+      );
     }
 
     const data = parsed.data;
@@ -89,13 +107,22 @@ export const createUserProfile = async (req, res) => {
       }),
     ]);
 
-    return res.status(201).json({
-      message: "User profile created successfully",
-      userProfile,
-    });
+    return successResponse(
+      res,
+      {
+        userProfile,
+      },
+      MESSAGES.PROFILE_CREATED,
+      STATUS.CREATED
+    );
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error" });
+
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_SERVER_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -108,23 +135,34 @@ export const getUserProfile = async (req, res) => {
     });
 
     if (!userProfile) {
-      return res.status(404).json({
-        message: "User profile not found",
-        isNewUser: true,
-      });
+      return errorResponse(
+        res,
+        MESSAGES.PROFILE_NOT_FOUND,
+        STATUS.NOT_FOUND,
+        {
+          isNewUser: true,
+        }
+      );
     }
 
-    return res.status(200).json({
-      message: "User profile fetched successfully",
-      userProfile,
-      isNewUser: false,
-    });
+    return successResponse(
+      res,
+      {
+        userProfile,
+        isNewUser: false,
+      },
+      MESSAGES.PROFILE_FETCHED
+    );
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: "Internal server error" });
+
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_SERVER_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
-
 export const getProfileMe = async (req, res) => {
   try {
     const { userId } = req.user;
@@ -145,7 +183,11 @@ export const getProfileMe = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return errorResponse(
+        res,
+        MESSAGES.USER_NOT_FOUND,
+        STATUS.NOT_FOUND
+      );
     }
 
     let stats = user.stats;
@@ -188,40 +230,47 @@ export const getProfileMe = async (req, res) => {
 
     const levelProgress = buildLevelProgress(stats.totalXp, stats.level);
 
-    return res.status(200).json({
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        displayName: user.displayName,
-        image: user.image,
-        isNewUser: user.isNewUser,
-        createdAt: user.createdAt,
+    return successResponse(
+      res,
+      {
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          displayName: user.displayName,
+          image: user.image,
+          isNewUser: user.isNewUser,
+          createdAt: user.createdAt,
+        },
+        profile: user.profile,
+        stats: {
+          totalXp: stats.totalXp,
+          level: stats.level,
+          currentStreak: stats.currentStreak,
+          longestStreak: stats.longestStreak,
+          lastActiveDate: stats.lastActiveDate,
+          ...levelProgress,
+        },
+        progress,
+        recentActivities,
+        recentSubmissions: recentSubmissions.map((sub) => ({
+          ...sub,
+          score:
+            sub.analysisJson &&
+            typeof sub.analysisJson === "object" &&
+            "score" in sub.analysisJson
+              ? sub.analysisJson.score
+              : null,
+        })),
       },
-      profile: user.profile,
-      stats: {
-        totalXp: stats.totalXp,
-        level: stats.level,
-        currentStreak: stats.currentStreak,
-        longestStreak: stats.longestStreak,
-        lastActiveDate: stats.lastActiveDate,
-        ...levelProgress,
-      },
-      progress,
-      recentActivities,
-      recentSubmissions: recentSubmissions.map((sub) => ({
-        ...sub,
-        score:
-          sub.analysisJson &&
-          typeof sub.analysisJson === "object" &&
-          "score" in sub.analysisJson
-            ? sub.analysisJson.score
-            : null,
-      })),
-    });
+      MESSAGES.PROFILE_FETCHED
+    );
   } catch (error) {
-    console.error("Error fetching profile me:", error);
-    return res.status(500).json({ message: "Internal server error" });
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
 
@@ -230,10 +279,14 @@ export const updateUserProfile = async (req, res) => {
     const { userId } = req.user;
 
     const parsed = profile_me_update_validator.safeParse(req.body);
+
     if (!parsed.success) {
-      return res
-        .status(400)
-        .json({ errors: parsed.error.flatten().fieldErrors });
+      return errorResponse(
+        res,
+        MESSAGES.INVALID_PROFILE_DATA,
+        STATUS.BAD_REQUEST,
+        { errors: parsed.error.flatten().fieldErrors }
+      );
     }
 
     const { name, displayName, ...profileFields } = parsed.data;
@@ -243,14 +296,25 @@ export const updateUserProfile = async (req, res) => {
     });
 
     if (!existingProfile) {
-      return res.status(404).json({ message: "Profile not found" });
+      return errorResponse(
+        res,
+        MESSAGES.PROFILE_NOT_FOUND,
+        STATUS.NOT_FOUND
+      );
     }
 
-    const hasUserFields = name !== undefined || displayName !== undefined;
-    const hasProfileFields = Object.keys(profileFields).length > 0;
+    const hasUserFields =
+      name !== undefined || displayName !== undefined;
+
+    const hasProfileFields =
+      Object.keys(profileFields).length > 0;
 
     if (!hasUserFields && !hasProfileFields) {
-      return res.status(400).json({ message: "No fields to update" });
+      return errorResponse(
+        res,
+        MESSAGES.NO_FIELDS_TO_UPDATE,
+        STATUS.BAD_REQUEST
+      );
     }
 
     const operations = [];
@@ -261,9 +325,11 @@ export const updateUserProfile = async (req, res) => {
           where: { id: userId },
           data: {
             ...(name !== undefined ? { name } : {}),
-            ...(displayName !== undefined ? { displayName } : {}),
+            ...(displayName !== undefined
+              ? { displayName }
+              : {}),
           },
-        }),
+        })
       );
     }
 
@@ -275,7 +341,7 @@ export const updateUserProfile = async (req, res) => {
             ...profileFields,
             updatedAt: new Date(),
           },
-        }),
+        })
       );
     }
 
@@ -293,28 +359,38 @@ export const updateUserProfile = async (req, res) => {
       },
     });
 
-    return res.status(200).json({
-      message: "Profile updated successfully",
-      user: {
-        id: updated.id,
-        name: updated.name,
-        email: updated.email,
-        displayName: updated.displayName,
-        image: updated.image,
+    return successResponse(
+      res,
+      {
+        user: {
+          id: updated.id,
+          name: updated.name,
+          email: updated.email,
+          displayName: updated.displayName,
+          image: updated.image,
+        },
+        userProfile: updated.profile,
       },
-      userProfile: updated.profile,
-    });
+      MESSAGES.PROFILE_UPDATED
+    );
   } catch (error) {
     console.error(error);
 
     if (error.code === "P2025") {
-      return res.status(404).json({ message: "Profile not found" });
+      return errorResponse(
+        res,
+        MESSAGES.PROFILE_NOT_FOUND,
+        STATUS.NOT_FOUND
+      );
     }
 
-    return res.status(500).json({ message: "Internal server error" });
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_SERVER_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };
-
 export const getUserStats = async (req, res) => {
   try {
     const { userId } = req.user;
@@ -337,42 +413,51 @@ export const getUserStats = async (req, res) => {
 
     const progress = await getProgressCounts(userId);
 
-    const [recentActivities, recentXpEvents] = await Promise.all([
-      prisma.userActivity.findMany({
-        where: { userId },
-        orderBy: { createdAt: "desc" },
-        take: 8,
-      }),
-      prisma.xpEvent.findMany({
-        where: { userId },
-        orderBy: { createdAt: "desc" },
-        take: 10,
-      }),
-    ]);
+    const [recentActivities, recentXpEvents] =
+      await Promise.all([
+        prisma.userActivity.findMany({
+          where: { userId },
+          orderBy: { createdAt: "desc" },
+          take: 8,
+        }),
+        prisma.xpEvent.findMany({
+          where: { userId },
+          orderBy: { createdAt: "desc" },
+          take: 10,
+        }),
+      ]);
 
     const levelProgress = buildLevelProgress(
       userStats.totalXp,
-      userStats.level,
+      userStats.level
     );
 
-    return res.status(200).json({
-      message: "User stats fetched successfully",
-      stats: {
-        totalXp: userStats.totalXp,
-        level: userStats.level,
-        currentStreak: userStats.currentStreak,
-        longestStreak: userStats.longestStreak,
-        lastActiveDate: userStats.lastActiveDate,
-        currentStreakDays: userStats.currentStreak,
-        longestStreakDays: userStats.longestStreak,
-        ...levelProgress,
+    return successResponse(
+      res,
+      {
+        stats: {
+          totalXp: userStats.totalXp,
+          level: userStats.level,
+          currentStreak: userStats.currentStreak,
+          longestStreak: userStats.longestStreak,
+          lastActiveDate: userStats.lastActiveDate,
+          currentStreakDays: userStats.currentStreak,
+          longestStreakDays: userStats.longestStreak,
+          ...levelProgress,
+        },
+        progress,
+        recentActivities,
+        recentXpEvents,
       },
-      progress,
-      recentActivities,
-      recentXpEvents,
-    });
+      MESSAGES.USER_STATS_FETCHED
+    );
   } catch (error) {
     console.error("Error fetching user stats:", error);
-    return res.status(500).json({ message: "Internal server error" });
+
+    return errorResponse(
+      res,
+      MESSAGES.INTERNAL_SERVER_ERROR,
+      STATUS.INTERNAL_SERVER_ERROR
+    );
   }
 };

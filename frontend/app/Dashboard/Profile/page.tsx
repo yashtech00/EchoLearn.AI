@@ -25,6 +25,7 @@ import {
   updateProfileMe,
   type ProfileMeUpdate,
 } from "@/app/api/user_profile/user_profile";
+import { getApiErrorMessage, getApiMessage } from "@/app/api/apiResponse";
 import type { ProfileMeUser, ProfileStats, ProfileProgress } from "@/types";
 
 const ROLE_OPTIONS = [
@@ -156,32 +157,10 @@ export default function ProfilePage() {
           : prev,
       );
       if (res.userProfile) setProfile(res.userProfile);
-      setSaveMessage("Profile saved successfully.");
+      setSaveMessage(getApiMessage(res, "Profile saved successfully."));
       setEditing(false);
     } catch (e: unknown) {
-      const responseData =
-        typeof e === "object" &&
-        e !== null &&
-        "response" in e &&
-        typeof e.response === "object" &&
-        e.response !== null &&
-        "data" in e.response
-          ? e.response.data
-          : null;
-      const msg =
-        typeof responseData === "object" &&
-        responseData !== null &&
-        "message" in responseData
-          ? responseData.message
-          : typeof responseData === "object" &&
-              responseData !== null &&
-              "errors" in responseData
-            ? responseData.errors
-            : null;
-      const fallback =
-        msg ||
-        "Failed to save profile.";
-      setError(typeof fallback === "string" ? fallback : "Failed to save profile.");
+      setError(getApiErrorMessage(e, "Failed to save profile."));
     } finally {
       setSaving(false);
     }

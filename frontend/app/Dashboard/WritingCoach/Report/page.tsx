@@ -3,17 +3,47 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getSubmissionStatus, getSubmissions } from "@/app/api/writing/writing_api";
+import { getApiErrorMessage } from "@/app/api/apiResponse";
 import { ArrowLeft, Sparkles, AlertCircle, RefreshCw, CheckCircle2, FileText, ChevronRight, BarChart, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FormattedAiFeedback } from "@/components/WritingCoach/FormattedAiFeedback";
+
+type Mistake = {
+  pillar?: string;
+  severity?: string;
+  surfaceText?: string;
+  suggestion?: string;
+  message?: string;
+};
+
+type Analysis = {
+  score?: number;
+  feedback?: string;
+};
+
+type SubmissionSummary = {
+  id: string;
+  title?: string | null;
+  genre?: string | null;
+  wordCount?: number | null;
+  createdAt: string;
+};
+
+type SubmissionDetail = SubmissionSummary & {
+  submissionId?: string;
+  status?: string;
+  analysis?: Analysis | null;
+  body?: string | null;
+  mistakes?: Mistake[];
+};
 
 function ReportContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const submissionId = searchParams.get("submissionId");
 
-  const [submissions, setSubmissions] = useState<any[]>([]);
-  const [submission, setSubmission] = useState<any>(null);
+  const [submissions, setSubmissions] = useState<SubmissionSummary[]>([]);
+  const [submission, setSubmission] = useState<SubmissionDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -65,7 +95,7 @@ function ReportContent() {
                 setError("Analysis failed. Please try again.");
                 setLoading(false);
               }
-            } catch (pollErr) {
+            } catch {
               clearInterval(pollInterval);
               setError("Failed to check analysis status.");
               setLoading(false);
@@ -93,7 +123,7 @@ function ReportContent() {
       }
     } catch (err) {
       console.error(err);
-      setError("Failed to load report");
+      setError(getApiErrorMessage(err, "Failed to load report"));
       setLoading(false);
     }
   };
@@ -154,9 +184,8 @@ function ReportContent() {
     );
   }
 
-  const { analysis, title, body, wordCount, genre, mistakes } = submission;
+  const { analysis, body, wordCount, mistakes } = submission;
   const score = analysis?.score || 0;
-  const summary = analysis?.summary;
   const feedback = analysis?.feedback;
 
   return (
@@ -260,7 +289,7 @@ function ReportContent() {
               </h3>
               {submissions.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                  {submissions.map((sub: any) => {
+                  {submissions.map((sub) => {
                     const isActive = sub.id === submission?.id;
                     return (
                       <div
@@ -309,7 +338,7 @@ function ReportContent() {
             
             {mistakes && mistakes.length > 0 ? (
               <div className="space-y-4">
-                {mistakes.map((mistake: any, idx: number) => (
+                {mistakes.map((mistake, idx: number) => (
                   <div key={idx} className="bg-[#faf6f0] rounded-[12px] p-4 sm:p-6 border border-[#4a7c59]/10 hover:border-[#4a7c59]/30 transition-all group" style={{ boxShadow: '0 4px 20px rgba(46, 50, 48, 0.06)' }}>
                     <div className="flex flex-wrap items-center gap-2 mb-3 sm:mb-4">
                       <span className="text-[10px] font-black bg-[#4a7c59]/10 text-[#4a7c59] px-2.5 sm:px-3 py-1 rounded-lg uppercase tracking-widest border border-[#4a7c59]/20">
@@ -348,7 +377,7 @@ function ReportContent() {
                   <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10 text-[#4a7c59]" />
                 </div>
                 <h3 className="text-xl sm:text-2xl font-bold text-[#2e3230] mb-2" style={{ fontFamily: "'Literata', serif" }}>Flawless writing!</h3>
-                <p className="text-[#2e3230]/70">We couldn't find any major mistakes in this submission.</p>
+                <p className="text-[#2e3230]/70">We couldn&apos;t find any major mistakes in this submission.</p>
               </div>
             )}
           </div>

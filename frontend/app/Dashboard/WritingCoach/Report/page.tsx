@@ -344,8 +344,8 @@ function ReportContent() {
                       <span className="text-[10px] font-black bg-[#4a7c59]/10 text-[#4a7c59] px-2.5 sm:px-3 py-1 rounded-lg uppercase tracking-widest border border-[#4a7c59]/20">
                         {mistake.pillar?.replace(/_/g, " ")}
                       </span>
-                      <span className={`text-[10px] font-black px-2.5 sm:px-3 py-1 rounded-lg uppercase tracking-widest border ${getSeverityColor(mistake.severity)}`}>
-                        {mistake.severity}
+                      <span className={`text-[10px] font-black px-2.5 sm:px-3 py-1 rounded-lg uppercase tracking-widest border ${getSeverityColor(mistake.severity || "LOW")}`}>
+                        {mistake.severity || "LOW"}
                       </span>
                     </div>
                     
